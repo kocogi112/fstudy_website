@@ -19,10 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['doing_text'])) {
 
 
 
-
-
-
-
 if (is_user_logged_in()) {
     global $wpdb;
 
@@ -39,7 +35,41 @@ if (is_user_logged_in()) {
         $current_username,
         $custom_number
     );
-    $results = $wpdb->get_results($results_query);
+    $results = $wpdb->get_results($results_query); ?>
+     <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    /* Create two equal columns that floats next to each other */
+    .column {
+      float: left;
+      width: 50%;
+      padding: 10px;
+    }
+
+    /* Clear floats after the columns */
+    .row:after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+
+    /* Additional styles */
+    .table {
+      width: 100%;
+      border: 1px solid #ddd;
+      border-collapse: collapse;
+    }
+
+    .table th, .table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+
+    </style>
+
+<?php
     if ( have_posts() ) :
         while ( have_posts() ) : the_post(); ?>
             <h1><?php the_title(); ?></h1>
@@ -47,8 +77,41 @@ if (is_user_logged_in()) {
 
 
 
-            <a href="doing">Start test</a>
+            <div class="row">
+                <div class="column" style="background-color:#aaa;">
+                    <h2>Do Real Test</h2>
+                    <a href="doing">Start test</a>
+                    <p>* By choosing this kind, you can test yourself with real accomodation (With time required)</p>
+                </div>
+                <div class="column" style="background-color:#bbb;">
+                    <h2>Practice this test with suitable accomodation</h2>
+                    <form action="doing" method="get">
+                        <label style="font-size: 18px;"  for="timer"><b> Choose time for test </b></label>
+
+                        <select id="timer" name="option">
+                            <option value="1000000">Unlimited time</option>
+                            <option value="60">1 minutes</option>
+                            <option value="1800">30 minutes</option>
+                            <option value="2700">45 minutes</option>
+                            <option value="3600">60 minutes</option>
+                            <option value="4500">75 minutes</option>
+                            <option value="5400">90 minutes</option>
+                            <option value="6300">105 minutes</option>
+                            <option value="7200">120 minutes</option>
+                            <option value="9000">150 minutes</option>
+                            <option value="10800">180 minutes</option>
+                        </select><br><br>      
+                        <button type="submit" value="Start test">Start test</button>
+                    </form>
+                    <p>*By choosing this kind, you can change time for this test, then you can practice it with suitable level</p>
+                </div>
+            </div>
+
+
+            
             <!--<button type="submit">Submit</button>-->
+
+            
 
 
 
@@ -61,12 +124,11 @@ if (is_user_logged_in()) {
     if ($results) {
                 
         
-
+        echo ' <h4>Your Test History</h4>';
 
         foreach ($results as $result) {
             // Display dateform of the result
             ?>
-            <h4>Test History</h4>
             <div class="test-result">
                 <p style = "font-style:bold" > <?php echo esc_html($result->dateform); ?></p>
                 

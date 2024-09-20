@@ -136,35 +136,7 @@ if (window.MathJax) {
                     <!-- If user want to practice, you can choose this, otherwise  just click button to start test without change time limit-->
 
                     <h2>Bạn có thể luyện tập bằng cách chọn thời gian làm bài. Nếu không chọn thời gian sẽ mặc định  </h2>
-                    <div>
-                        <input type="radio" name="time-limit" id="limit-86400" value="86400" onclick="setTimeLimit(this.value)">
-                        <label for="limit-86400">Không giới hạn</label>
-
-                        <input type="radio" name="time-limit" id="time-100" value="100" onclick="setTimeLimit(this.value)">
-                        <label for="time-100">30 phút</label>
-
-                        <input type="radio" name="time-limit" id="time-500" value="500" onclick="setTimeLimit(this.value)">
-                        <label for="time-500">45 phút</label>
-
-                        <input type="radio" name="time-limit" id="time-1000" value="1000" onclick="setTimeLimit(this.value)">
-                        <label for="time-1000">60 phút</label>
-
-                        <input type="radio" name="time-limit" id="time-1000" value="1000" onclick="setTimeLimit(this.value)">
-                        <label for="time-1000">90 phút</label>
-
-                        <input type="radio" name="time-limit" id="time-1000" value="1000" onclick="setTimeLimit(this.value)">
-                        <label for="time-1000">120 phút</label>
-
-                        <input type="radio" name="time-limit" id="time-1000" value="1000" onclick="setTimeLimit(this.value)">
-                        <label for="time-1000">150 phút</label>
-
-                        <input type="radio" name="time-limit" id="time-1000" value="1000" onclick="setTimeLimit(this.value)">
-                        <label for="time-1000">180 phút</label>
-
-                       
-                       
-
-                </div>
+                   
 
 
                 </div>
@@ -289,9 +261,10 @@ if (window.MathJax) {
          
          
          
-                   <div id="center-block"> 
-                        <h3 id="countdown"></h3>
+                   <div id="center-block" style="display:none"> 
+                        <h3 id="countdowns"style="display:none"></h3>
                     </div>
+
                     <button class="quick-view-checkbox-button" id="checkbox-button">Quick View All Questions</button>
 
                   <div id ="navi-button" style="display: none;">
@@ -706,9 +679,33 @@ dateElement.innerHTML = `${day}/${month}/${year}`;
 
 dateElement2.innerHTML = `${day}/${month}/${year}`;
 
+
+
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    const optionTimeSet = urlParams.get('option');
+    const optionTrackSystem = urlParams.get('optiontrack');
+
+
+    if (optionTimeSet) {
+        setTimeLimit(optionTimeSet);
+        var timeleft = optionTimeSet / 60 + " phút";
+        console.log(`Time left: ${timeleft}`);
+        
+    }
+});
+
+
+
 function setTimeLimit(value) {
     countdownValue = parseInt(value);
-    document.getElementById('countdown').innerHTML = secondsToHMS(countdownValue);
+    document.getElementById('countdowns').innerHTML = secondsToHMS(countdownValue);
 }
 
 let DoingTest = false;
@@ -926,19 +923,18 @@ function startTest() {
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/translate.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/zoom-text.js"></script>
 
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/toggle-time-remaining-container.js"></script>
+<!--<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/toggle-time-remaining-container.js"></script>-->
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/report-error.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/note-sidebar.js"></script>
 
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/main.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/main_2.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/submit-answer-2.js"></script>
 
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/highlight-text-2.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/fullscreen.js"></script>
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/format-time-2.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/format-time.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/draft-popup.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/color-background.js"></script>
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/choose-time.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/checkbox+remember2.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/begining-loading-popup.js"></script>
 <!-- <script type="text/javascript" src="function/quick-view-answer.js"></script> -->

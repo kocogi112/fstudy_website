@@ -87,8 +87,6 @@ function openDraft(index) {
 function main() {
     
     document.getElementById("start-test").style.display  ='block';
-
-
     MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
     if (quizData.logoname == undefined) {
         quizData.logoname = '';
@@ -101,6 +99,10 @@ function main() {
     if (quizData.description != "") {
         document.getElementById("description").innerHTML = quizData.description;
     }
+
+    
+
+
     document.getElementById("id_test").innerHTML = pre_id_test_;
     document.getElementById("id_category").innerHTML = quizData.id_category;
     document.getElementById("test_type").innerHTML = quizData.test_type;
@@ -314,6 +316,13 @@ contentQuestions += '</div><p class="question">'  + question.question +
 
         addEventListenersToInputs();
     });
+
+    
+
+
+
+
+          //showLoadingPopup();
     
 }
 
