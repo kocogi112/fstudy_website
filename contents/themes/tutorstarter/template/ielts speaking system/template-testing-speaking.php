@@ -19,9 +19,60 @@ if (is_user_logged_in()) {
         exit;
     }
 $post_id = get_the_ID();
-
 // Get the custom number field value
 $custom_number = get_post_meta($post_id, '_ieltsspeakingtests_custom_number', true);
+
+// Database credentials (update with your own database details)
+$servername = "localhost";
+$username = "root";
+$password = ""; // No password by default
+$dbname = "wordpress";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Prepare the SQL query to fetch question_content, stt, topic, sample, speaking_part where id_test matches the custom_number
+$sql = "SELECT stt, question_content, topic, sample, speaking_part FROM ielts_speaking_part_1_question WHERE id_test = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $custom_number); // 'i' is used for integer
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Initialize an empty array to store the questions data
+$questions = [];
+$topic = ''; // Variable to store the topic
+
+while ($row = $result->fetch_assoc()) {
+    // Add each row as an associative array to the $questions array
+    $questions[] = [
+        "question" => $row['question_content'],
+        "part" => $row['speaking_part'],
+        "id" => $row['stt'],
+        "sample" => $row['sample']
+    ];
+
+    // Capture the topic (assumes the topic is the same for all rows)
+    if (!$topic) {
+        $topic = $row['topic'];
+    }
+}
+
+// Output the quizData as JavaScript
+echo '<script type="text/javascript">
+const quizData = {
+    "title": "' . htmlspecialchars($topic) . '",
+    "questions": ' . json_encode($questions) . '
+};
+console.log(quizData);
+</script>';
+
+// Close the database connection
+$conn->close();
 
     ?>
     
@@ -464,8 +515,7 @@ document.getElementById("show-list-popup-btn").addEventListener('click', openLis
 
 let pre_id_test_ = `<?php echo esc_html($custom_number);?>`;
         console.log(`${pre_id_test_}`)
-  <?php echo wp_kses_post($additional_info);
- ?>      
+     
  
 
         let part1Count = 0;
