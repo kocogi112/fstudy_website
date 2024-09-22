@@ -51,7 +51,7 @@ if (window.MathJax) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title></title>
-    <link rel="stylesheet" href="/wordpress/contents/themes/tutorstarter/system-test-toolkit/style/style2.css">
+    <link rel="stylesheet" href="/wordpress/contents/themes/tutorstarter/system-test-toolkit/style/style_2.css">
     <style type="text/css">
         .quiz-section {
                display: flex;
@@ -82,12 +82,16 @@ if (window.MathJax) {
 </div>
 
         <div  class="container">
+        
 
 
             <div class="blank-block"></div>
-            <div class="main-block">
-                <h1 style="text-align: center;" id="title"></h1>
-                <div id="basic-info">
+            <div class="loader" id="loadingSpinner"></div>
+
+            <div class="main-block" >
+            
+                <h1 style="text-align: center;" id="title" style="display:none"></h1>
+                <div id="basic-info" style="display:none">
                     <div id="description"></div>
                     <div style="display: flex;">
                         <b style="margin-right: 5px;">Thời gian làm bài: </b>
@@ -176,7 +180,7 @@ if (window.MathJax) {
 
 <!-- end Hiện xem nhanh đáp án -->
 
-                <button id="start-test" onclick="showLoadingPopup()">Bắt đầu làm bài</button>
+                <button id="start-test"  style="display:none" onclick="showLoadingPopup()">Bắt đầu làm bài</button>
                 <h1 style="display: none;" id="final-result"></h1>
                 <h5 style="display: none;" id="time-result"></h5>
                 <h5  style="display: none;" id ="useranswerdiv"></h5>
@@ -927,7 +931,7 @@ function startTest() {
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/report-error.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/note-sidebar.js"></script>
 
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/main_2.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/main_3.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/submit-answer-2.js"></script>
 
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/highlight-text-2.js"></script>
@@ -936,7 +940,7 @@ function startTest() {
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/draft-popup.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/color-background.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/checkbox+remember2.js"></script>
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/begining-loading-popup.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/begining-loading-popup_2.js"></script>
 <!-- <script type="text/javascript" src="function/quick-view-answer.js"></script> -->
 
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/reload-test.js"></script>
@@ -954,9 +958,9 @@ function startTest() {
 </html>
 
 <?php
-    get_footer();
+    //get_footer();
 } else {
     get_header();
     echo '<p>Please log in to submit your answer.</p>';
-    get_footer();
+    //get_footer();
 }

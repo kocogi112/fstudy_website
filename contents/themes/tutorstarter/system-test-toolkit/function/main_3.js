@@ -86,7 +86,7 @@ function openDraft(index) {
   }
 function main() {
     
-    document.getElementById("start-test").style.display  ='block';
+   // document.getElementById("start-test").style.display  ='block';
     MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
     if (quizData.logoname == undefined) {
         quizData.logoname = '';
@@ -310,6 +310,7 @@ contentQuestions += '</div><p class="question">'  + question.question +
         document.getElementById("quiz-container").style.display = 'none';
         document.getElementById("submit-button").style.display = 'none';
         document.getElementById("center-block").style.display = 'none';
+        document.getElementById("title").style.display = 'none';
         checkboxesContainer.innerHTML = contentCheckboxes;
         
 
@@ -322,7 +323,7 @@ contentQuestions += '</div><p class="question">'  + question.question +
 
 
 
-          //showLoadingPopup();
+          showLoadingPopup();
     
 }
 
