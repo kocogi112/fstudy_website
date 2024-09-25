@@ -24,7 +24,6 @@ $limit = 10; // Number of records per page
 $page = isset($_GET['page']) ? $_GET['page'] : 1; // Current page number
 $offset = ($page - 1) * $limit; // Calculate offset
 
-// Count total number of rows based on the filter
 $total_sql = "SELECT COUNT(*) FROM ielts_speaking_part_1_question";
 if ($id_test_filter) {
     $total_sql .= " WHERE id_test LIKE '%$id_test_filter%'"; // Apply filter to total count
@@ -33,7 +32,6 @@ $total_result = $conn->query($total_sql);
 $total_rows = $total_result->fetch_row()[0];
 $total_pages = ceil($total_rows / $limit); // Calculate total pages
 
-// Fetch data with LIMIT, OFFSET, and filtering by id_test if provided
 $sql = "SELECT * FROM ielts_speaking_part_1_question";
 if ($id_test_filter) {
     $sql .= " WHERE id_test LIKE '%$id_test_filter%'"; // Apply filter to the SQL query

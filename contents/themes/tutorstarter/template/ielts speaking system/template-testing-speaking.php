@@ -38,16 +38,56 @@ if ($conn->connect_error) {
 
 // Prepare the SQL query to fetch question_content, stt, topic, sample, speaking_part where id_test matches the custom_number
 $sql = "SELECT stt, question_content, topic, sample, speaking_part FROM ielts_speaking_part_1_question WHERE id_test = ?";
+$sql2 = "SELECT question_content, topic, sample, speaking_part FROM ielts_speaking_part_2_question WHERE id_test = ?";
+$sql3 = "SELECT stt, question_content, topic, sample, speaking_part FROM ielts_speaking_part_3_question WHERE id_test = ?";
+
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $custom_number); // 'i' is used for integer
 $stmt->execute();
 $result = $stmt->get_result();
+
+$stmt2 = $conn->prepare($sql2);
+$stmt2->bind_param("i", $custom_number); // 'i' is used for integer
+$stmt2->execute();
+$result2 = $stmt2->get_result();
+
+$stmt3 = $conn->prepare($sql3);
+$stmt3->bind_param("i", $custom_number); // 'i' is used for integer
+$stmt3->execute();
+$result3 = $stmt3->get_result();
 
 // Initialize an empty array to store the questions data
 $questions = [];
 $topic = ''; // Variable to store the topic
 
 while ($row = $result->fetch_assoc()) {
+    // Add each row as an associative array to the $questions array
+    $questions[] = [
+        "question" => $row['question_content'],
+        "part" => $row['speaking_part'],
+        "id" => $row['stt'],
+        "sample" => $row['sample']
+    ];
+
+    // Capture the topic (assumes the topic is the same for all rows)
+    if (!$topic) {
+        $topic = $row['topic'];
+    }
+}
+while ($row = $result2->fetch_assoc()) {
+    // Add each row as an associative array to the $questions array
+    $questions[] = [
+        "question" => $row['question_content'],
+        "part" => $row['speaking_part'],
+        "sample" => $row['sample']
+    ];
+
+    // Capture the topic (assumes the topic is the same for all rows)
+    if (!$topic) {
+        $topic = $row['topic'];
+    }
+}
+while ($row = $result3->fetch_assoc()) {
     // Add each row as an associative array to the $questions array
     $questions[] = [
         "question" => $row['question_content'],
