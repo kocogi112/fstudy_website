@@ -5,6 +5,7 @@
  
  */
 
+ get_header(); // Gọi phần đầu trang (header.php)
 
 if (is_user_logged_in()) {
     $post_id = get_the_ID();
@@ -122,16 +123,7 @@ $conn->close();
 <html lang="en" dir="ltr">
 
 <head>
-    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML">
-            if (window.MathJax) {
-                    MathJax.Hub.Config({
-                    tex2jax: {
-                        inlineMath: [["$", "$"], ["\\(", "\\)"]],
-                        processEscapes: true
-                    }
-                });
-            }
-            </script>    
+     
     <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="https://code.responsivevoice.org/responsivevoice.js?key=qt48zGVy"></script>
 
@@ -140,27 +132,40 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <title>Home Page</title>
+    <title>Speaking Ielts Simulation</title>
     <link rel="stylesheet" href="\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\style\style.css">
 
-    <style></style>
+    <style>
+        .parent-container {
+            display: flex; /* Use Flexbox */
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+        }
+        .video-container-2 {
+            border: 1px solid rgb(73, 61, 61);
+
+            border-radius: 10%;
+            width: 40%;   
+            overflow: hidden; /* Ensure video does not overflow container */
+        }
+        .video-container-intro{
+         
+            overflow: hidden; /* Ensure video does not overflow container */
+        }
+        
+
+        .video-container-2 video {
+
+            width: 100%; /* Make the video responsive within its container */
+            height: 100%;
+            display: block;
+        }
+
+    </style>
 </head>
 
 <body>
-    <div class="header">
-        <a class="logo">Onluyen247.net</a>
-        <div class="header-right">
-          <a  href="#home">Home</a>
-          
-        </div>
-
-        <div class="header-center">
-            <h3 id="title"></h3>
-
-        </div>
-
-
-      </div>
+    
 
 
 
@@ -196,6 +201,13 @@ $conn->close();
             <div  class="column0" > 
                 
                 <div id ="intro_test">
+                    <h3 id="title"></h3>
+                    <div id="id_test"></div>
+                    <div id="testtype"></div>
+
+
+
+
                      <h2  style="font: bold;" id ="title"></h2>
                      <h3>Hướng dẫn</h3>
                      <p>     Trước hết, bạn cần cho phép truy cập microphone xuyên suốt quá trình làm bài để không ảnh hưởng đến kết quả</p>
@@ -246,7 +258,7 @@ $conn->close();
                 <h2 id ="speaking-part"></h2>
 
             <div class="parent-container">
-                <div class="video-container">
+                <div class="video-container-2">
                     <video id="examinerVideo" class="video-background" autoplay playsinline style="pointer-events: none;">
                         <source src="\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\examiner.mp4" type="video/mp4">
                         Your browser does not support the video tag.
@@ -318,6 +330,8 @@ $conn->close();
 
         <div id ="result-page-tabs-1" class="tabcontent">
             <h3>Result </h3>
+            <div style="display: none;" id="date" style="visibility:hidden;"></div>
+
             <div id ="final-result"></div>
             <div id ="breakdown"></div>
             <div id ="band-decriptor"></div>
@@ -339,6 +353,82 @@ $conn->close();
         </div>
         <div id ="result-page-tabs-4"class="tabcontent">
                 <h3>This is tab 4 result</h3>
+                <div id="userResult"></div>  
+                <div id="userBandDetail"></div>            
+                <div id="userAnswerAndComment"></div>   
+                
+                    <!-- giấu form send kết quả bài thi -->
+
+
+                    
+                
+                <span id="message"></span>
+                <form id="saveUserResultTest" >
+                        <div class="card">
+                            <div class="card-header">Form lưu kết quả</div>
+                            <div class="card-body" >
+
+                    <div class = "form-group" >
+                        <input   type="text" id="resulttest" name="resulttest" placeholder="Kết quả"  class="form-control form_data" />
+                        <span id="result_error" class="text-danger" ></span>
+
+                    </div>
+
+
+                    <div class = "form-group">
+                        <input type="text" id="dateform" name="dateform" placeholder="Ngày"  class="form-control form_data"  />
+                        <span id="date_error" class="text-danger" ></span>
+                    </div>
+
+                    
+
+                    <div class = "form-group" >
+                        <input type="text" id="idtest" name="idtest" placeholder="Id test"  class="form-control form_data" />
+                        <span id="idtest_error" class="text-danger" ></span>
+                    </div>
+
+                 
+
+                    <div class = "form-group"   >
+                        <input type="text"  id="testname" name="testname" placeholder="Test Name"  class="form-control form_data" />
+                        <span id="testname_error" class="text-danger"></span>
+                    </div>
+
+
+                    <div class = "form-group"   >
+                        <input type="text"  id="band_detail" name="band_detail" placeholder="Band Detail"  class="form-control form_data" />
+                        <span id="correctanswer_error" class="text-danger"></span>  
+                    </div>
+                    
+                    <div class = "form-group"   >
+                        <input type="text"  id="test_type" name="test_type" placeholder="Test Type"  class="form-control form_data" />
+                        <span id="correctanswer_error" class="text-danger"></span>  
+                    </div>
+
+                    <div class = "form-group"   >
+                        <input type="text"  id="user_answer_and_comment" name="user_answer_and_comment" placeholder="User Answer And Comment"  class="form-control form_data" />
+                        <span id="useranswer_error" class="text-danger"></span>
+                </div>
+
+                
+
+
+
+
+                    </div>
+
+                <div class="card-footer">
+                    <!--  <button type="button" name="submit" id="submit" class="btn btn-primary" onclick="save_data(); return false;">Save</button>-->
+                                    <td><input type="submit" id="submit" name="submit"/></td> 
+
+                    </div>
+                        
+                </div>
+                <div id="result_msg" ></div>
+                </form>
+                <!-- kết thúc send form -->	
+         
+
         </div>
         
     </div>
@@ -351,6 +441,20 @@ $conn->close();
 
     <script>
         
+// save date (ngày làm bài cho user)
+const currentDate = new Date();
+
+// Get day, month, and year
+const day = currentDate.getDate();
+const month = currentDate.getMonth() + 1; // Adding 1 because getMonth() returns zero-based month index
+const year = currentDate.getFullYear();
+
+// Display the date
+const dateElement = document.getElementById('date');
+dateElement.innerHTML = `${day}/${month}/${year}`;
+
+
+
     let os = null; 
     
     document.addEventListener('DOMContentLoaded', function () {
@@ -557,6 +661,49 @@ let pre_id_test_ = `<?php echo esc_html($custom_number);?>`;
         console.log(`${pre_id_test_}`)
      
  
+
+
+
+// function save data qua ajax
+
+
+jQuery('#saveUserResultTest').submit(function(event) {
+event.preventDefault(); // Prevent the default form submission
+
+ var link = "<?php echo admin_url('admin-ajax.php'); ?>";
+
+ var form = jQuery('#saveUserResultTest').serialize();
+ var formData = new FormData();
+ formData.append('action', 'save_user_result_ielts_speaking');
+ formData.append('save_user_result_ielts_speaking', form);
+
+ jQuery.ajax({
+     url: link,
+     data: formData,
+     processData: false,
+     contentType: false,
+     type: 'post',
+     success: function(result) {
+         jQuery('#submit').attr('disabled', false);
+         if (result.success == true) {
+             jQuery('#saveUserResultTest')[0].reset();
+         }
+         jQuery('#result_msg').html('<span class="' + result.success + '">' + result.data + '</span>');
+     }
+ });
+});
+
+         //end
+
+         document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("submitForm", function () {
+        setTimeout(function () {
+            let form = document.getElementById("saveUserResultTest");
+            form.submit(); // This should work now that there's no conflict
+        }, 2000); 
+    });
+});
+
 
         let part1Count = 0;
         let part2Count = 0;
@@ -798,6 +945,9 @@ function startRecording1() {
 
 const ret = document.getElementById("timer");
 const startBtn = document.querySelector("#start-timer");
+document.getElementById("id_test").innerHTML = pre_id_test_;
+
+document.getElementById("testtype").innerHTML = 'Practice Test';
 
 let counter = 0;
 let interval;
@@ -1108,7 +1258,7 @@ let pronunciation_all_point_part3 = 0;
 
 async function submitAnswers() {
     //console.log(wordsSpelling);
-    for (let element of document.getElementsByClassName("video-container")) {
+    for (let element of document.getElementsByClassName("video-container-2")) {
         element.style.display = "none";
     }
     document.getElementById("confidence-level").style.display="none";
@@ -1235,8 +1385,40 @@ for (let i = 0; i < quizData.questions.length; i++){
 
     
 
-
+        ResultInput();
     }
+
+
+
+function ResultInput() {
+        // Copy the content to the form fields
+
+    var contentToCopy1 = document.getElementById("userAnswerAndComment").textContent;
+    var contentToCopy2 = document.getElementById("date").textContent;
+    var contentToCopy4 = document.getElementById("title").textContent;
+    var contentToCopy6 = document.getElementById("id_test").textContent;
+    var contentToCopy7 = document.getElementById("userResult").textContent;
+    var contentToCopy8 = document.getElementById("userBandDetail").textContent;
+    var contentToCopy9 = document.getElementById("testtype").textContent;
+
+
+    document.getElementById("user_answer_and_comment").value = contentToCopy1;
+    document.getElementById("dateform").value = contentToCopy2;
+    document.getElementById("testname").value = contentToCopy4;
+    document.getElementById("idtest").value = contentToCopy6;
+    document.getElementById("resulttest").value = contentToCopy7;
+    document.getElementById("band_detail").value = contentToCopy8;
+    document.getElementById("test_type").value = contentToCopy9;
+
+    
+    // Add a delay before submitting the form
+setTimeout(function() {
+// Automatically submit the form
+jQuery('#saveUserResultTest').submit();
+}, 5000); // 5000 milliseconds = 5 seconds
+}
+          
+
 
 function checkForGreatKeyword(answer) {
     if (answer.toLowerCase().includes('great')) {
@@ -1330,8 +1512,8 @@ function recordWord(expectedWord, buttonElement) {
             
 </script>
 
-<script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\summary.js"></script>
-<script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\overall-tab.js"></script>
+<script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\summary2.js"></script>
+<script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\overall-tab1.js"></script>
 <script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\sample-tab.js"></script>
 <script src = "\wordpress\contents\themes\tutorstarter\scan-device\location_and_ip.js"></script>
 <script src = "\wordpress\contents\themes\tutorstarter\scan-device\system_os_2.js"></script>
@@ -1347,7 +1529,6 @@ function recordWord(expectedWord, buttonElement) {
 
 </html>
 <?php
-    get_footer();
 } else {
     get_header();
     echo '<p>Please log in start speaking test.</p>';

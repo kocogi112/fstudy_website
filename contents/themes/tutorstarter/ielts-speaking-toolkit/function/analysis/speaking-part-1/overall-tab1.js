@@ -40,6 +40,15 @@ function getOverallBand() {
         overallPronunciationPoint) /
       4;
   
+
+    let userResult =  document.getElementById('userResult');
+    userResult.innerText = `${overallBandFinal.toFixed(2)}`;
+
+    let userBandDetail = document.getElementById('userBandDetail');
+  
+    userBandDetail.innerHTML = `Lexical Resource: ${overallLexicalResourcePoint}<br> Fluency and Coherence: ${overallFluencyAndCoherencePoint}<br> Grammatical Range and Accuracy: ${overallGrammaticalRangeAndAccuracyPoint}<br> Pronunciation: ${overallPronunciationPoint}`
+
+
     // Calculate percentages for pie charts
     let overallLexicalResourcePointPercentage =
       (overallLexicalResourcePoint / 9) * 100;

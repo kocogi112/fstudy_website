@@ -64,16 +64,19 @@ async function submitTest() {
         currentQuestionIndex = 0;
 
         document.getElementById('submit-button').style.display = 'none';
-        
+
 
         document.getElementById('countdown').style.display = 'none';
         clearInterval(countdownInterval); // Stop the countdown when submitting
 
+        document.getElementById("result-full-page").style.display="block";
 
         document.getElementById('overall_band_test_container').style.display = 'block';
+        document.getElementById("container").style.display = "none"
 
         const questions = document.getElementsByClassName("questions");
 
+        const buttonsContainer = document.getElementById("question-buttons-container"); // To hold the navigation buttons
 
         let overallBandsSummary = ''; // Initialize the summary string
 
@@ -109,12 +112,18 @@ async function submitTest() {
     document.getElementById(`userEssayCheck-${i+1}`).innerHTML = `<p>${userEssayInput}</p>`;
     document.getElementById(`userEssayCheckContainer${i+1}`).style.display='block';
     document.getElementById(`question-${i}-input`).style.display='none';
+
+    let userEssayCheckContainer = document.getElementById(`userEssayCheckContainer${i+1}`).innerHTML;
+    let userMarkEssay = document.getElementById("tab2-user-essay-container").innerHTML;
+    let sampleEssay =  document.getElementById("sample-tab-container").innerHTML;
+    let questionContextArea = document.getElementById(`questionContextArea-${i}`).innerHTML;
+    userEssayTab2 = document.getElementById(`userEssayTab2-${i}`).innerHTML;
+    
+    
     await processEssay(i);
-    console.log("Structure ìnof", structure_info)
 
-
-
-
+   
+    
 
     let textarea = document.getElementById(`question-${i}-input`);
     let explanation = document.getElementById(`explanation-${quizData.questions[i].id}`);
@@ -122,10 +131,28 @@ async function submitTest() {
     let sampleEassayContainer = document.getElementById(`sample-essay-area-${i}`);
     let current_band_detail = document.getElementById(`current_band_detail_div-${quizData.questions[i].id}`);
 
-    let summarizeUserEssay = document.getElementById(`summarize-${quizData.questions[i].id}`);
-    let detailCretariaEssay = document.getElementById(`detail-cretaria-${quizData.questions[i].id}`);
-    let recommendToBoostBand = document.getElementById(`recommendation-${quizData.questions[i].id}`);
+    let summarizeUserEssay = document.getElementById(`summarize-${i}`);
+    let detailCretariaEssay = document.getElementById(`detail-cretaria-${i}`);
+    let recommendToBoostBand = document.getElementById(`recommendation-${i}`);
 
+
+    userMarkEssay += `${questionContextArea}<br> ${userEssayTab2}`;
+    sampleEssay += `${sampleEassayContainer.innerHTML}`;
+
+    
+     // Create a navigation button for each question
+     const button = document.createElement("button");
+     button.innerHTML = `Question ${i + 1}`;
+     button.addEventListener('click', function() {
+         displayQuestion(i); // Function to display respective question
+     });
+     buttonsContainer.appendChild(button);
+
+
+    document.getElementById("tab2-user-essay-container").innerHTML = userMarkEssay;
+    document.getElementById("sample-tab-container").innerHTML = sampleEssay;
+    
+    
 
 
     let part = quizData.questions[i].part;
@@ -209,6 +236,7 @@ async function submitTest() {
     
 
 
+    
 
     
     let task_achievement1_1; //check độ dài user essay - (length_essay) //dạng point
@@ -705,7 +733,6 @@ async function submitTest() {
         // Determine part of the question
         let questionId = quizData.questions[i].id;
 
-        let sampleEssay = quizData.questions[i].sample_essay;
 
         let currentquestion = quizData.questions[i].question;// choose current question
         let lengthBonus = 0;
@@ -756,6 +783,7 @@ async function submitTest() {
 
 
     }
+    displayQuestion(0);
         //let finalOverallScore =     ((totalPart1 / countPart1) + 2 * (totalPart2 / countPart2)) / 3;
         let finalOverallScore =   (totalPart1+totalPart2*2)/(countPart1+countPart2*2);
 
@@ -771,12 +799,30 @@ async function submitTest() {
 
 
 
-draw_full_overall_band(xValues, yValues);
+    draw_full_overall_band(xValues, yValues);
     showQuestion(currentQuestionIndex);
     
 }
 
+function displayQuestion(index) {
+    const questions = document.getElementsByClassName("questions");
+    
+    // Hide all question result containers
+    for (let i = 0; i < questions.length; i++) {
+        document.getElementById(`userEssayCheckContainer${i+1}`).style.display = 'none';
+    }
 
+    // Display the result for the selected question
+    document.getElementById(`userEssayCheckContainer${index+1}`).style.display = 'block';
+
+    // Update the essay content for the selected question
+    let questionContextArea = document.getElementById(`questionContextArea-${index}`).innerHTML;
+    let userEssayTab2 = document.getElementById(`userEssayTab2-${index}`).innerHTML;
+    //let sampleEssayContent = document.getElementById(`sample-essay-area-${index}`).innerHTML;
+
+    document.getElementById("tab2-user-essay-container").innerHTML = `${questionContextArea}<br> ${userEssayTab2}`;
+    //document.getElementById("sample-tab-container").innerHTML = `${sampleEssayContent}`;
+}
 /*
 function ResultInput() {
     // Copy the content to the form fields

@@ -1,7 +1,9 @@
 <?php
 /*
  * Template Name: Content Question DATABASE
+ * Template Post Type: ieltsspeakingtests
  */
+get_header();
 $servername = "localhost";
 $username = "root";
 $password = ""; // No password by default
@@ -250,7 +252,7 @@ table {
         const part3Id = selectedParts[3];
 
         // Construct the URL with the selected IDs using unique parameter names
-        const redirectUrl = `/wordpress/contents/themes/tutorstarter/template/ielts%20speaking%20system/template-full-ielts-speaking-test-custom.php?part1_id=${part1Id}&part2_id=${part2Id}&part3_id=${part3Id}`;
+        const redirectUrl = `/wordpress/ieltsspeakingtests/full-ielts-speaking-test/?part1_id=${part1Id}&part2_id=${part2Id}&part3_id=${part3Id}`;
 
         // Redirect to the constructed URL
         window.location.href = redirectUrl;

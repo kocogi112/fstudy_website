@@ -12,6 +12,7 @@
     remove_filter('the_content', 'wptexturize');
     remove_filter('the_title', 'wptexturize');
     remove_filter('comment_text', 'wptexturize');
+    get_header(); // Gọi phần đầu trang (header.php)
 
 if (is_user_logged_in()) {
     $post_id = get_the_ID();
@@ -69,24 +70,41 @@ if (window.MathJax) {
                    width: 100%;
                }
            }
+           #quiz-container {
+                visibility: visible;
+                position: absolute;
+                left: 0;
+                width: 100%;
+            }
+            #image-test-exam{
+                width: 90px;
+                height: 90px;
+            }
+            .small-button {
+                border: none;
+                padding: 5px 10px;
+                margin-right: 5px;
+                border-radius: 5px;
+                width: 50px;
+                height: 50px;
+            }
+            table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+
    </style>
 </head>
 
     <body onload="main()">
-        <div class="header">
-  <a class="logo" id = 'logo'>Onluyen247.net</a>
-  <div class="header-right">
-    <a  href="#home">Home</a>
     
-  </div>
-</div>
 
         <div  class="container">
         
 
 
             <div class="blank-block"></div>
-            <div class="loader" id="loadingSpinner"></div>
 
             <div class="main-block" >
             
@@ -156,9 +174,9 @@ if (window.MathJax) {
 
       <div class="popup-content">
           <span class="close" onclick="closeChangeDisplayPopup()">&times;</span>
-          <image width ="90px" height ="90px" id = "change_appearane_default" alt="Change to appearance default" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/appearance_image\appearance_default.png"></image>
-          <image width ="90px" height ="90px" id = "change_appearane_1" alt="Change to appearance 1" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/appearance_image\appearance_1.png"></image>
-          <image width ="90px" height ="90px" id = "change_appearane_2" alt="Change to appearance 2" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/appearance_image\appearance_2.png"></image>
+          <image class = "image-test-exam"    id = "change_appearane_default" alt="Change to appearance default" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/appearance_image\appearance_default.png"></image>
+          <image class = "image-test-exam"  id = "change_appearane_1" alt="Change to appearance 1" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/appearance_image\appearance_1.png"></image>
+          <image class = "image-test-exam"   id = "change_appearane_2" alt="Change to appearance 2" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/appearance_image\appearance_2.png"></image>
       </div>
   </div>
 
@@ -569,6 +587,8 @@ if (window.MathJax) {
 let submitTest = false;
 let pre_id_test_ = `<?php echo esc_html($custom_number);?>`;
 console.log(`${pre_id_test_}`)
+
+
 // function save data qua ajax
 jQuery('#frmContactUs').submit(function(event) {
 event.preventDefault(); // Prevent the default form submission
@@ -631,7 +651,7 @@ for (let i = 1; i <= quizData.questions.length; i++)
 console.log("Hiện tại đang có", demsocau, "/",quizData.number_questions,"câu được khởi tạo" );
     
 
-        let logoname = document.getElementsByClassName('logo')[0].innerHTML;
+        let logoname = "";
         console.log("Logo tên:" ,logoname)
 
         
@@ -931,7 +951,7 @@ function startTest() {
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/report-error.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/note-sidebar.js"></script>
 
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/main_3.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/main_1.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/submit-answer-2.js"></script>
 
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/highlight-text-2.js"></script>
@@ -940,7 +960,7 @@ function startTest() {
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/draft-popup.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/color-background.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/checkbox+remember2.js"></script>
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/begining-loading-popup_2.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/begining-loading-popup.js"></script>
 <!-- <script type="text/javascript" src="function/quick-view-answer.js"></script> -->
 
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/reload-test.js"></script>

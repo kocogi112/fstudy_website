@@ -5,6 +5,7 @@
  
  */
 
+ get_header(); // Gọi phần đầu trang (header.php)
 
 if (is_user_logged_in()) {
     $post_id = get_the_ID();
@@ -23,13 +24,88 @@ $post_id = get_the_ID();
 // Get the custom number field value
 $custom_number = get_post_meta($post_id, '_ieltswritingtests_custom_number', true);
 
-   //get_header();
-    ?>
-    <script>
-    // Log the additional info to the console.
-</script>
-        <div><?php the_content(); ?></div>
+// Database credentials (update with your own database details)
+$servername = "localhost";
+$username = "root";
+$password = ""; // No password by default
+$dbname = "wordpress";
 
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+$sql = "SELECT task, time, question_type, question_content, image_link, sample_writing, important_add FROM ielts_writing_task_1_question WHERE id_test = ?";
+$sql2 = "SELECT task, time, topic, question_type, question_content, sample_writing, important_add FROM ielts_writing_task_2_question WHERE id_test = ?";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $custom_number); // 'i' is used for integer
+$stmt->execute();
+$result = $stmt->get_result();
+
+$stmt2 = $conn->prepare($sql2);
+$stmt2->bind_param("i", $custom_number); // 'i' is used for integer
+$stmt2->execute();
+$result2 = $stmt2->get_result();
+
+
+$questions = [];
+$topic = ''; // Variable to store the topic
+$time = '';  // Variable to store the time
+
+while ($row = $result->fetch_assoc()) {
+    // Add each row as an associative array to the $questions array
+    $questions[] = [
+        "question" => $row['question_content'],
+        "part" => $row['task'],
+        "sample_essay" => $row['sample_writing'],
+        "image" => $row['image_link'],
+    ];
+
+    // Capture the time (assuming the same time for all rows)
+    if (!$time) {
+        $time = $row['time'];
+    }
+}
+
+while ($row = $result2->fetch_assoc()) {
+    // Add each row as an associative array to the $questions array
+    $questions[] = [
+        "question" => $row['question_content'],
+        "part" => $row['task'],
+        "sample_essay" => $row['sample_writing'],
+    ];
+
+    // Capture the time if it hasn't been set yet
+    if (!$time) {
+        $time = $row['time'];
+    }
+
+    // Capture the topic (assuming the same topic for all rows)
+    if (!$topic) {
+        $topic = $row['topic'];
+    }
+}
+
+// Output the quizData as JavaScript
+echo '<script type="text/javascript">
+const quizData = {
+    "title": "' . htmlspecialchars($topic) . '",
+    "duration": "' . htmlspecialchars($time) . '",
+    "questions": ' . json_encode($questions) . '
+};
+console.log("Bài thi: ",quizData);
+</script>';
+
+
+// Close the database connection
+$conn->close();
+
+    ?>
+  
 
 
 <html lang="en">
@@ -54,25 +130,94 @@ $custom_number = get_post_meta($post_id, '_ieltswritingtests_custom_number', tru
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Onluyen247</title>
-    <link rel="stylesheet" href="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/style/style.css">
+    <link rel="stylesheet" href="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/style/style_2.css">
     
 </head>
+<style>
+    .container {
+            margin-bottom: 60px; /* Ensure space for the time-remaining-container */
+            display: flex;
+}
 
+
+.buttonsidebar{
+    background-color: transparent;
+              padding: 8px 12px 8px 12px;
+              border: none;
+          color: black;
+              font-family: sf pro text, -apple-system, BlinkMacSystemFont, Roboto,
+                  segoe ui, Helvetica, Arial, sans-serif, apple color emoji,
+                  segoe ui emoji, segoe ui symbol;
+              margin-top: 20px;
+              font-weight: 700;
+              font-size: 20px;
+}
+.buttonsidebar img{
+    width: 22px;
+    height: 22px;
+}
+.h1-text{
+    font-weight:bold;
+    font-size: 25px;
+}
+
+
+.quiz-container {
+    visibility: visible;
+    position: absolute;
+    left: 0;
+    width: 100%;
+  } 
+
+.overall_band_test_container-css{
+    width: 100%;
+}
+
+  #time-remaining-container {
+    width: 100%;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    position: fixed;
+    bottom: 0;
+    background-color: black;
+    color: white;
+    padding: 0px;
+    left: 0;
+}
+
+.question-side-img{
+    width: 85%;
+}
+
+
+.chart_overall_full{
+    display: flex;
+    flex-direction: row;
+}
+
+.left_chart {
+    width: 70%;
+    padding: 10px;
+}
+
+.right_chart {
+    width: 30%;
+    padding: 10px;
+}
+
+
+</style>
 <body onload="main()">
-    <div class="header">
-          <a class="logo">Onluyen247.net</a>
-          <div class="header-right">
-            <a  href="#home">Home</a>
-            
-          </div>
-        </div>
-    <div class="container"  >
+    
+    <div class="container"  id ="container">
         <div class="main-block">
 
          
 
 
-            <h1 style="text-align: center;" id="title"></h1>
+            <p class ="h1-text" style="text-align: center;" id="title"></p>
             <div id="basic-info">
                 <div style="display: flex;">
                     <b style="margin-right: 5px;">Description </b>
@@ -127,7 +272,7 @@ $custom_number = get_post_meta($post_id, '_ieltswritingtests_custom_number', tru
                     <div class="popup-content-1">
                 
                         <span class="close" onclick="closeListQuestion()">&times;</span>
-                         <h2>Danh sách câu hỏi</h2>
+                         <p class ="h1-text" >Danh sách câu hỏi</p>
                          <div id="question-list"></div>
                     </div>
                  </div>
@@ -138,32 +283,10 @@ $custom_number = get_post_meta($post_id, '_ieltswritingtests_custom_number', tru
             <button class="button-3"  id="start-test" onclick="showLoadingPopup()">Bắt đầu làm bài</button>
             
             
-            <div id ="overall_band_test_container" style="display:none">
-
-                <div id ="full_band_chart" class="chart_overall_full">
-                    <div class ="left_chart">
-                        <h3 style="color:red">FULL OVERALL</h3>
-                        <canvas id="barchartfull" style="width:100%;max-width:600px"></canvas>
-                    </div>
-                    <div class ="right_chart">
-                        <div id="detail_score"></div>
-                    </div>
-
-
-                </div>
-                <div id ="area-final">
-                    <button class ="button-3">Rent teacher to mark this essay</button>
-                    <button onclick="window.print();" class ="button-3">Print your essay</button>
-
-                </div>
-                
-
-            
-            </div>
          <!-- New add sửa đổi 3/8/2024-->
 
             <div class = "fixedrightsmallbuttoncontainer">
-                <button  class ="buttonsidebar"  id="report-error"><img width="22px" height="22px" src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/assets/images/report.png" ></button><br>  
+                <button  class ="buttonsidebar"  id="report-error"><img  width="22px" height="22px" src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/assets/images/report.png" ></button><br>  
                    <button class ="buttonsidebar"  id="full-screen-button">⛶</button><br>
                     <button  onclick=" DarkMode()" class ="buttonsidebar"><img width="30px" height="30px" src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/assets/images/dark-mode.png"></img></button><br>
                 </div>
@@ -177,7 +300,7 @@ $custom_number = get_post_meta($post_id, '_ieltswritingtests_custom_number', tru
          
          <span class="close" onclick="closeReportErorPopup()">&times;</span>
                 <section class ="contact">
-                <h2 style="text-align: center;" > Báo lỗi đề thi, đáp án </h2>
+                <p class ="h1-text" style="text-align: center;" > Báo lỗi đề thi, đáp án </p>
          
          
                 <form action="#" reset()>
@@ -233,7 +356,7 @@ $custom_number = get_post_meta($post_id, '_ieltswritingtests_custom_number', tru
          </div>
          <!-- End new add sửa đổi 3/8/2024-->
   
-            <div id="quiz-container"></div>
+            <div id="quiz-container" class ="quiz-container"></div>
             
         </div>
         
@@ -336,11 +459,149 @@ $custom_number = get_post_meta($post_id, '_ieltswritingtests_custom_number', tru
  </form>-->
  <!-- kết thúc send form -->	
 
+</div>
+ <div id ="result-full-page">
+        <div class="tab">
+            <button class="tablinks" onclick="changeTabResult(event, 'result-page-tabs-1')">Overall</button>
+            <button class="tablinks" onclick="changeTabResult(event, 'result-page-tabs-2')">Your test</button>
+            <button class="tablinks" onclick="changeTabResult(event, 'result-page-tabs-3')">Sample</button>
+            <button class="tablinks" onclick="changeTabResult(event, 'result-page-tabs-4')">Practice</button>
+
+
+        </div>
+
+        <div id ="result-page-tabs-1" class="tabcontent">
+            <h3>Result </h3>
+            <div style="display: none;" id="date" style="visibility:hidden;"></div>
+
+            <div id ="overall_band_test_container" class ="overall_band_test_container-css" style="display:none">
+
+                <div id ="full_band_chart" class="chart_overall_full">
+                    <div class ="left_chart">
+                        <h3 style="color:red">FULL OVERALL</h3>
+                        <canvas id="barchartfull" style="width:100%;max-width:600px"></canvas>
+                    </div>
+                    <div class ="right_chart">
+                        <div id="detail_score"></div>
+                    </div>
+
+
+                </div>
+                <div id ="area-final">
+                    <button class ="button-3">Rent teacher to mark this essay</button>
+                    <button onclick="window.print();" class ="button-3">Print your essay</button>
+
+                </div>
+                
+
+            
+            </div>
+            <div id ="final-result"></div>
+            <div id ="breakdown"></div>
+            <div id ="band-decriptor"></div>
+            <h3>General Comment</h3>
+            <div id ="general-comment"></div>
+
+        </div>
+        <div id="result-page-tabs-2" class="tabcontent">
+            <div id="question-buttons-container"></div>
+            <div id="tab2-user-essay-container"></div>
+        </div>
+
+
+
+
+        <div id ="result-page-tabs-3"class="tabcontent">
+            <h3>Sample Answer</h3>
+            <div id = "sample-tab-container"></div>
+
+        </div>
+        <div id ="result-page-tabs-4"class="tabcontent">
+                <h3>This is tab 4 result</h3>
+                <div id="userResult"></div>  
+                <div id="userBandDetail"></div>            
+                <div id="userAnswerAndComment"></div>   
+                
+                    <!-- giấu form send kết quả bài thi -->
+
+
+                    
+                
+                <span id="message"></span>
+                <form id="saveUserResultTest" >
+                        <div class="card">
+                            <div class="card-header">Form lưu kết quả</div>
+                            <div class="card-body" >
+
+                    <div class = "form-group" >
+                        <input   type="text" id="resulttest" name="resulttest" placeholder="Kết quả"  class="form-control form_data" />
+                        <span id="result_error" class="text-danger" ></span>
+
+                    </div>
+
+
+                    <div class = "form-group">
+                        <input type="text" id="dateform" name="dateform" placeholder="Ngày"  class="form-control form_data"  />
+                        <span id="date_error" class="text-danger" ></span>
+                    </div>
+
+                    
+
+                    <div class = "form-group" >
+                        <input type="text" id="idtest" name="idtest" placeholder="Id test"  class="form-control form_data" />
+                        <span id="idtest_error" class="text-danger" ></span>
+                    </div>
+
+                 
+
+                    <div class = "form-group"   >
+                        <input type="text"  id="testname" name="testname" placeholder="Test Name"  class="form-control form_data" />
+                        <span id="testname_error" class="text-danger"></span>
+                    </div>
+
+
+                    <div class = "form-group"   >
+                        <input type="text"  id="band_detail" name="band_detail" placeholder="Band Detail"  class="form-control form_data" />
+                        <span id="correctanswer_error" class="text-danger"></span>  
+                    </div>
+                    
+                    <div class = "form-group"   >
+                        <input type="text"  id="test_type" name="test_type" placeholder="Test Type"  class="form-control form_data" />
+                        <span id="correctanswer_error" class="text-danger"></span>  
+                    </div>
+
+                    <div class = "form-group"   >
+                        <input type="text"  id="user_answer_and_comment" name="user_answer_and_comment" placeholder="User Answer And Comment"  class="form-control form_data" />
+                        <span id="useranswer_error" class="text-danger"></span>
+                </div>
+
+                
+
+
+
+
+                    </div>
+
+                <div class="card-footer">
+                    <!--  <button type="button" name="submit" id="submit" class="btn btn-primary" onclick="save_data(); return false;">Save</button>-->
+                                    <td><input type="submit" id="submit" name="submit"/></td> 
+
+                    </div>
+                        
+                </div>
+                <div id="result_msg" ></div>
+                </form>
+                <!-- kết thúc send form -->	
+         
+
+        </div>
+        
+    </div>
+    
     <script >
     
 
-<?php echo wp_kses_post($additional_info);
- ?>
+
 
         
 
@@ -415,7 +676,28 @@ function openDraft(index) {
   }
 }
 
+
+function changeTabResult(evt, tabResultName) {
+                var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(tabResultName).style.display = "block";
+        evt.currentTarget.className += " active";
+        }
+
+        // Automatically click the first tab when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('.tablinks').click();
+    });
+        
 let currentQuestionIndex = 0;
+let userMarkEssay;
 function main() {
     //MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
     if (quizData.description !== "")
@@ -428,7 +710,7 @@ function main() {
     document.getElementById("id_test_div").innerHTML = quizData.id_test;
 
     let contentQuestions = "";
-
+   
 
  for (let i = 0; i < quizData.questions.length; i++) {
     let questionId = quizData.questions[i].id;
@@ -458,20 +740,20 @@ function main() {
            
         
                 </div>
-
-                <p class="question"><p style="font-style:italic"> Writing task ${part} </p> <b>${questioncontent}</b><img width="85%" src="${quizData.questions[i].image}"></p>
-                
+                <div id = "questionContextArea-${i}" >
+                    <p class="question"  ><p style="font-style:italic"> Writing task ${part} </p> <b>${questioncontent}</b><img class="question-side-img"  src="${quizData.questions[i].image}"></p>
+                </div>
                 <button onclick="openDraft(${i})" class ='open-draft-button'>Open Draft</button>
 
                 <textarea class="draft" id="draft-${i}"></textarea>
 
-                <div id ="sample-essay-area-${i}" style="display:none;"><h2 style='color:red'>Sample Essay:</h2> <br>${sampleEssay} </div> 
+                <div id ="sample-essay-area-${i}" style="display:none;"><p class ="h1-text" style='color:red'>Sample Essay:</p> <br>${sampleEssay} </div> 
 
                 <div id="overall-band-${questionId}" class="overall-band" style="display:none;"></div>
             </div>
 
 
-            <div class="answer-side">
+            <div class="answer-side" id = "userEssayTab2-${i}" >
                 <div class="answer-list">
                     <button id="input_normal" style ="display:none" onclick="toggleInputMode(${i}, 'normal')">Nhập văn bản bình thường</button>
                     <button id="input_handwrite" style ="display:none" onclick="toggleInputMode(${i}, 'handwrite')">Chuyển sang dạng viết (Phù hợp với thí sinh thi paper exam)</button>
@@ -492,17 +774,22 @@ function main() {
                     <p><b>Giải thích: </b>${explanationQuiz}</p>
                 </div>
 
-                <div id="summarize-${questionId}" style="display:none;"> </div>
-                <div id="detail-cretaria-${questionId}" style="display:none;"> </div>
-                <div id="recommendation-${questionId}" style="display:none;"> </div>
+                <div id="summarize-${i}" style="display:none;"> </div>
+                <div id="detail-cretaria-${i}" style="display:none;"> </div>
+                <div id="recommendation-${i}" style="display:none;"> </div>
 
             </div>
         </div>
     </div>`;
+
+   
+    
 }
 
 
+
     document.getElementById("quiz-container").innerHTML = contentQuestions;
+    
     document.getElementById("quiz-container").style.display = 'none';
     document.getElementById("submit-button").style.display = 'none';
     document.getElementById("clock-block").style.display = 'none';
@@ -939,7 +1226,7 @@ The given table compares different means of transportation in terms of the annua
 
 
     <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/full_overall_chart/full_band_chart.js"></script>
-    <script  src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/process.js"></script>
+    <script  src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/process_v2.js"></script>
     
 
 
@@ -949,7 +1236,7 @@ The given table compares different means of transportation in terms of the annua
     <script  src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/right_bar_feature/change-mode.js"></script>
 
 
-  <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/submitTest_2.js"></script>
+  <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/submitTest____8.js"></script>
 
 
 
@@ -959,8 +1246,13 @@ The given table compares different means of transportation in terms of the annua
 
 </body>
 </html>
+
+        
+
+
+
+
 <?php
-    get_footer();
 } else {
     get_header();
     echo '<p>Please log in to submit your answer.</p>';

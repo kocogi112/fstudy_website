@@ -7,6 +7,8 @@ async function GetSummaryPart1(i) {
 
     let resultColumn = document.getElementById('resultColumn');
     
+
+    
     let answer = answers['answer' + (i + 1)] || "";
     let current_question = quizData.questions[i].question;
     let counter = counters['counter' + (i + 1)] || "";
@@ -38,7 +40,8 @@ async function GetSummaryPart1(i) {
     let highlightedAnswer = answer;
 
     try {
-        const response = await fetch('https://fstudy-speaking-ielts-check.onrender.com/check-speaking', {
+       // const response = await fetch('https://fstudy-speaking-ielts-check.onrender.com/check-speaking', {
+        const response = await fetch('http://localhost:3000/check-speaking', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -133,12 +136,12 @@ async function GetSummaryPart1(i) {
     }
 
     
-
-    
-   
-
+    let userAnswerAndComment = document.getElementById('userAnswerAndComment');
+  
 
 
+ 
+       
 
     resultColumn.innerHTML += `<p style = "color:red"><strong>Question ${i + 1}  (Part: ${quizData.questions[i].part}):</strong> ${current_question}</p>`;
     resultColumn.innerHTML += `<p><strong>Your Answer:</strong> ${highlightedAnswer}</p>`;
@@ -164,6 +167,7 @@ async function GetSummaryPart1(i) {
 
     //resultColumn.innerHTML += `<p><strong>Result:</strong> ${result}</p>`;
     resultColumn.innerHTML += `<p><strong>Time used:</strong> ${Timeused} second and <strong>Word Count: </strong>${wordCount}. Average Rate: ${averageSpeakRate} word per second</p>`;
+    userAnswerAndComment.innerHTML = `${resultColumn.innerHTML}`;
 
     console.log("Done Summary - Show Result - DONE ALL");
 }

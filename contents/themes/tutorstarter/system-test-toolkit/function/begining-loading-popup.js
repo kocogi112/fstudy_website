@@ -2,7 +2,6 @@ function showLoadingPopup() {
   let timerInterval;
   
   // Show the loader when the popup opens
-  document.getElementById('loadingSpinner').style.display = 'block';
 
   Swal.fire({
       title: "<p>Bạn sẵn sàng làm bài chưa</p>", 
@@ -25,6 +24,7 @@ function showLoadingPopup() {
               },
               willClose: () => {
                   clearInterval(timerInterval);
+                  
               }
           }).then((result) => {
               if (result.dismiss === Swal.DismissReason.timer) {
@@ -34,12 +34,10 @@ function showLoadingPopup() {
                   MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
 
                   // Hide the loader after loading completes
-                  document.getElementById('loadingSpinner').style.display = 'none';
               }
           });
       } else {
           // Hide the loader if the user cancels the test
-          document.getElementById('loadingSpinner').style.display = 'none';
       }
   });
 }

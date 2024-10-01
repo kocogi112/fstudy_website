@@ -3,6 +3,7 @@
  * Template Name: Explanation Template
  * Template Post Type: testsonlinesystem
  */
+get_header(); // Gọi phần đầu trang (header.php)
 
 
     if (!defined('ABSPATH')) {

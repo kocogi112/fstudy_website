@@ -947,13 +947,7 @@ form button:hover{
     visibility: hidden;
   }
   
-  #quiz-container {
-    visibility: visible;
-    position: absolute;
-    left: 0;
-    width: 100%;
-    top: 0;
-  }
+ 
   .explain-zone{
     visibility: hidden;
  
@@ -1139,11 +1133,7 @@ form button:hover{
     display: inline-block;
     vertical-align: top;
 }
-table {
-    font-family: arial, sans-serif;
-    border-collapse: collapse;
-    width: 100%;
-  }
+
   
   td, th {
     border: 1px solid #dddddd;

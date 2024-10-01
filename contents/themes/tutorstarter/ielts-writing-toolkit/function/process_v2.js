@@ -11,7 +11,7 @@ async function processEssay(i) {
 
     try {
         
-        const response = await fetch('https://fstudy-v2.onrender.com/check-answer', {
+        const response = await fetch('http://localhost:3000/check-answer', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
