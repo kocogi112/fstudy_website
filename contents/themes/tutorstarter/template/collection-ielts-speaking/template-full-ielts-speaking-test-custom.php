@@ -1,7 +1,6 @@
 <?php
 /*
  * Template Name: Full Custom Speaking Test
- * Template Post Type: ieltsspeakingtests
  */
 get_header(); // Gọi phần đầu trang (header.php)
 
@@ -11,13 +10,13 @@ if (is_user_logged_in()) {
     $post_id = get_the_ID();
     $user_id = get_current_user_id();
 
-    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['doing_text'])) {
+    /*if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['doing_text'])) {
         $textarea_content = sanitize_textarea_field($_POST['doing_text']);
         update_user_meta($user_id, "ieltsspeakingtests_{$post_id}_textarea", $textarea_content);
 
         wp_safe_redirect(get_permalink($post_id) . 'get-mark-speaking/');
         exit;
-    }
+    }*/
 $post_id = get_the_ID();
 // Get the custom number field value
 

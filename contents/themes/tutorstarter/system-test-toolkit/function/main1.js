@@ -321,9 +321,12 @@ contentQuestions += '</div><p class="question">'  + question.question +
     
 
 
+    setTimeout(function(){
+        console.log("Show Test V1");
+        startTest();
+    }, 5000);
 
-
-    showLoadingPopup();
+    //showLoadingPopup();
     
 }
 

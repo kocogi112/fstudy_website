@@ -47,6 +47,8 @@ function closePopup() {
 }
 
 function startTest() {
+    document.getElementById("test-prepare").style.display = "none";
+
   document.getElementById("title").style.display = "none";
   document.getElementById("navi-button").style.display = 'block';
   document.getElementById("checkbox-button").style.display = 'block';

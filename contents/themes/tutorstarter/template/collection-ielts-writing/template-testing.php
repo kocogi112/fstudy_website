@@ -206,45 +206,7 @@ $conn->close();
     width: 30%;
     padding: 10px;
 }
-/* HTML: <div class="loader"></div> */
-.loader {
-  width: 70px;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  border: 8px solid #514b82;
-  animation: l20-1 0.8s infinite linear alternate, l20-2 1.6s infinite linear;
-}
 
-#test-prepare {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    position: fixed; /* Giữ loader cố định giữa màn hình */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* Căn giữa theo cả chiều ngang và dọc */
-    height: 200px;
-    z-index: 1001; /* Đảm bảo loader ở trên các phần tử khác */
-}
-
-
-@keyframes l20-1{
-   0%    {clip-path: polygon(50% 50%,0       0,  50%   0%,  50%    0%, 50%    0%, 50%    0%, 50%    0% )}
-   12.5% {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100%   0%, 100%   0%, 100%   0% )}
-   25%   {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100% 100%, 100% 100%, 100% 100% )}
-   50%   {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100% 100%, 50%  100%, 0%   100% )}
-   62.5% {clip-path: polygon(50% 50%,100%    0, 100%   0%,  100%   0%, 100% 100%, 50%  100%, 0%   100% )}
-   75%   {clip-path: polygon(50% 50%,100% 100%, 100% 100%,  100% 100%, 100% 100%, 50%  100%, 0%   100% )}
-   100%  {clip-path: polygon(50% 50%,50%  100%,  50% 100%,   50% 100%,  50% 100%, 50%  100%, 0%   100% )}
-}
-@keyframes l20-2{ 
-  0%    {transform:scaleY(1)  rotate(0deg)}
-  49.99%{transform:scaleY(1)  rotate(135deg)}
-  50%   {transform:scaleY(-1) rotate(0deg)}
-  100%  {transform:scaleY(-1) rotate(-135deg)}
-}
-/* Fixed bottom navigation for questions */
 
 </style>
 <body onload="main()">
@@ -252,20 +214,11 @@ $conn->close();
     <div class="container"  id ="container">
         <div class="main-block">
 
-
-        <div id = "test-prepare">
-            <div class="loader"></div>
-            <h3>Your test will begin shortly</h3>
-            <div style="display: none;" id="date" style="visibility:hidden;"></div>
-            <div style="display: none;" id="title" style="visibility:hidden;"><?php the_title(); ?></div>
-            <div  style="display: none;"  id="id_test"  style="visibility:hidden;"><?php echo esc_html($custom_number);?></div>
-
-        </div>
          
 
 
-            <p class ="h1-text" style="text-align: center;" id="title"  style="display:none"></p>
-            <div id="basic-info"  style="display:none">
+            <p class ="h1-text" style="text-align: center;" id="title"></p>
+            <div id="basic-info">
                 <div style="display: flex;">
                     <b style="margin-right: 5px;">Description </b>
                     <div id="description"></div>
@@ -288,7 +241,7 @@ $conn->close();
 
 
 
-        <div id ="info-div"  style="display:none">
+        <div id ="info-div">
                 <div id="date-div"></div>
                 <div id="number-of-question-div" ></div>
                 <div id="id-category-div"></div>
@@ -327,7 +280,7 @@ $conn->close();
 
                  
             </div>
-            <button class="button-3" style="display:none"  id="start-test" onclick="showLoadingPopup()">Bắt đầu làm bài</button>
+            <button class="button-3"  id="start-test" onclick="showLoadingPopup()">Bắt đầu làm bài</button>
             
             
          <!-- New add sửa đổi 3/8/2024-->
@@ -743,20 +696,9 @@ function changeTabResult(evt, tabResultName) {
         document.querySelector('.tablinks').click();
     });
         
-    
-
-
-
 let currentQuestionIndex = 0;
 let userMarkEssay;
 function main() {
-    
-    setTimeout(function(){
-        console.log("Show Test!");
-        startTest();
-    }, 2000);
-
-
     //MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
     if (quizData.description !== "")
         document.getElementById("description").innerHTML = quizData.description;
@@ -1074,28 +1016,10 @@ function showLoadingPopup() {
 }
 
 
-let duration = quizData.duration * 60;
-document.addEventListener("DOMContentLoaded", function() {
-    const urlParams = new URLSearchParams(window.location.search);
-
-    const optionTimeSet = urlParams.get('option');
-    const optionTrackSystem = urlParams.get('optiontrack');
-
-
-    if (optionTimeSet) {
-        duration = optionTimeSet;
-        //startCountdown(optionTimeSet);
-        var timeleft = optionTimeSet / 60 + " phút";
-        console.log(`Time left: ${timeleft}`);
-        
-    }
-});
 
 function startTest() {
+    
 
-    
-    
-    document.getElementById("test-prepare").style.display = "none";
     document.getElementById("quiz-container").style.display = 'block';
     document.getElementById("start-test").style.display = 'none';
     document.getElementById("clock-block").style.display = 'block';
@@ -1107,7 +1031,7 @@ function startTest() {
     hideBasicInfo();
     showQuestion(currentQuestionIndex);
 
-    
+    const duration = quizData.duration * 60;
     startCountdown(duration);
 }
 function doit(index, event) {

@@ -17,19 +17,10 @@
 if (is_user_logged_in()) {
     $post_id = get_the_ID();
     $user_id = get_current_user_id();
-    $additional_info = get_post_meta($post_id, '_testsonlinesystem_additional_info', true);
-
-    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['doing_text'])) {
-        $textarea_content = sanitize_textarea_field($_POST['doing_text']);
-        update_user_meta($user_id, "testsonlinesystem_{$post_id}_textarea", $textarea_content);
-
-        wp_safe_redirect(get_permalink($post_id) . 'result/');
-        exit;
-    }
-$post_id = get_the_ID();
-
-// Get the custom number field value
-$custom_number = get_post_meta($post_id, '_testsonlinesystem_custom_number', true);
+    $additional_info = get_post_meta($post_id, '_testsonlinesystem_additional_info', true); 
+    $post_id = get_the_ID();
+    // Get the custom number field value
+    $custom_number = get_post_meta($post_id, '_testsonlinesystem_custom_number', true);
 
     ?>
 
@@ -52,7 +43,7 @@ if (window.MathJax) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title></title>
-    <link rel="stylesheet" href="/wordpress/contents/themes/tutorstarter/system-test-toolkit/style/style_2.css">
+    <link rel="stylesheet" href="/wordpress/contents/themes/tutorstarter/system-test-toolkit/style/style.css">
     <style type="text/css">
         .quiz-section {
                display: flex;
@@ -93,11 +84,53 @@ if (window.MathJax) {
     border-collapse: collapse;
     width: 100%;
   }
+  
+/* HTML: <div class="loader"></div> */
+.loader {
+  width: 70px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 8px solid #514b82;
+  animation: l20-1 0.8s infinite linear alternate, l20-2 1.6s infinite linear;
+}
+
+#test-prepare {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: fixed; /* Giữ loader cố định giữa màn hình */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Căn giữa theo cả chiều ngang và dọc */
+    height: 200px;
+    z-index: 1001; /* Đảm bảo loader ở trên các phần tử khác */
+}
+
+
+@keyframes l20-1{
+   0%    {clip-path: polygon(50% 50%,0       0,  50%   0%,  50%    0%, 50%    0%, 50%    0%, 50%    0% )}
+   12.5% {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100%   0%, 100%   0%, 100%   0% )}
+   25%   {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100% 100%, 100% 100%, 100% 100% )}
+   50%   {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100% 100%, 50%  100%, 0%   100% )}
+   62.5% {clip-path: polygon(50% 50%,100%    0, 100%   0%,  100%   0%, 100% 100%, 50%  100%, 0%   100% )}
+   75%   {clip-path: polygon(50% 50%,100% 100%, 100% 100%,  100% 100%, 100% 100%, 50%  100%, 0%   100% )}
+   100%  {clip-path: polygon(50% 50%,50%  100%,  50% 100%,   50% 100%,  50% 100%, 50%  100%, 0%   100% )}
+}
+@keyframes l20-2{ 
+  0%    {transform:scaleY(1)  rotate(0deg)}
+  49.99%{transform:scaleY(1)  rotate(135deg)}
+  50%   {transform:scaleY(-1) rotate(0deg)}
+  100%  {transform:scaleY(-1) rotate(-135deg)}
+}
+/* Fixed bottom navigation for questions */
+
 
    </style>
 </head>
 
     <body onload="main()">
+        
     
 
         <div  class="container">
@@ -107,6 +140,14 @@ if (window.MathJax) {
             <div class="blank-block"></div>
 
             <div class="main-block" >
+                <div id = "test-prepare">
+                    <div class="loader"></div>
+                    <h3>Your test will begin shortly</h3>
+                    <div style="display: none;" id="date" style="visibility:hidden;"></div>
+                    <div style="display: none;" id="title" style="visibility:hidden;"><?php the_title(); ?></div>
+                    <div  style="display: none;"  id="id_test"  style="visibility:hidden;"><?php echo esc_html($custom_number);?></div>
+
+                </div>
             
                 <h1 style="text-align: center;" id="title" style="display:none"></h1>
                 <div id="basic-info" style="display:none">
@@ -917,8 +958,10 @@ function blue_highlight(spanId) {
         function green_highlight(spanId) {
             document.getElementById(spanId).style.backgroundColor = 'green';
         }
-      
+    /*
 function startTest() {
+            document.getElementById("test-prepare").style.display = "none";
+
             document.getElementById("change_appearance").style.display = "block";
             document.getElementById("start-test").style.display = 'none';
             document.getElementById("basic-info").style.display = 'none';
@@ -936,7 +979,7 @@ function startTest() {
 
             showQuestion(currentQuestionIndex);
 
-}
+}*/
 
        
 
@@ -951,7 +994,7 @@ function startTest() {
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/report-error.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/note-sidebar.js"></script>
 
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/main_1.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/main1.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/submit-answer-2.js"></script>
 
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/highlight-text-2.js"></script>
@@ -960,7 +1003,7 @@ function startTest() {
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/draft-popup.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/color-background.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/checkbox+remember2.js"></script>
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/begining-loading-popup.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/start-test.js"></script>
 <!-- <script type="text/javascript" src="function/quick-view-answer.js"></script> -->
 
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/reload-test.js"></script>

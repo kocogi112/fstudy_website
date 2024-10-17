@@ -4,6 +4,10 @@
  * Template Post Type: ieltsspeakingtests
  */
 get_header();
+echo '<h1>Template Loaded: Content Question DATABASE</h1>';
+
+require_once('C:\xampp\htdocs\wordpress\wp-load.php'); // Adjust the path as necessary
+
 $servername = "localhost";
 $username = "root";
 $password = ""; // No password by default
