@@ -5,7 +5,7 @@ require_once('C:\xampp\htdocs\wordpress\wp-load.php'); // Adjust the path as nec
 global $wpdb;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $number = intval($_POST['number']);
+    $number = wp_kses_post($_POST['number']);
     
     // Fetch the record from the database
     $row = $wpdb->get_row($wpdb->prepare("SELECT * FROM ielts_speaking_part_2_question WHERE number = %d", $number), ARRAY_A);

@@ -32,3 +32,8 @@ endif;
 if ( class_exists( 'Tutor_Starter\\Init' ) ) :
 	Tutor_Starter\Init::register_services();
 endif;
+
+
+add_filter('rest_url_prefix', function() {
+    return 'api'; // Change 'api' to your desired prefix
+});

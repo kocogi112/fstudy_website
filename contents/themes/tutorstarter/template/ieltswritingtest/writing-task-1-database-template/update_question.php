@@ -5,9 +5,9 @@ require_once('C:\xampp\htdocs\wordpress\wp-load.php'); // Adjust the path as nec
 global $wpdb;
 
 // Get the data from the POST request
-$number = intval($_POST['number']);
-$id_test = sanitize_text_field($_POST['id_test']);
-$task = sanitize_text_field($_POST['task']);
+$number = wp_kses_post($_POST['number']);
+$id_test = wp_kses_post($_POST['id_test']);
+$task = wp_kses_post($_POST['task']);
 $question_type = wp_kses_post($_POST['question_type']);
 
 // Escape content to retain line breaks

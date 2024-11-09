@@ -5,8 +5,7 @@ get_header(); // Gọi phần đầu trang (header.php)
 $post_id = get_the_ID();
 $user_id = get_current_user_id();
 // Get the custom number field value
-$custom_number = get_post_meta($post_id, '_testsonlinesystem_custom_number', true);
-$additional_info = get_post_meta($post_id, '_testsonlinesystem_additional_info', true);
+$custom_number = get_post_meta($post_id, '_dictationexercise_custom_number', true);
 $commentcount = get_comments_number( $post->ID );
 
 
@@ -31,14 +30,50 @@ if (is_user_logged_in()) {
 
     // Get results for the current user and specific idtest (custom_number)
     $results_query = $wpdb->prepare("
-        SELECT * FROM wp_contact_us 
-        WHERE username = %s 
-        AND idtest = %d
-        ORDER BY dateform DESC",
+        SELECT * FROM dictation_question 
+        WHERE idtest = %d
+        ",
         $current_username,
         $custom_number
-    );
+            );
+        // Database credentials (update with your own database details)
+        $servername = "localhost";
+        $username = "root";
+        $password = ""; // No password by default
+        $dbname = "wordpress";
+
+        // Create connection
+        $conn = new mysqli($servername, $username, $password, $dbname);
+
+        // Check connection
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+
+        $sql = "SELECT type_test, testname, script_paragraph FROM dictation_question WHERE id_test = ?";
+
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $custom_number); // 'i' is used for integer
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+
+        // Fetch result and store in variables
+        if ($row = $result->fetch_assoc()) {
+            $script_paragraph = $row['script_paragraph'];
+            $type_test = $row['type_test'];
+            $testname = $row['testname'];
+        } else {
+            $script_paragraph = "No content available.";
+        }
+        // Đóng kết nối
+        $conn->close();
+
+
     $results = $wpdb->get_results($results_query); ?>
+
+    
      <style>
             * {
             box-sizing: border-box;
@@ -174,10 +209,10 @@ if (is_user_logged_in()) {
 
 
            <div class="container-info-test">
-           <h1><?php the_title(); ?> <span class="check-icon">✔️</span></h1>
+           <h1><?php echo htmlspecialchars($testname); ?> <span class="check-icon"></span></h1>
            
         <div class="test-info">
-            <p><strong>Thời gian làm bài:</strong> 40 phút | 4 phần thi | 40 câu hỏi | <?php echo wp_kses_post($commentcount);?> bình luận</p>
+            <p>Loại đề: <?php echo htmlspecialchars($type_test); ?></p>
             <p>203832 người đã luyện tập đề thi này</p>
             <p class="note">Chú ý: để được duy trì điểm scaled score (ví dụ trên điểm 990 TOEIC hoặc 9.0 cho IELTS), vui lòng chọn chế độ làm FULL TEST.</p>
         </div>

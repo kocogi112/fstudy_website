@@ -219,7 +219,7 @@ $result = $conn->query($sql);
             </div>
             <div class="modal-body">
                 <form id="addForm">
-                    ID Test: <input type="number" id="add_id_test" name="id_test" class="form-control" required><br>
+                    ID Test: <input type="text" id="add_id_test" name="id_test" class="form-control" required><br>
                     Task: <input type="number" id="add_task" name="task" class="form-control" required><br>
                     Question Type: <input type="text" id="add_question_type" name="question_type" class="form-control" required><br>
                     Question Content: <textarea id="add_question_content" name="question_content" class="form-control" required></textarea><br>

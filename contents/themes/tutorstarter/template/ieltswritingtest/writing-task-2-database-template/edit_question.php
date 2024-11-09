@@ -19,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             Question Type: <input type="number" name="question_type" value="<?php echo esc_attr($row['question_type']); ?>" required><br>
             Question Content: <textarea name="question_content" required><?php echo esc_textarea($row['question_content']); ?></textarea><br>
             Sample: <textarea name="sample"><?php echo esc_textarea($row['sample_writing']); ?></textarea><br>
+            Time (minute): <input type="text" name="time" value="<?php echo esc_attr($row['time']); ?>" required><br>
             Important Add: <textarea name="important_add"><?php echo esc_textarea($row['important_add']); ?></textarea><br>
             Topic: <input type="text" name="topic" value="<?php echo esc_attr($row['topic']); ?>" required><br>
             <input type="submit" value="Update">

@@ -6,13 +6,13 @@ global $wpdb;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Get the input data and sanitize it
-    $id_test = sanitize_text_field($_POST['id_test']);
-    $topic = sanitize_text_field($_POST['topic']);
-    $stt = intval($_POST['stt']);
-    $question_content = sanitize_textarea_field($_POST['question_content']);
-    $sample = sanitize_textarea_field($_POST['sample']);
-    $important_add = sanitize_textarea_field($_POST['important_add']);
-    $speaking_part = intval($_POST['speaking_part']);
+    $id_test = wp_kses_post($_POST['id_test']);
+    $topic = wp_kses_post($_POST['topic']);
+    $stt = wp_kses_post($_POST['stt']);
+    $question_content = wp_kses_post($_POST['question_content']);
+    $sample = wp_kses_post($_POST['sample']);
+    $important_add = wp_kses_post($_POST['important_add']);
+    $speaking_part = wp_kses_post($_POST['speaking_part']);
 
     // Prepare the data for insertion
     $data = array(

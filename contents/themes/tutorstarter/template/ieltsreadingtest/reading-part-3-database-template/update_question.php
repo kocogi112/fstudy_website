@@ -11,7 +11,7 @@ $part = sanitize_text_field($_POST['part']);
 $duration = intval($_POST['duration']);
 $number_question_of_this_part = sanitize_textarea_field($_POST['number_question_of_this_part']);
 $paragraph = sanitize_textarea_field($_POST['paragraph']);
-$group_question = sanitize_textarea_field($_POST['group_question']);
+//$group_question = sanitize_textarea_field($_POST['group_question']);
 $category = sanitize_textarea_field($_POST['category']);
 
 // Prepare the data for updating
@@ -21,7 +21,7 @@ $data = array(
     'duration' => $duration,
     'number_question_of_this_part' => $number_question_of_this_part,
     'paragraph' => $paragraph,
-    'group_question' => $group_question,
+    //'group_question' => $group_question,
     'category' => $category,
 );
 

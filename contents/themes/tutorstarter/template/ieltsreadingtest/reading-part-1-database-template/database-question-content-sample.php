@@ -70,7 +70,8 @@ $result = $conn->query($sql);
 <body>
 
 <h1>IELTS Reading Part 1 Questions Database</h1>
-<b>Question Content (Các câu hỏi) nên up trực tiếp trong database. Ở đây dễ sai</b>
+<b>Question Content (Các câu hỏi) up trực tiếp trong database. Không up ở đây</b>
+<b>Note 2: LƯU Ý: THÊM TESTNAME CHO Reading - dễ nhận biết</b>
 
 <!-- Filter form -->
 <form method="GET" action="">
@@ -181,6 +182,7 @@ $result = $conn->query($sql);
             <div class="modal-body">
                 <form id="editForm">
                     <input type="hidden" id="edit_number" name="number">
+                    
                     ID Test: <input type="text" id="edit_id_test" name="id_test" class="form-control" required><br>
                     Part: <input type="text" id="edit_part" name="part" class="form-control" required><br>
                     Duration: <input type="number" id="edit_duration" name="duration" class="form-control" required><br>

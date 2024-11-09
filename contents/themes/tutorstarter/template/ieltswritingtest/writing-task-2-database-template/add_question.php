@@ -6,14 +6,14 @@ global $wpdb;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Get the input data and sanitize it
-    $id_test = intval($_POST['id_test']);
-    $task = intval($_POST['task']);
-    $question_type = sanitize_textarea_field($_POST['question_type']);
-    $question_content = sanitize_textarea_field($_POST['question_content']);
-    $sample_writing = sanitize_textarea_field($_POST['sample_writing']);
-    $important_add = sanitize_textarea_field($_POST['important_add']);
-    $topic = sanitize_textarea_field($_POST['topic']);
-
+    $id_test = wp_kses_post($_POST['id_test']);
+    $task = wp_kses_post($_POST['task']);
+    $question_type = wp_kses_post($_POST['question_type']);
+    $question_content = wp_kses_post($_POST['question_content']);
+    $sample_writing = wp_kses_post($_POST['sample_writing']);
+    $important_add = wp_kses_post($_POST['important_add']);
+    $topic = wp_kses_post($_POST['topic']);
+    $time = wp_kses_post($_POST['time']);
     // Prepare the data for insertion
     $data = array(
         'id_test' => $id_test,
@@ -22,7 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'question_content' => $question_content,
         'sample_writing' => $sample_writing,
         'important_add' => $important_add,
-        'topic' => $topic
+        'topic' => $topic,
+        'time' => $time
     );
 
     // Insert the data into the database

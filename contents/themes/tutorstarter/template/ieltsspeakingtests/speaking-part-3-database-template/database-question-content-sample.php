@@ -210,8 +210,8 @@ $result = $conn->query($sql);
                     Question Content: <textarea id="add_question_content" name="question_content" class="form-control" required></textarea><br>
                     Sample: <textarea id="add_sample" name="sample" class="form-control"></textarea><br>
                     Important Add: <textarea id="add_important_add" name="important_add" class="form-control"></textarea><br>
-                    Speaking Part: <input type="number" id="add_speaking_part" name="speaking_part" class="form-control" required><br>
-                </form>
+                    Speaking Part: <input type="number" id="add_speaking_part" name="speaking_part" class="form-control" value="3" readonly required><br>
+                    </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-success" onclick="saveNew()">Add Question</button>
@@ -227,7 +227,7 @@ $result = $conn->query($sql);
 // Open the edit modal and populate it with data
 function openEditModal(number) {
     $.ajax({
-        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ielts speaking system/speaking-part-3-database-template/get_question.php', // Fetch the question details
+        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ieltsspeakingtests/speaking-part-3-database-template/get_question.php', // Fetch the question details
         type: 'POST',
         data: { number: number },
         success: function(response) {
@@ -248,7 +248,7 @@ function openEditModal(number) {
 // Save the edited data
 function saveEdit() {
     $.ajax({
-        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ielts speaking system/speaking-part-3-database-template/update_question.php',
+        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ieltsspeakingtests/speaking-part-3-database-template/update_question.php',
         type: 'POST',
         data: $('#editForm').serialize(),
         success: function(response) {
@@ -265,7 +265,7 @@ function openAddModal() {
 // Save the new question
 function saveNew() {
     $.ajax({
-        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ielts speaking system/speaking-part-3-database-template/add_question.php',
+        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ieltsspeakingtests/speaking-part-3-database-template/add_question.php',
         type: 'POST',
         data: $('#addForm').serialize(),
         success: function(response) {
@@ -278,7 +278,7 @@ function saveNew() {
 function deleteRecord(number) {
     if (confirm('Are you sure you want to delete this question?')) {
         $.ajax({
-            url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ielts speaking system/speaking-part-3-database-template/delete_question.php',
+            url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ieltsspeakingtests/speaking-part-3-database-template/delete_question.php',
             type: 'POST',
             data: { number: number },
             success: function(response) {

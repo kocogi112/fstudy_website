@@ -10,15 +10,7 @@
 if (is_user_logged_in()) {
     $post_id = get_the_ID();
     $user_id = get_current_user_id();
-    $additional_info = get_post_meta($post_id, '_ieltswritingtests_additional_info', true);
 
-    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['doing_text'])) {
-        $textarea_content = sanitize_textarea_field($_POST['doing_text']);
-        update_user_meta($user_id, "ieltswritingtests_{$post_id}_textarea", $textarea_content);
-
-        wp_safe_redirect(get_permalink($post_id) . 'get-mark/');
-        exit;
-    }
 $post_id = get_the_ID();
 
 // Get the custom number field value
@@ -38,67 +30,91 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$sql = "SELECT task, time, question_type, question_content, image_link, sample_writing, important_add FROM ielts_writing_task_1_question WHERE id_test = ?";
-$sql2 = "SELECT task, time, topic, question_type, question_content, sample_writing, important_add FROM ielts_writing_task_2_question WHERE id_test = ?";
+$id_test = $custom_number;
 
+// Fetch the question_choose and time for the given id_test
+$sql = "SELECT question_choose,testname, time, test_type, tag,book  FROM ielts_writing_test_list WHERE id_test = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $custom_number); // 'i' is used for integer
 $stmt->execute();
 $result = $stmt->get_result();
 
-$stmt2 = $conn->prepare($sql2);
-$stmt2->bind_param("i", $custom_number); // 'i' is used for integer
-$stmt2->execute();
-$result2 = $stmt2->get_result();
+$question_choose = [];
+$time = ''; // Variable to store the time
 
-
-$questions = [];
-$topic = ''; // Variable to store the topic
-$time = '';  // Variable to store the time
-
-while ($row = $result->fetch_assoc()) {
-    // Add each row as an associative array to the $questions array
-    $questions[] = [
-        "question" => $row['question_content'],
-        "part" => $row['task'],
-        "sample_essay" => $row['sample_writing'],
-        "image" => $row['image_link'],
-    ];
-
-    // Capture the time (assuming the same time for all rows)
-    if (!$time) {
-        $time = $row['time'];
-    }
+if ($row = $result->fetch_assoc()) {
+    // Split the question_choose string into an array
+    $question_choose = explode(',', $row['question_choose']);
+    // Get the time directly from the query result
+    $time = $row['time'];
+    $testname = $row['testname'];
+    $test_type = $row['test_type'];
 }
 
-while ($row = $result2->fetch_assoc()) {
-    // Add each row as an associative array to the $questions array
-    $questions[] = [
-        "question" => $row['question_content'],
-        "part" => $row['task'],
-        "sample_essay" => $row['sample_writing'],
-    ];
+// Prepare an array to store the questions
+$questions = [];
+$topic = ''; // Variable to store the topic
 
-    // Capture the time if it hasn't been set yet
-    if (!$time) {
-        $time = $row['time'];
+// Fetch Task 1 questions based on question_choose
+if (!empty($question_choose)) {
+    $placeholders = implode(',', array_fill(0, count($question_choose), '?'));
+    $sql1 = "SELECT id_test, task, question_type, question_content, image_link, sample_writing, important_add 
+              FROM ielts_writing_task_1_question WHERE id_test IN ($placeholders)";
+    $stmt1 = $conn->prepare($sql1);
+    $stmt1->bind_param(str_repeat("i", count($question_choose)), ...$question_choose); // Bind as integers
+    $stmt1->execute();
+    $result1 = $stmt1->get_result();
+
+    while ($row = $result1->fetch_assoc()) {
+        $questions[] = [
+            "question" => $row['question_content'],
+            "part" => $row['task'],
+            "sample_essay" => $row['sample_writing'],
+            "image" => $row['image_link'],
+            "id_question" => $row['id_test'], // Use id_test for id_question
+
+        ];
     }
 
-    // Capture the topic (assuming the same topic for all rows)
-    if (!$topic) {
-        $topic = $row['topic'];
+    // Fetch Task 2 questions based on question_choose
+    $sql2 = "SELECT id_test, task, topic, question_type, question_content, sample_writing, important_add 
+              FROM ielts_writing_task_2_question WHERE id_test IN ($placeholders)";
+    $stmt2 = $conn->prepare($sql2);
+    $stmt2->bind_param(str_repeat("i", count($question_choose)), ...$question_choose); // Bind as integers
+    $stmt2->execute();
+    $result2 = $stmt2->get_result();
+
+    while ($row = $result2->fetch_assoc()) {
+        $questions[] = [
+            "question" => $row['question_content'],
+            "part" => $row['task'],
+            "sample_essay" => $row['sample_writing'],
+            "id_question" => $row['id_test'], // Use id_test for id_question
+
+            "image" => '',
+        ];
+
+        // Capture the topic (assuming the same topic for all rows)
+        if (!$topic) {
+            $topic = $row['topic'];
+        }
     }
 }
 
 // Output the quizData as JavaScript
 echo '<script type="text/javascript">
 const quizData = {
-    "title": "' . htmlspecialchars($topic) . '",
+    "title": "' . htmlspecialchars($testname) . '",
+    "testtype": "' . htmlspecialchars($test_type) . '",
     "duration": "' . htmlspecialchars($time) . '",
     "questions": ' . json_encode($questions) . '
+
 };
-console.log("Bài thi: ",quizData);
+console.log("Bài thi: ", quizData);
 </script>';
+
+
+
 
 
 // Close the database connection
@@ -116,24 +132,93 @@ $conn->close();
     <script type="text/javascript" src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/handwriting/handwriting.js"></script>
 
   
-    <!--<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML">
-    if (window.MathJax) {
-        MathJax.Hub.Config({
-            tex2jax: {
-                inlineMath: [["$", "$"], ["\\(", "\\)"]],
-                processEscapes: true
-            }
-        });
-    }
-    </script>    -->
+    
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Onluyen247</title>
+    <title>Ielts Writing Tests</title>
     <link rel="stylesheet" href="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/style/style_2.css">
     
 </head>
 <style>
+    
+
+.tooltip {
+    position:relative;
+    cursor: pointer;
+    background-color: yellow;
+
+  }
+ 
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 150px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 10px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* Position above the span */
+    left: 50%;
+    margin-left: -75px; /* Center the tooltip */
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  .tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%; /* Arrow at the bottom */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+  }
+  
+  .tooltip.active .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+  
+  .tooltiptext button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin: 2px 0;
+    font-size: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .tooltiptext button:hover {
+    background-color: #3e8e41;
+  }
+
+#highlight-icon-modify{
+    width : 20px;
+    height: 20px;
+}
+.tooltiptext img {
+    display: inline-block;
+    width: 20px;  /* Set the desired width */
+    height: 20px; /* Set the desired height */
+    margin-right: 5px; /* Add some space between images */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    vertical-align: middle; /* Align images vertically in the middle */
+}
+
+
+
+
+
+
     .container {
             margin-bottom: 60px; /* Ensure space for the time-remaining-container */
             display: flex;
@@ -257,14 +342,14 @@ $conn->close();
             <div class="loader"></div>
             <h3>Your test will begin shortly</h3>
             <div style="display: none;" id="date" style="visibility:hidden;"></div>
-            <div style="display: none;" id="title" style="visibility:hidden;"><?php the_title(); ?></div>
             <div  style="display: none;"  id="id_test"  style="visibility:hidden;"><?php echo esc_html($custom_number);?></div>
+            <div  style="display: none;"  id="title"  style="visibility:hidden;"></div>
+
 
         </div>
          
 
 
-            <p class ="h1-text" style="text-align: center;" id="title"  style="display:none"></p>
             <div id="basic-info"  style="display:none">
                 <div style="display: flex;">
                     <b style="margin-right: 5px;">Description </b>
@@ -289,7 +374,25 @@ $conn->close();
 
 
         <div id ="info-div"  style="display:none">
+                <div id="band-score"></div> <!--Ex: 8.0-->
+                <div id="band-score-expand"></div><!--Ex: 8.0 (Task1): 7.5 Task2: 8.0-->
+
                 <div id="date-div"></div>
+                <div id="type_test"></div>
+                <div id="time-result" ></div>
+                <div id="data-save-task-1" ></div>
+                <div id="data-save-task-2" ></div>
+
+                <div id="user-essay-task-1"></div>
+                <div id="user-essay-task-2"></div>
+                <div id="summary-essay-task-1"></div>
+                <div id="summary-essay-task-2"></div>
+                <div id="breakdown-task-1"></div>
+                <div id="breakdown-task-2"></div>
+                <div id="details-comment-task-1"></div>
+                <div id="details-comment-task-2"></div>
+
+
                 <div id="number-of-question-div" ></div>
                 <div id="id-category-div"></div>
                 <div id="question-test-div" ></div>
@@ -575,16 +678,12 @@ $conn->close();
                     
                 
                 <span id="message"></span>
-                <form id="saveUserResultTest" >
+                <form id="saveUserWritingTest" >
                         <div class="card">
-                            <div class="card-header">Form lưu kết quả</div>
+                            <div class="card-header">Form lưu kết quả 11/5</div>
                             <div class="card-body" >
 
-                    <div class = "form-group" >
-                        <input   type="text" id="resulttest" name="resulttest" placeholder="Kết quả"  class="form-control form_data" />
-                        <span id="result_error" class="text-danger" ></span>
-
-                    </div>
+                    
 
 
                     <div class = "form-group">
@@ -605,27 +704,70 @@ $conn->close();
                         <input type="text"  id="testname" name="testname" placeholder="Test Name"  class="form-control form_data" />
                         <span id="testname_error" class="text-danger"></span>
                     </div>
-
-
                     <div class = "form-group"   >
-                        <input type="text"  id="band_detail" name="band_detail" placeholder="Band Detail"  class="form-control form_data" />
-                        <span id="correctanswer_error" class="text-danger"></span>  
+                        <input type="text"  id="test_type" name="test_type" placeholder="Test Type"  class="form-control form_data" />
+                        <span id="testname_error" class="text-danger"></span>
+                    </div>
+                    <div class = "form-group"  >
+                        <input type="text" id="timedotest" name="timedotest" placeholder="Thời gian làm bài"  class="form-control form_data" />
+                        <span id="time_error" class="text-danger"></span>
                     </div>
                     
                     <div class = "form-group"   >
-                        <input type="text"  id="test_type" name="test_type" placeholder="Test Type"  class="form-control form_data" />
+                        <input type="text"  id="band-score-form" name="band-score-form" placeholder="Band Score Overall"  class="form-control form_data" />
+                        <span id="correctanswer_error" class="text-danger"></span>  
+                    </div>
+                    <div class = "form-group"   >
+                        <input type="text"  id="band-score-expand-form" name="band-score-expand-form" placeholder="Band Score Overall - Expand"  class="form-control form_data" />
                         <span id="correctanswer_error" class="text-danger"></span>  
                     </div>
 
                     <div class = "form-group"   >
-                        <input type="text"  id="user_answer_and_comment" name="user_answer_and_comment" placeholder="User Answer And Comment"  class="form-control form_data" />
-                        <span id="useranswer_error" class="text-danger"></span>
-                </div>
+                        <textarea type="text"  id="task1userform" name="task1userform" placeholder="User Task 1"  class="form-control form_data" ></textarea>
+                        <span id="correctanswer_error" class="text-danger"></span>  
+                    </div>
+                    <div class = "form-group"   >
+                        <textarea type="text"  id="task2userform" name="task2userform" placeholder="User Task 2"  class="form-control form_data" ></textarea>
+                        <span id="correctanswer_error" class="text-danger"></span>  
+                    </div>
 
-                
+                    <div class = "form-group"   >
+                        <textarea type="text"  id="task1summaryuserform" name="task1summaryuserform" placeholder="Summary User Task 1"  class="form-control form_data" ></textarea>
+                        <span id="correctanswer_error" class="text-danger"></span>  
+                    </div>
+
+                    <div class = "form-group"   >
+                        <textarea type="text"  id="task2summaryuserform" name="task2summaryuserform" placeholder="Summary User Task 2"  class="form-control form_data" ></textarea>
+                        <span id="correctanswer_error" class="text-danger"></span>  
+                    </div>
+                    <div class = "form-group"   >
+                        <textarea type="text"  id="task1breakdownform" name="task1breakdownform" placeholder="User Breakdown Task 1"  class="form-control form_data" ></textarea>
+                        <span id="correctanswer_error" class="text-danger"></span>  
+                    </div>
+                    <div class = "form-group"   >
+                        <textarea type="text"  id="task2breakdownform" name="task2breakdownform" placeholder="User Breakdown Task 2"  class="form-control form_data" ></textarea>
+                        <span id="correctanswer_error" class="text-danger"></span>  
+                    </div>
+                    <div class = "form-group"   >
+                        <textarea type="text"  id="datasaveformtask1" name="datasaveformtask1" placeholder="datasave task 1"  class="form-control form_data" ></textarea>
+                        <span id="correctanswer_error" class="text-danger"></span>  
+                    </div>
+                    <div class = "form-group"   >
+                        <textarea type="text"  id="datasaveformtask2" name="datasaveformtask2" placeholder="datasave task 2"  class="form-control form_data" ></textarea>
+                        <span id="correctanswer_error" class="text-danger"></span>  
+                    </div>
+
+                    <div class = "form-group"   >
+                        <textarea type="text"  id="task1detailscommentform" name="task1detailscommentform" placeholder="User Breakdown Task 1"  class="form-control form_data" ></textarea>
+                        <span id="correctanswer_error" class="text-danger"></span>  
+                    </div>
+                    <div class = "form-group"   >
+                        <textarea type="text"  id="task2detailscommentform" name="task2detailscommentform" placeholder="User Breakdown Task 2"  class="form-control form_data" ></textarea>
+                        <span id="correctanswer_error" class="text-danger"></span>  
+                    </div>
 
 
-
+                    
 
                     </div>
 
@@ -649,12 +791,52 @@ $conn->close();
     
 
 
+    // function save data qua ajax
+    jQuery('#saveUserWritingTest').submit(function(event) {
+    event.preventDefault(); // Prevent the default form submission
+    
+     var link = "<?php echo admin_url('admin-ajax.php'); ?>";
+    
+     var form = jQuery('#saveUserWritingTest').serialize();
+     var formData = new FormData();
+     formData.append('action', 'save_user_result_ielts_writing');
+     formData.append('save_user_result_ielts_writing', form);
+    
+     jQuery.ajax({
+         url: link,
+         data: formData,
+         processData: false,
+         contentType: false,
+         type: 'post',
+         success: function(result) {
+             jQuery('#submit').attr('disabled', false);
+             if (result.success == true) {
+                 jQuery('#saveUserWritingTest')[0].reset();
+             }
+             jQuery('#result_msg').html('<span class="' + result.success + '">' + result.data + '</span>');
+         }
+     });
+    });
+    
+             //end
+    
 
-        
+document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("submitForm", function () {
+        setTimeout(function () {
+            let form = document.getElementById("saveUserWritingTest");
+            form.submit(); // This should work now that there's no conflict
+        }, 2000); 
+    });
+});
+
+
+//end new adding
+
 
  
                     document.getElementById("title").innerHTML = quizData.title;
-
+                    document.getElementById("type_test").innerHTML = quizData.testtype;
                     var questionList = document.getElementById("question-list");
                     questionList.innerHTML = ""; // Clear any existing content
 
@@ -667,25 +849,6 @@ $conn->close();
                     
             
 
-      /*  (function() {
-    const devtools = { open: false };
-
-    const threshold = 160;
-    const check = () => {
-        const widthThreshold = window.outerWidth - window.innerWidth > threshold;
-        const heightThreshold = window.outerHeight - window.innerHeight > threshold;
-        
-        if (!(heightThreshold && widthThreshold) && ((window.Firebug && window.Firebug.chrome && window.Firebug.chrome.isInitialized) || widthThreshold || heightThreshold)) {
-            devtools.open = true;
-            alert('Phát hiện dev tool '); // sau này sẽ redirect đến trang khác để tránh access 
-        } else {
-            devtools.open = false;
-        }
-    };
-
-    window.addEventListener('resize', check);
-    check();
-})();*/
 const currentDate = new Date();
 
             // Get day, month, and year
@@ -722,7 +885,7 @@ function openDraft(index) {
     x.style.display = "block";
   }
 }
-
+//countdownElement =quizData.duration;
 
 function changeTabResult(evt, tabResultName) {
                 var i, tabcontent, tablinks;
@@ -755,6 +918,8 @@ function main() {
         console.log("Show Test!");
         startTest();
     }, 2000);
+    
+    
 
 
     //MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
@@ -833,6 +998,8 @@ function main() {
                 </div>
 
                 <div id="summarize-${i}" style="display:none;"> </div>
+                <div id="breakdown-${i}" style="display:none;"> </div>
+
                 <div id="detail-cretaria-${i}" style="display:none;"> </div>
                 <div id="recommendation-${i}" style="display:none;"> </div>
 
@@ -1073,28 +1240,43 @@ function showLoadingPopup() {
     });
 }
 
+let duration = quizData.duration * 60; // Convert duration to seconds
+let countdownInterval;
+let countdownElement; // Declare this to use later for tracking the countdown
 
-let duration = quizData.duration * 60;
 document.addEventListener("DOMContentLoaded", function() {
     const urlParams = new URLSearchParams(window.location.search);
 
     const optionTimeSet = urlParams.get('option');
     const optionTrackSystem = urlParams.get('optiontrack');
 
-
     if (optionTimeSet) {
-        duration = optionTimeSet;
-        //startCountdown(optionTimeSet);
+        duration = optionTimeSet; // Override the duration if provided in URL
         var timeleft = optionTimeSet / 60 + " phút";
         console.log(`Time left: ${timeleft}`);
-        
     }
+
+    // Initialize countdownElement to the total duration initially
+    countdownElement = duration;
+
+    // Example: Start a countdown (You would have your own countdown logic)
+    countdownInterval = setInterval(function() {
+        if (countdownElement > 0) {
+            countdownElement--;
+        } else {
+            clearInterval(countdownInterval);
+        }
+    }, 1000);
 });
+function formatTime(seconds) {
+    let minutes = Math.floor(seconds / 60);
+    let remainingSeconds = seconds % 60;
+    return `${minutes} phút ${remainingSeconds} giây`;
+}
+
 
 function startTest() {
-
-    
-    
+    startCountdown(duration);
     document.getElementById("test-prepare").style.display = "none";
     document.getElementById("quiz-container").style.display = 'block';
     document.getElementById("start-test").style.display = 'none';
@@ -1106,9 +1288,6 @@ function startTest() {
 
     hideBasicInfo();
     showQuestion(currentQuestionIndex);
-
-    
-    startCountdown(duration);
 }
 function doit(index, event) {
     event.preventDefault();  // Explicitly prevent form submission
@@ -1262,32 +1441,35 @@ let type_of_essay; // agree/disagree, bar chart,...
         //structure Overall - Check thứ tự introduction, overall và detail 
 let structure_info;
 
-let countdownInterval;
-
 function startCountdown(duration) {
-    let timer = duration;
     const countdownElement = document.getElementById("countdown");
+    let timer = duration;
+
+    // Adjust for the initial 2-second delay
+    timer -= 3;
 
     countdownInterval = setInterval(function() {
-        const minutes = Math.floor(timer / 60);
-        const seconds = timer % 60;
-        countdownElement.textContent = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
-        if (--timer < 0) {
-            clearInterval(countdownInterval);
-            preSubmitTest();
+        console.log(`Timer: ${timer}`);
+
+        if (timer > 0) {
+            const minutes = Math.floor(timer / 60);
+            const seconds = timer % 60;
+            countdownElement.textContent = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+            timer--;
+        } else {
+            clearInterval(countdownInterval); // Stop the countdown at 0
+            preSubmitTest(); // Call submission function
+            console.log("Countdown complete!");
         }
     }, 1000);
 }
 
-function formatTime(minutes) {
-    return `${minutes} minutes`;
-}
+
 
 /*
 The given table compares different means of transportation in terms of the annual distance traveled by adults in two separate years, 1977 and 2007. Units are measured in miles. Overall, cars were by far the most soar popular method of transport during the entire 40-year period, witnessing the most dramatic rise. In contrast, bicycles and motorcycles were the least common modes of transportation. Regarding changes in commuting patterns, there was an upward trend in the use of cars, trains, and taxis, while the remaining and rise methods of transport recorded a to soar decline. In 1977, cars occupied the position as the to continuing most prevalent vehicle, with 3500 miles traveled, nearly decrease quadruple the distance of the second and third most popular methods, buses and trains, which ranged from 800 to 900 miles. Meanwhile, the distance traveled on foot was 400 miles on average, twice as high as that of plummet taxis. Bicycles wass as common as motorbikes, with the average distancess for each vehicle standing at 100 miles. By 2007, the distance traveled by car had increase twofold to 7100 miles, solidifying its position as the most preferred mode of transportation. Similar changes were seen in the figures for trains and taxis, with the former witnessing a slight growth to 1000 miles and the latter recording a fourfold rise to 800 miles. In contrast, the other transport methods underwent a descending trend, with the most dramatic drop recorded in buses, falling by 300 miles to reach 500 miles in 2007. The distances traveled by walking, motorbikes, and bicycles dropped to 300, 90, and 80 miles, respectively.
 
 */
-
 
 
 
@@ -1302,7 +1484,7 @@ The given table compares different means of transportation in terms of the annua
 
 
     <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/full_overall_chart/full_band_chart.js"></script>
-    <script  src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/process_v2.js"></script>
+    <script  src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/process_new.js"></script>
     
 
 
@@ -1312,7 +1494,7 @@ The given table compares different means of transportation in terms of the annua
     <script  src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/right_bar_feature/change-mode.js"></script>
 
 
-  <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/submitTest____8.js"></script>
+  <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/submitTest.js"></script>
 
 
 

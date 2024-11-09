@@ -266,52 +266,53 @@ $conn->close();
 
 
 
+        
         <div class="practice-options">
-            <p class="options-header">
-                <span class="option active" id="practice">Luyện tập</span> 
-                <span class="option" id="full-test">Làm full test</span>  
-                <span class="option" id="discussion">Thảo luận</span>
-                <span class="option" id="preview_test" ><a href="javascript:void(0)" onclick="toggle_visibility('popup-box3');">Xem trước các câu hỏi</a></span>
-    </p>
-            
-            <div id="tips-container">
-                <div id="practice-content">
-                    <div class="alert alert-success" role="alert">
-                        <h4 class="alert-heading">Pro tips:</h4> <hr>
-                        <p>Hình thức luyện tập từng phần và chọn mức thời gian phù hợp sẽ giúp bạn tập trung vào giải đúng các câu hỏi thay vì phải chịu áp lực hoàn thành bài thi.</p>    
-                    </div><br>
-                    
-                    <p class ="h2-test" >Giới hạn thời gian (Để trống để làm bài không giới hạn):</p>
-                    <form action="start" method="get">
-                        <label style="font-size: 18px;"  for="timer"></label>
+        <p class="options-header">
+            <span class="option active" id="full-test">Làm full test</span>  
+            <span class="option" id="practice">Luyện tập</span> 
+            <span class="option" id="discussion">Thảo luận</span>
+            <span class="option" id="preview_test" ><a href="javascript:void(0)" onclick="toggle_visibility('popup-box3');">Xem trước các câu hỏi</a></span>
 
-                        <select id="timer" name="option">
-                            <option value="1000000">Unlimited time</option>
-                            <option value="60">1 minutes</option>
-                            <option value="1800">30 minutes</option>
-                            <option value="2700">45 minutes</option>
-                            <option value="3600">60 minutes</option>
-                            <option value="4500">75 minutes</option>
-                            <option value="5400">90 minutes</option>
-                            <option value="6300">105 minutes</option>
-                            <option value="7200">120 minutes</option>
-                            <option value="9000">150 minutes</option>
-                            <option value="10800">180 minutes</option>
-                        </select><br><br>      
-                        <button  class ="btn-submit" type="submit" value="Start test">Luyện tập</button>
-                    </form>
-                </div>
+        </p>
 
-                <div id="full-test-content" style="display: none;">
-                <div class="alert alert-success" role="alert">
-                        <h4 class="alert-heading">Pro tips:</h4> <hr>
-                        <p>Sẵn sàng để bắt đầu làm full test? Để đạt được kết quả tốt nhất, bạn cần dành ra 40 phút cho bài test này.</p>
-                        </div><br>
-                    <a   class="btn-submit" href="start">Bắt đầu bài thi</a>
-                </div>
-            </div>
+    <div id="tips-container">
+        <div id="full-test-content">
+            <div class="alert alert-success" role="alert">
+                <h4 class="alert-heading">Pro tips:</h4> <hr>
+                <p>Sẵn sàng để bắt đầu làm full test? Để đạt được kết quả tốt nhất, bạn cần dành ra 40 phút cho bài test này.</p>
+            </div><br>
+            <a class="btn-submit" href="start">Bắt đầu bài thi</a>
+        </div>
+
+        <div id="practice-content" style="display: none;">
+            <div class="alert alert-success" role="alert">
+                <h4 class="alert-heading">Pro tips:</h4> <hr>
+                <p>Hình thức luyện tập từng phần và chọn mức thời gian phù hợp sẽ giúp bạn tập trung vào giải đúng các câu hỏi thay vì phải chịu áp lực hoàn thành bài thi.</p>    
+            </div><br>
+
+            <p class="h2-test">Giới hạn thời gian (Để trống để làm bài không giới hạn):</p>
+            <form action="start" method="get">
+                <label style="font-size: 18px;" for="timer"></label>
+
+                <select id="timer" name="option">
+                    <option value="1000000">Unlimited time</option>
+                    <option value="60">1 minutes</option>
+                    <option value="1800">30 minutes</option>
+                    <option value="2700">45 minutes</option>
+                    <option value="3600">60 minutes</option>
+                    <option value="4500">75 minutes</option>
+                    <option value="5400">90 minutes</option>
+                    <option value="6300">105 minutes</option>
+                    <option value="7200">120 minutes</option>
+                    <option value="9000">150 minutes</option>
+                    <option value="10800">180 minutes</option>
+                </select><br><br>      
+                <button class="btn-submit" type="submit" value="Start test">Luyện tập</button>
+            </form>
         </div>
     </div>
+</div>
     <div id="popup-box3" class="popup-position" style="display:none;">
     <div id="popup-wrapper">
         <div id="popup-container" style="height: 500px; overflow-y: auto; position: relative;">
@@ -407,7 +408,7 @@ $conn->close();
   }
 }
 
- document.getElementById('practice').addEventListener('click', function() {
+document.getElementById('practice').addEventListener('click', function() {
     // Show practice content
     document.getElementById('practice-content').style.display = 'block';
     document.getElementById('full-test-content').style.display = 'none';
@@ -425,10 +426,26 @@ document.getElementById('full-test').addEventListener('click', function() {
     setActiveOption('full-test');
 });
 
-document.getElementById('full-test').addEventListener('click', function() {
-    // Show full test content
-    
+// Event listener for the discussion tab to redirect to #comment
+document.getElementById('discussion').addEventListener('click', function() {
+    window.location.href = '#comment';  // Redirect to #comment
 });
+
+function setActiveOption(optionId) {
+    const options = document.querySelectorAll('.option');
+    options.forEach(option => {
+        if (option.id === optionId) {
+            option.classList.add('active');
+        } else {
+            option.classList.remove('active');
+        }
+    });
+}
+
+// Initial state: Show full test content and highlight the full test button
+document.getElementById('full-test-content').style.display = 'block';
+document.getElementById('practice-content').style.display = 'none';
+setActiveOption('full-test');
 
 
 // Get the elements
@@ -459,7 +476,8 @@ function resetActiveOptions() {
 }
 
 // Initial state: Show practice content and highlight the practice button
-setActiveOption('practice');
+setActiveOption('full-test');
+
 
 
 </script>

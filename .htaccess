@@ -2,8 +2,6 @@
 # END LSCACHE
 # BEGIN NON_LSCACHE
 # END NON_LSCACHE
-
-
 # BEGIN WordPress
 # The directives (lines) between "BEGIN WordPress" and "END WordPress" are
 # dynamically generated, and should only be modified via WordPress filters.
@@ -19,4 +17,3 @@ RewriteRule . /wordpress/index.php [L]
 </IfModule>
 
 # END WordPress
-

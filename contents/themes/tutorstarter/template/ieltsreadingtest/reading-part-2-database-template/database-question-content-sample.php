@@ -70,7 +70,8 @@ $result = $conn->query($sql);
 <body>
 
 <h1>IELTS Reading Part 2 Questions Database</h1>
-<b>Question Content (Các câu hỏi) nên up trực tiếp trong database. Ở đây dễ sai</b>
+<b>Question Content (Các câu hỏi) up trực tiếp trong database. Không up ở đây</b>
+<b>Note 2: LƯU Ý: THÊM TESTNAME CHO Reading - dễ nhận biết</b>
 
 <!-- Filter form -->
 <form method="GET" action="">

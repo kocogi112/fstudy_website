@@ -5,15 +5,15 @@ require_once('C:\xampp\htdocs\wordpress\wp-load.php'); // Adjust the path as nec
 global $wpdb;
 
 // Get the data from the POST request
-$number = intval($_POST['number']);
-$id_test = sanitize_text_field($_POST['id_test']);
-$topic = sanitize_text_field($_POST['topic']);
+$number = wp_kses_post($_POST['number']);
+$id_test = wp_kses_post($_POST['id_test']);
+$topic = wp_kses_post($_POST['topic']);
 
 // Escape content to retain line breaks
 $question_content = wp_kses_post($_POST['question_content']);
 $sample = wp_kses_post($_POST['sample']);
 $important_add = wp_kses_post($_POST['important_add']);
-$speaking_part = intval($_POST['speaking_part']);
+$speaking_part = wp_kses_post($_POST['speaking_part']);
 
 // Prepare the data for updating
 $data = array(

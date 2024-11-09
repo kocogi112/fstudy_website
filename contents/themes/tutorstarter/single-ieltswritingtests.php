@@ -46,13 +46,6 @@ $stmt2->execute();
 $result2 = $stmt2->get_result();
 
 
-// Prepare the SQL query to fetch question_content and stt where id_test matches the custom_number
-$sql3 = "SELECT stt, question_content, topic, speaking_part, sample  FROM ielts_speaking_part_3_question WHERE id_test = ?";
-$stmt3 = $conn->prepare($sql3);
-$stmt3->bind_param("i", $custom_number); // 'i' is used for integer
-$stmt3->execute();
-$result3 = $stmt3->get_result();
-
 
 global $wpdb;
 
@@ -62,7 +55,7 @@ $current_username = $current_user->user_login;
 
 // Get results for the current user and specific idtest (custom_number)
 $results_query = $wpdb->prepare("
-    SELECT * FROM save_user_result_ielts_speaking 
+    SELECT * FROM save_user_result_ielts_writing 
     WHERE username = %s 
     AND idtest = %d
     ORDER BY dateform DESC",
@@ -72,121 +65,130 @@ $results_query = $wpdb->prepare("
 $results = $wpdb->get_results($results_query); ?>
 
     <style>
-        * {
-        box-sizing: border-box;
+         * {
+            box-sizing: border-box;
+            }
+
+            /* Create two equal columns that floats next to each other */
+            .column {
+            float: left;
+            width: 50%;
+            padding: 10px;
+            }
+
+            /* Clear floats after the columns */
+            .row:after {
+            content: "";
+            display: table;
+            clear: both;
+            }
+
+            /* Additional styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
         }
 
-        /* Create two equal columns that floats next to each other */
-        .column {
-        float: left;
-        width: 50%;
-        padding: 10px;
+        .container-info-test {
+            max-width: 100%;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        /* Clear floats after the columns */
-        .row:after {
-        content: "";
-        display: table;
-        clear: both;
+        h1 {
+            font-size: 24px;
+            color: #333;
         }
 
-        /* Additional styles */
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f9f9f9;
-        margin: 0;
-        padding: 20px;
-    }
+        .check-icon {
+            color: green;
+        }
 
-    .container-info-test {
-        max-width: 100%;
-        margin: auto;
-        background: white;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
+        .test-info, .results, .practice-options {
+            margin-bottom: 20px;
+        }
 
-    h1 {
-        font-size: 24px;
-        color: #333;
-    }
+        .note {
+            color: red;
+            font-weight: bold;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
 
-    .check-icon {
-        color: green;
-    }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
 
-    .test-info, .results, .practice-options {
-        margin-bottom: 20px;
-    }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
 
-    .note {
-        color: red;
-        font-weight: bold;
-    }
-    html {
-        scroll-behavior: smooth;
-    }
+        .options-header {
+            display: flex;
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
 
-  
+        .option {
+            cursor: pointer;
+            color: #007bff;
+            text-decoration: underline;
+            padding: 5px 10px;
+        }
 
-    .options-header {
-        display: flex;
-        margin-bottom: 20px;
-        font-size: 15px;
-    }
+        .option:hover {
+            text-decoration: none;
+        }
 
-    .option {
-        cursor: pointer;
-        color: #007bff;
-        text-decoration: underline;
-        padding: 5px 10px;
-    }
+        .active {
+            background-color: #007bff; /* Highlight color */
+            color: white; /* Text color for active state */
+            border-radius: 5px;
+        }
 
-    .option:hover {
-        text-decoration: none;
-    }
+        .checkbox-group {
+            margin-bottom: 20px;
+        }
+        .checkbox-group label {
+            display: block;
+            margin: 5px 0;
+        }
+        .btn-submit {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
 
-    .active {
-        background-color: #007bff; /* Highlight color */
-        color: white; /* Text color for active state */
-        border-radius: 5px;
-    }
-
-    .checkbox-group {
-        margin-bottom: 20px;
-    }
-    .checkbox-group label {
-        display: block;
-        margin: 5px 0;
-    }
-    .btn-submit {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        cursor: pointer;
-    }
-
-    .btn-submit:hover {
-        background-color: #0056b3;
-    }
-    .h2-test{
-        font-weight: bold;
-        font-size: 25px;
-    }
-    .alert{
-        margin-bottom: 0;
-        position: relative;
-        padding: .75rem 1.25rem;
-        border: 1px solid transparent;
-        border-radius: .35rem;
-    }
-    .alert-success{
-        color: 1f5e39;
-        background-color: #d8f0e2;
-        border-color: #c8ead6;
-    }
+        .btn-submit:hover {
+            background-color: #0056b3;
+        }
+        .h2-test{
+            font-weight: bold;
+            font-size: 25px;
+        }
+        .alert{
+            margin-bottom: 0;
+            position: relative;
+            padding: .75rem 1.25rem;
+            border: 1px solid transparent;
+            border-radius: .35rem;
+        }
+        .alert-success{
+            color: 1f5e39;
+            background-color: #d8f0e2;
+            border-color: #c8ead6;
+        }
 
             
     .popup-position {
@@ -242,8 +244,10 @@ $results = $wpdb->get_results($results_query); ?>
                     <thead>
                         <tr>
                             <th>Ngày làm</th>
+                            <th>Thời gian làm</th>
                             <th>Kết quả</th>
                             <th>Điểm thành phần</th>
+                            <th>Chi tiết bài làm</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -253,8 +257,14 @@ $results = $wpdb->get_results($results_query); ?>
                         ?>
                         <tr>
                             <td><?php echo esc_html($result->dateform); ?></td>
-                            <td><?php echo esc_html($result->resulttest); ?></td>
-                            <td><?php echo esc_html($result->band_detail); ?></td>
+                            <td><?php echo esc_html($result->timeSpent); ?></td>
+                            <td><?php echo esc_html($result->band_score); ?></td>
+                            <td><?php echo esc_html($result->band_score_expand); ?></td>
+                            <td>
+                                <a href="<?php echo esc_url(get_permalink()) . 'result/' . esc_html($result->testsavenumber); ?>">
+                                    Xem bài làm
+                                </a>
+                            </td>
                         </tr>
                         <?php
                     }
@@ -272,52 +282,53 @@ $results = $wpdb->get_results($results_query); ?>
 
 
 
-        <div class="practice-options">
-            <p class="options-header">
-                <span class="option active" id="practice">Luyện tập</span> 
-                <span class="option" id="full-test">Làm full test</span>  
-                <span class="option" id="discussion">Thảo luận</span>
-                <span class="option" id="preview_test" ><a href="javascript:void(0)" onclick="toggle_visibility('popup-box3');">Xem trước các câu hỏi</a></span>
-    </p>
-            
-            <div id="tips-container">
-                <div id="practice-content">
-                    <div class="alert alert-success" role="alert">
-                        <h4 class="alert-heading">Pro tips:</h4> <hr>
-                        <p>Hình thức luyện tập từng phần và chọn mức thời gian phù hợp sẽ giúp bạn tập trung vào giải đúng các câu hỏi thay vì phải chịu áp lực hoàn thành bài thi.</p>    
-                    </div><br>
-                    
-                    <p class ="h2-test" >Giới hạn thời gian (Để trống để làm bài không giới hạn):</p>
-                    <form action="testing" method="get">
-                        <label style="font-size: 18px;"  for="timer"></label>
+        
+    <div class="practice-options">
+        <p class="options-header">
+            <span class="option active" id="full-test">Làm full test</span>  
+            <span class="option" id="practice">Luyện tập</span> 
+            <span class="option" id="discussion">Thảo luận</span>
+            <span class="option" id="preview_test" ><a href="javascript:void(0)" onclick="toggle_visibility('popup-box3');">Xem trước các câu hỏi</a></span>
 
-                        <select id="timer" name="option">
-                            <option value="1000000">Unlimited time</option>
-                            <option value="60">1 minutes</option>
-                            <option value="1800">30 minutes</option>
-                            <option value="2700">45 minutes</option>
-                            <option value="3600">60 minutes</option>
-                            <option value="4500">75 minutes</option>
-                            <option value="5400">90 minutes</option>
-                            <option value="6300">105 minutes</option>
-                            <option value="7200">120 minutes</option>
-                            <option value="9000">150 minutes</option>
-                            <option value="10800">180 minutes</option>
-                        </select><br><br>      
-                        <button  class ="btn-submit" type="submit" value="Start test">Luyện tập</button>
-                    </form>
-                </div>
+        </p>
 
-                <div id="full-test-content" style="display: none;">
-                <div class="alert alert-success" role="alert">
-                        <h4 class="alert-heading">Pro tips:</h4> <hr>
-                        <p>Sẵn sàng để bắt đầu làm full test? Để đạt được kết quả tốt nhất, bạn cần dành ra 40 phút cho bài test này.</p>
-                        </div><br>
-                    <a   class="btn-submit" href="testing">Bắt đầu bài thi</a>
-                </div>
-            </div>
+    <div id="tips-container">
+        <div id="full-test-content">
+            <div class="alert alert-success" role="alert">
+                <h4 class="alert-heading">Pro tips:</h4> <hr>
+                <p>Sẵn sàng để bắt đầu làm full test? Để đạt được kết quả tốt nhất, bạn cần dành ra 40 phút cho bài test này.</p>
+            </div><br>
+            <a class="btn-submit" href="testing">Bắt đầu bài thi</a>
+        </div>
+
+        <div id="practice-content" style="display: none;">
+            <div class="alert alert-success" role="alert">
+                <h4 class="alert-heading">Pro tips:</h4> <hr>
+                <p>Hình thức luyện tập từng phần và chọn mức thời gian phù hợp sẽ giúp bạn tập trung vào giải đúng các câu hỏi thay vì phải chịu áp lực hoàn thành bài thi.</p>    
+            </div><br>
+
+            <p class="h2-test">Giới hạn thời gian (Để trống để làm bài không giới hạn):</p>
+            <form action="testing" method="get">
+                <label style="font-size: 18px;" for="timer"></label>
+
+                <select id="timer" name="option">
+                    <option value="1000000">Unlimited time</option>
+                    <option value="60">1 minutes</option>
+                    <option value="1800">30 minutes</option>
+                    <option value="2700">45 minutes</option>
+                    <option value="3600">60 minutes</option>
+                    <option value="4500">75 minutes</option>
+                    <option value="5400">90 minutes</option>
+                    <option value="6300">105 minutes</option>
+                    <option value="7200">120 minutes</option>
+                    <option value="9000">150 minutes</option>
+                    <option value="10800">180 minutes</option>
+                </select><br><br>      
+                <button class="btn-submit" type="submit" value="Start test">Luyện tập</button>
+            </form>
         </div>
     </div>
+</div>
     <div id="popup-box3" class="popup-position" style="display:none;">
     <div id="popup-wrapper">
         <div id="popup-container" style="height: 500px; overflow-y: auto; position: relative;">
@@ -414,7 +425,7 @@ $results = $wpdb->get_results($results_query); ?>
   }
 }
 
- document.getElementById('practice').addEventListener('click', function() {
+document.getElementById('practice').addEventListener('click', function() {
     // Show practice content
     document.getElementById('practice-content').style.display = 'block';
     document.getElementById('full-test-content').style.display = 'none';
@@ -432,10 +443,26 @@ document.getElementById('full-test').addEventListener('click', function() {
     setActiveOption('full-test');
 });
 
-document.getElementById('full-test').addEventListener('click', function() {
-    // Show full test content
-    
+// Event listener for the discussion tab to redirect to #comment
+document.getElementById('discussion').addEventListener('click', function() {
+    window.location.href = '#comment';  // Redirect to #comment
 });
+
+function setActiveOption(optionId) {
+    const options = document.querySelectorAll('.option');
+    options.forEach(option => {
+        if (option.id === optionId) {
+            option.classList.add('active');
+        } else {
+            option.classList.remove('active');
+        }
+    });
+}
+
+// Initial state: Show full test content and highlight the full test button
+document.getElementById('full-test-content').style.display = 'block';
+document.getElementById('practice-content').style.display = 'none';
+setActiveOption('full-test');
 
 
 // Get the elements
@@ -466,7 +493,8 @@ function resetActiveOptions() {
 }
 
 // Initial state: Show practice content and highlight the practice button
-setActiveOption('practice');
+setActiveOption('full-test');
+
 
 
 </script>

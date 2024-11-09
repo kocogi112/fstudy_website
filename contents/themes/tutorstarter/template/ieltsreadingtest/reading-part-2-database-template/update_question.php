@@ -5,14 +5,14 @@ require_once('C:\xampp\htdocs\wordpress\wp-load.php'); // Adjust the path as nec
 global $wpdb;
 
 // Get the data from the POST request
-$number = sanitize_textarea_field($_POST['number']);
-$id_test = sanitize_text_field($_POST['id_test']);
-$part = sanitize_text_field($_POST['part']);
-$duration = intval($_POST['duration']);
-$number_question_of_this_part = sanitize_textarea_field($_POST['number_question_of_this_part']);
-$paragraph = sanitize_textarea_field($_POST['paragraph']);
-$group_question = sanitize_textarea_field($_POST['group_question']);
-$category = sanitize_textarea_field($_POST['category']);
+$number = wp_kses_post($_POST['number']);
+$id_test = wp_kses_post($_POST['id_test']);
+$part = wp_kses_post($_POST['part']);
+$duration = wp_kses_post($_POST['duration']);
+$number_question_of_this_part = wp_kses_post($_POST['number_question_of_this_part']);
+$paragraph = wp_kses_post($_POST['paragraph']);
+//$group_question = wp_kses_post($_POST['group_question']);
+$category = wp_kses_post($_POST['category']);
 
 // Prepare the data for updating
 $data = array(
@@ -21,7 +21,7 @@ $data = array(
     'duration' => $duration,
     'number_question_of_this_part' => $number_question_of_this_part,
     'paragraph' => $paragraph,
-    'group_question' => $group_question,
+   // 'group_question' => $group_question,
     'category' => $category,
 );
 

@@ -12,13 +12,13 @@ if (is_user_logged_in()) {
     $user_id = get_current_user_id();
     $additional_info = get_post_meta($post_id, '_ieltsspeakingtests_additional_info', true);
 
-    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['doing_text'])) {
+    /*if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['doing_text'])) {
         $textarea_content = sanitize_textarea_field($_POST['doing_text']);
         update_user_meta($user_id, "ieltsspeakingtests_{$post_id}_textarea", $textarea_content);
 
         wp_safe_redirect(get_permalink($post_id) . 'get-mark-speaking/');
         exit;
-    }
+    }*/
 $post_id = get_the_ID();
 // Get the custom number field value
 $custom_number = get_post_meta($post_id, '_ieltsspeakingtests_custom_number', true);
@@ -37,80 +37,109 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Prepare the SQL query to fetch question_content, stt, topic, sample, speaking_part where id_test matches the custom_number
-$sql = "SELECT stt, question_content, topic, sample, speaking_part FROM ielts_speaking_part_1_question WHERE id_test = ?";
-$sql2 = "SELECT question_content, topic, sample, speaking_part FROM ielts_speaking_part_2_question WHERE id_test = ?";
-$sql3 = "SELECT stt, question_content, topic, sample, speaking_part FROM ielts_speaking_part_3_question WHERE id_test = ?";
+$id_test = $custom_number;
 
+// Fetch the question_choose and time for the given id_test
+$sql = "SELECT id_test, question_choose,testname, test_type, tag,book  FROM ielts_speaking_test_list WHERE id_test = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $custom_number); // 'i' is used for integer
 $stmt->execute();
 $result = $stmt->get_result();
 
-$stmt2 = $conn->prepare($sql2);
-$stmt2->bind_param("i", $custom_number); // 'i' is used for integer
-$stmt2->execute();
-$result2 = $stmt2->get_result();
+$question_choose = [];
 
-$stmt3 = $conn->prepare($sql3);
-$stmt3->bind_param("i", $custom_number); // 'i' is used for integer
-$stmt3->execute();
-$result3 = $stmt3->get_result();
+if ($row = $result->fetch_assoc()) {
+    // Split the question_choose string into an array
+    $question_choose = explode(',', $row['question_choose']);
+    // Get the time directly from the query result
+    $testname = $row['testname'];
+    $test_type = $row['test_type'];
+}
 
-// Initialize an empty array to store the questions data
+// Prepare an array to store the questions
 $questions = [];
 $topic = ''; // Variable to store the topic
 
-while ($row = $result->fetch_assoc()) {
-    // Add each row as an associative array to the $questions array
-    $questions[] = [
-        "question" => $row['question_content'],
-        "part" => $row['speaking_part'],
-        "id" => $row['stt'],
-        "sample" => $row['sample']
-    ];
+// Fetch speaking_part 1 questions based on question_choose
+if (!empty($question_choose)) {
+    $placeholders = implode(',', array_fill(0, count($question_choose), '?'));
+    $sql1 = "SELECT id_test, speaking_part, topic, stt, question_content, sample, important_add 
+              FROM ielts_speaking_part_1_question WHERE id_test IN ($placeholders)";
+    $stmt1 = $conn->prepare($sql1);
+    $stmt1->bind_param(str_repeat("i", count($question_choose)), ...$question_choose); // Bind as integers
+    $stmt1->execute();
+    $result1 = $stmt1->get_result();
 
-    // Capture the topic (assumes the topic is the same for all rows)
-    if (!$topic) {
-        $topic = $row['topic'];
+    while ($row = $result1->fetch_assoc()) {
+        $questions[] = [
+            "question" => $row['question_content'],
+            "part" => $row['speaking_part'],
+            "stt" => $row['stt'],
+            "topic" => $row['topic'],
+            "id" => $row['id_test'],
+            "sample" => $row['sample']
+
+        ];
+    }
+
+    // Fetch speaking_part 2 questions based on question_choose
+    $sql2 = "SELECT id_test, speaking_part, topic, question_content, sample 
+              FROM ielts_speaking_part_2_question WHERE id_test IN ($placeholders)";
+    $stmt2 = $conn->prepare($sql2);
+    $stmt2->bind_param(str_repeat("i", count($question_choose)), ...$question_choose); // Bind as integers
+    $stmt2->execute();
+    $result2 = $stmt2->get_result();
+
+    while ($row = $result2->fetch_assoc()) {
+        $questions[] = [
+            "question" => $row['question_content'],
+            "part" => $row['speaking_part'],
+            "id" => $row['id_test'],
+            "stt" => 1,
+            "topic" => $row['topic'],
+            "sample" => $row['sample']
+        ];
+    }
+
+
+    // Fetch speaking_part 2 questions based on question_choose
+    $sql3 = "SELECT id_test, speaking_part, topic, stt, question_content, sample 
+              FROM ielts_speaking_part_3_question WHERE id_test IN ($placeholders)";
+    $stmt3 = $conn->prepare($sql3);
+    $stmt3->bind_param(str_repeat("i", count($question_choose)), ...$question_choose); // Bind as integers
+    $stmt3->execute();
+    $result3 = $stmt3->get_result();
+
+    while ($row = $result3->fetch_assoc()) {
+        $questions[] = [
+            "question" => $row['question_content'],
+            "part" => $row['speaking_part'],
+            "stt" => $row['stt'],
+            "id" => $row['id_test'],
+            "topic" => $row['topic'],
+            "sample" => $row['sample']
+        ];
+
+        // Capture the topic (assuming the same topic for all rows)
+        if (!$topic) {
+            $topic = $row['topic'];
+        }
     }
 }
-while ($row = $result2->fetch_assoc()) {
-    // Add each row as an associative array to the $questions array
-    $questions[] = [
-        "question" => $row['question_content'],
-        "part" => $row['speaking_part'],
-        "sample" => $row['sample']
-    ];
 
-    // Capture the topic (assumes the topic is the same for all rows)
-    if (!$topic) {
-        $topic = $row['topic'];
-    }
-}
-while ($row = $result3->fetch_assoc()) {
-    // Add each row as an associative array to the $questions array
-    $questions[] = [
-        "question" => $row['question_content'],
-        "part" => $row['speaking_part'],
-        "id" => $row['stt'],
-        "sample" => $row['sample']
-    ];
 
-    // Capture the topic (assumes the topic is the same for all rows)
-    if (!$topic) {
-        $topic = $row['topic'];
-    }
-}
 
 // Output the quizData as JavaScript
 echo '<script type="text/javascript">
 const quizData = {
-    "title": "' . htmlspecialchars($topic) . '",
+    "title": "' . htmlspecialchars($testname) . '",
+    "testtype": "' . htmlspecialchars($test_type) . '",
     "questions": ' . json_encode($questions) . '
 };
 console.log(quizData);
 </script>';
+
+
 
 // Close the database connection
 $conn->close();
@@ -194,6 +223,7 @@ $conn->close();
                 <button id ="change_examiner"> Change examiner</button>
                 <button id ="change_examiner_voice"> Change examiner's voice</button>
                 <button id="change_examiner_speed">Change examiner's voice speed</button>
+                <div id="data-save-full-speaking" ></div>
 
 
              </div>
@@ -369,44 +399,44 @@ $conn->close();
                             <div class="card-body" >
 
                     <div class = "form-group" >
-                        <input   type="text" id="resulttest" name="resulttest" placeholder="Kết quả"  class="form-control form_data" />
+                        <textarea   type="text" id="resulttest" name="resulttest" placeholder="Kết quả"  class="form-control form_data" ></textarea>
                         <span id="result_error" class="text-danger" ></span>
 
                     </div>
 
 
                     <div class = "form-group">
-                        <input type="text" id="dateform" name="dateform" placeholder="Ngày"  class="form-control form_data"  />
+                        <textarea type="text" id="dateform" name="dateform" placeholder="Ngày"  class="form-control form_data" ></textarea>
                         <span id="date_error" class="text-danger" ></span>
                     </div>
 
                     
 
                     <div class = "form-group" >
-                        <input type="text" id="idtest" name="idtest" placeholder="Id test"  class="form-control form_data" />
+                        <textarea type="text" id="idtest" name="idtest" placeholder="Id test"  class="form-control form_data"></textarea>
                         <span id="idtest_error" class="text-danger" ></span>
                     </div>
 
                  
 
                     <div class = "form-group"   >
-                        <input type="text"  id="testname" name="testname" placeholder="Test Name"  class="form-control form_data" />
+                        <textarea type="text"  id="testname" name="testname" placeholder="Test Name"  class="form-control form_data"></textarea>
                         <span id="testname_error" class="text-danger"></span>
                     </div>
 
 
                     <div class = "form-group"   >
-                        <input type="text"  id="band_detail" name="band_detail" placeholder="Band Detail"  class="form-control form_data" />
+                        <textarea type="text"  id="band_detail" name="band_detail" placeholder="Band Detail"  class="form-control form_data" ></textarea>
                         <span id="correctanswer_error" class="text-danger"></span>  
                     </div>
                     
                     <div class = "form-group"   >
-                        <input type="text"  id="test_type" name="test_type" placeholder="Test Type"  class="form-control form_data" />
+                        <textarea type="text"  id="test_type" name="test_type" placeholder="Test Type"  class="form-control form_data" ></textarea>
                         <span id="correctanswer_error" class="text-danger"></span>  
                     </div>
 
                     <div class = "form-group"   >
-                        <input type="text"  id="user_answer_and_comment" name="user_answer_and_comment" placeholder="User Answer And Comment"  class="form-control form_data" />
+                        <textarea type="text"  id="user_answer_and_comment" name="user_answer_and_comment" placeholder="Data Save Speaking"  class="form-control form_data"></textarea>
                         <span id="useranswer_error" class="text-danger"></span>
                 </div>
 
@@ -459,7 +489,7 @@ dateElement.innerHTML = `${day}/${month}/${year}`;
     
     document.addEventListener('DOMContentLoaded', function () {
         getOS();
-        checkLocationAndIpAdress();   
+        //checkLocationAndIpAdress();   
             
     // Get the video element
     const videoElement = document.getElementById('examinerVideo');
@@ -695,7 +725,7 @@ event.preventDefault(); // Prevent the default form submission
 
          //end
 
-         document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function () {
     document.addEventListener("submitForm", function () {
         setTimeout(function () {
             let form = document.getElementById("saveUserResultTest");
@@ -703,6 +733,28 @@ event.preventDefault(); // Prevent the default form submission
         }, 2000); 
     });
 });
+
+
+async function uploadRecording(blob) {
+    const formData = new FormData();
+    formData.append('file', blob, 'recording.mp3');
+    formData.append('upload_preset', 'ccgbws2m');  // Replace with your preset name
+
+    const response = await fetch('https://api.cloudinary.com/v1_1/dloq2wl7k/upload', {  // Replace with your cloud name
+        method: 'POST',
+        body: formData,
+    });
+
+    const result = await response.json();
+
+    // Check if the upload was successful
+    if (result.secure_url) {
+        return result.secure_url; // Return the URL of the uploaded audio file
+    } else {
+        console.error('Upload failed:', result);
+        return null;
+    }
+}
 
 
         let part1Count = 0;
@@ -735,7 +787,7 @@ event.preventDefault(); // Prevent the default form submission
 
 
         document.getElementById("title").innerHTML = quizData.title;
-
+        document.getElementById("testtype").innerHTML = quizData.testtype;
         let recognition;
         let textarea = document.getElementById('answerTextarea');
         let questionElement = document.getElementById('question');
@@ -788,21 +840,23 @@ document.addEventListener('DOMContentLoaded', function () {
             mediaRecorder.onstop = () => {
                 if (!isAnswerSubmitted) {
                     const blob = new Blob(recordedChunks, { type: 'audio/mp3' });
-                    recordingsList.push(blob);
                     recordedChunks = [];
-                    numRecordings++;
-                    isAnswerSubmitted = true; // Prevent multiple submissions
+                    recordingsList.push(blob);
 
-                    // Collect the user's answer
+                    uploadRecording(blob).then(link => {
+                        answers['link_audio' + (currentQuestionIndex)] = link;
+                        console.log(`Uploaded audio for Question ${currentQuestionIndex}: ${link}`);
+                    });
+
+                    // Collect and save the user's answer
                     let answer = textarea.value.trim();
                     answers['answer' + (currentQuestionIndex + 1)] = answer;
                     console.log("Question " + (currentQuestionIndex + 1) + ": " + questionElement.textContent);
                     console.log("Answer " + (currentQuestionIndex + 1) + ": " + answer);
-                    console.log(`Time used for question:`+ (currentQuestionIndex + 1) +": "+ counter)
-                    counter = 0; // Reset the counter to 0
-                    ret.innerHTML = convertSec(counter); // Update the display to show 00:00
-                    // Move to next question or end the quiz
-                    currentQuestionIndex++;
+
+                    counter = 0; // Reset counter
+                    ret.innerHTML = convertSec(counter); // Update display
+                    currentQuestionIndex++; // Move to next question or end the quiz
                    
                
                     if (currentQuestionIndex < quizData.questions.length) {
@@ -947,7 +1001,6 @@ const ret = document.getElementById("timer");
 const startBtn = document.querySelector("#start-timer");
 document.getElementById("id_test").innerHTML = pre_id_test_;
 
-document.getElementById("testtype").innerHTML = 'Practice Test';
 
 let counter = 0;
 let interval;
@@ -971,76 +1024,6 @@ function convertSec(cnt) {
 
 
 
-
-    /*    function stopRecording() {
-            if (recognition) {
-                recognition.stop();
-                let answer = textarea.value.trim();
-
-                answers['answer' + (currentQuestionIndex + 1)] = answer;
-                counters['counter' + (currentQuestionIndex + 1)] = counter;
-                textarea.value = '';
-
-                if (answer == "can you repeat question"){
-                     
-                    speakText(questionElement.textContent);
-                    //console.log("Answer " + (currentQuestionIndex + 1) + ": " + answer);
-
-                }   
-                
-                else{
-                
-                    if (mediaRecorder.state === 'recording') {
-                    mediaRecorder.stop(); // Ensure the recorder is stopped
-                }
-
-                clearInterval(interval);
-                //startBtn.disabled = false;
-                
-
-
-                    // Log the question and answer
-                console.log("Question " + (currentQuestionIndex + 1) + ": " + questionElement.textContent);
-                console.log("Answer " + (currentQuestionIndex + 1) + ": " + answer);
-                console.log(`Time used for question:`+ (currentQuestionIndex + 1) +": "+ counter)
-
-               
-
-                mediaRecorder.onstop = () => {
-                const blob = new Blob(recordedChunks, { type: 'audio/mp3' });
-                recordingsList.push(blob);
-                recordedChunks = []; // Clear the chunks for the next recording
-                numRecordings++;
-                document.getElementById('submitButton').disabled = false;
-                currentQuestionIndex++;
-
-                counter = 0; // Reset the counter to 0
-                ret.innerHTML = convertSec(counter); // Update the display to show 00:00
-               
-
-                if (currentQuestionIndex < quizData.questions.length) {
-                    loadQuestion();
-                    //mediaRecorder.start(); // Start the recorder for the next question
-
-                } else {
-                    document.getElementById('startButton').style.display = 'none';
-                    document.getElementById('stopButton').style.display = 'none';
-                    
-                    document.getElementById('submitButton').style.display = 'block';
-                    
-                    endTest();
-                    showRecordings();
-                    
-                }
-            };
-                
-              
-            }
-
-            }
-            document.getElementById('stopButton').disabled = false; // Ensure the stop button is re-enabled
-    
-        }*/
 
 function stopRecording() {
     let questionText = questionElement.textContent;
@@ -1139,10 +1122,10 @@ function stopRecording() {
 
 
             const currentQuestion = quizData.questions[currentQuestionIndex];
-            const currentQuestionPart = quizData.questions.part;
+            const currentQuestionPart = quizData.questions.part; 
 
-            questionElement.textContent = `Question ${currentQuestion.id}: ${currentQuestion.question}`;
-            document.getElementById("speaking-part").innerHTML = `Speaking part ${currentQuestion.part}`;
+            questionElement.textContent = `Question ${currentQuestion.stt}: ${currentQuestion.question}`;
+            document.getElementById("speaking-part").innerHTML = `Speaking part ${currentQuestion.part} - Topic: ${currentQuestion.topic}`;
             
             
             // Stop any ongoing speech before speaking the new question
@@ -1151,31 +1134,44 @@ function stopRecording() {
             textarea.value = '';
 
             document.getElementById('stopButton').disabled = false; // Ensure the stop button is enabled for each new question
-            if (mediaRecorder.state !== 'recording') {
+            /*if (mediaRecorder.state !== 'recording') {
                 mediaRecorder.start(); // Start the recorder for the new question
-            }
+            }*/
         }
 
         function showRecordings() {
             const recordingsListDiv = document.getElementById('recordingsList');
             recordingsListDiv.innerHTML = ''; // Clear previous recordings
-            recordingsList.forEach((blob,index) => {
+
+            recordingsList.forEach((blob, index) => {
                 const audioElement = document.createElement('audio');
                 audioElement.src = URL.createObjectURL(blob);
                 audioElement.controls = true;
-                audioElement.preload = 'metadata'; // Prevent autoplay
+                audioElement.preload = 'metadata';
 
                 const recordingLabel = document.createElement('p');
                 recordingLabel.textContent = `Question ${index + 1}:`;
 
                 recordingsListDiv.appendChild(recordingLabel);
                 recordingsListDiv.appendChild(audioElement);
+
+                // Retrieve and display the saved link from answers
+                const link = answers['link_audio' + (index + 1)];
+                if (link) {
+                    const linkElement = document.createElement('a');
+                    linkElement.href = link;
+                    linkElement.target = '_blank';
+                    linkElement.textContent = 'Download link';
+                    recordingsListDiv.appendChild(linkElement);
+                }
+
                 recordingsListDiv.appendChild(document.createElement('br'));
                 recordingsListDiv.appendChild(document.createElement('br'));
             });
 
             document.getElementById('submitButton').style.display = 'none';
         }
+
 
 
 // mic-check
@@ -1295,6 +1291,7 @@ for (let i = 0; i < quizData.questions.length; i++){
     quizData.questions.forEach((question, i) => {
         
         let answer = answers['answer' + (i + 1)] || "";
+        const link = answers['link_audio' + (i + 1)];
 
         let counter = counters['counter' + (i + 1)] || "";
         let reanswer = reanswers['reanswer' + (i + 1)] || "";
@@ -1393,12 +1390,12 @@ for (let i = 0; i < quizData.questions.length; i++){
 function ResultInput() {
         // Copy the content to the form fields
 
-    var contentToCopy1 = document.getElementById("userAnswerAndComment").textContent;
+    var contentToCopy1 = document.getElementById("data-save-full-speaking").textContent;
     var contentToCopy2 = document.getElementById("date").textContent;
     var contentToCopy4 = document.getElementById("title").textContent;
     var contentToCopy6 = document.getElementById("id_test").textContent;
     var contentToCopy7 = document.getElementById("userResult").textContent;
-    var contentToCopy8 = document.getElementById("userBandDetail").textContent;
+    var contentToCopy8 = document.getElementById("userBandDetail").innerHTML;
     var contentToCopy9 = document.getElementById("testtype").textContent;
 
 
@@ -1411,11 +1408,12 @@ function ResultInput() {
     document.getElementById("test_type").value = contentToCopy9;
 
     
-    // Add a delay before submitting the form
+   /* // Add a delay before submitting the form
 setTimeout(function() {
 // Automatically submit the form
 jQuery('#saveUserResultTest').submit();
-}, 5000); // 5000 milliseconds = 5 seconds
+}, 5000); // 5000 milliseconds = 5 seconds */
+
 }
           
 
@@ -1512,8 +1510,8 @@ function recordWord(expectedWord, buttonElement) {
             
 </script>
 
-<script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\summary2.js"></script>
-<script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\overall-tab1.js"></script>
+<script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\summarynew.js"></script>
+<script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\overalltab.js"></script>
 <script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\sample-tab.js"></script>
 <script src = "\wordpress\contents\themes\tutorstarter\scan-device\location_and_ip.js"></script>
 <script src = "\wordpress\contents\themes\tutorstarter\scan-device\system_os_2.js"></script>

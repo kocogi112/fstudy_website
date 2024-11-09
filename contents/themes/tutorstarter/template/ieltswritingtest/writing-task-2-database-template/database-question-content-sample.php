@@ -89,8 +89,8 @@ $result = $conn->query($sql);
         <th>Question Type</th>
         <th>Question Content</th>
         <th>Topic</th>
-        <th>Time for test (seconds)</th>
-        <th>Sample</th>
+        <th>Time for test (minute)</th>
+        <th>Sample Band 7</th>
         <th>Important Add</th>
         <th>Actions</th>
     </tr>
@@ -101,7 +101,7 @@ $result = $conn->query($sql);
                 // Process "Sample" and "Important Add" columns
                 $sample_words = explode(' ', $row['sample_writing']);
                 $sample_display = count($sample_words) > 20 ? implode(' ', array_slice($sample_words, 0, 20)) . '...' : $row['sample_writing'];
-                $sample_view_more = count($sample_words) > 20 ? "<button class='btn btn-link' onclick='showFullContent(\"Sample\", \"{$row['sample']}\")'>View More</button>" : '';
+                $sample_view_more = count($sample_words) > 20 ? "<button class='btn btn-link' onclick='showFullContent(\"Sample\", \"{$row['sample_writing']}\")'>View More</button>" : '';
 
                 $important_words = explode(' ', $row['important_add']);
                 $important_display = count($important_words) > 20 ? implode(' ', array_slice($important_words, 0, 20)) . '...' : $row['important_add'];
@@ -179,11 +179,11 @@ $result = $conn->query($sql);
             <div class="modal-body">
                 <form id="editForm">
                     <input type="hidden" id="edit_number" name="number">
-                    ID Test: <input type="number" id="edit_id_test" name="id_test" class="form-control" required><br>
+                    ID Test: <input type="text" id="edit_id_test" name="id_test" class="form-control" required><br>
                     Task: <input type="number" id="edit_task" name="task" class="form-control" required><br>
                     Question Type: <input type="text" id="edit_question_type" name="question_type" class="form-control" required><br>
                     Question Content: <textarea id="edit_question_content" name="question_content" class="form-control" required></textarea><br>
-                    Sample: <textarea  id="edit_sample_writing" name="sample_writing" class="form-control"></textarea><br>
+                    Sample Band 7: <textarea  id="edit_sample_writing" name="sample_writing" class="form-control"></textarea><br>
                     Time (seconds): <textarea  id="edit_time" name="time" class="form-control"></textarea><br>
 
                     Important Add: <textarea id="edit_important_add" name="important_add" class="form-control"></textarea><br>
@@ -210,12 +210,22 @@ $result = $conn->query($sql);
             </div>
             <div class="modal-body">
                 <form id="addForm">
-                    ID Test: <input type="number" id="add_id_test" name="id_test" class="form-control" required><br>
-                    Task: <input type="number" id="add_task" name="task" class="form-control" required><br>
-                    Question Type: <input type="text" id="add_question_type" name="question_type" class="form-control" required><br>
+                    ID Test: <input type="text" id="add_id_test" name="id_test" class="form-control" required><br>
+                    Task: <input type="number" id="add_task" name="task" class="form-control" value="2" readonly required><br>
+                    <select id="add_question_type" name="question_type" class="form-control" required>
+                        <option value="">Select a Question Type</option>
+                        <option value="Opinion Essay">Opinion Essay                        </option>
+                        <option value="Agree and Disagree Essay">Agree and Disagree Essay</option>
+                        <option value="Discussion Essay">Discussion Essay</option>
+                        <option value="Problem and Solution Essay">Problem and Solution Essay</option>
+                        <option value="Advantage and Disadvantage Essay">Advantage and Disadvantage Essay</option>
+                        <option value="Two Part Essay">Two Part Essay</option>
+
+                    </select><br>
+
                     Question Content: <textarea id="add_question_content" name="question_content" class="form-control" required></textarea><br>
                     Sample: <textarea id="add_sample_writing" name="sample_writing" class="form-control"></textarea><br>
-                    Time (seconds): <textarea id="add_time" name="time" class="form-control"></textarea><br>
+                    Time (seconds): <input id="add_time" name="time" class="form-control" value="40" readonly required><br>
 
                     Important Add: <textarea id="add_important_add" name="important_add" class="form-control"></textarea><br>
                     Topic: <input type="text" id="add_topic" name="topic" class="form-control" required><br>

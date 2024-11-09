@@ -6,13 +6,13 @@ global $wpdb;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Get the input data and sanitize it
-    $id_test = sanitize_text_field($_POST['id_test']);
-    $part = sanitize_text_field($_POST['part']);
-    $duration = intval($_POST['duration']);
-    $number_question_of_this_part = sanitize_textarea_field($_POST['number_question_of_this_part']);
-    $paragraph = sanitize_textarea_field($_POST['paragraph']);
-    $group_question = json_encode(sanitize_textarea_field($_POST['group_question']));
-    $category = sanitize_textarea_field($_POST['category']);
+    $id_test = wp_kses_post($_POST['id_test']);
+    $part = wp_kses_post($_POST['part']);
+    $duration = wp_kses_post($_POST['duration']);
+    $number_question_of_this_part = wp_kses_post($_POST['number_question_of_this_part']);
+    $paragraph = wp_kses_post($_POST['paragraph']);
+    $group_question = json_encode(wp_kses_post($_POST['group_question']));
+    $category = wp_kses_post($_POST['category']);
 
     // Prepare the data for insertion
     $data = array(
