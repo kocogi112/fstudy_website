@@ -1,4 +1,5 @@
 <?php
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -203,8 +204,8 @@ if ( ! class_exists( 'UM' ) ) {
 				$this->is_filtering = 0;
 				$this->honeypot = 'um_request';
 
-				// textdomain loading
-				add_action( 'init', array( &$this, 'localize' ), 0 );
+				// @todo investigate permanently delete https://make.wordpress.org/core/2024/10/21/i18n-improvements-6-7/#Enhanced-support-for-only-using-PHP-translation-files
+				add_action( 'init', array( &$this, 'localize' ), 0 ); // textdomain loading
 
 				// include UM classes
 				$this->includes();
@@ -242,33 +243,33 @@ if ( ! class_exists( 'UM' ) ) {
 		 *
 		 * @since 2.8.5 WordPress native functions are used to make this function clear.
 		 */
-		public function localize() {
-			$default_domain = dirname( plugin_basename( UM_PLUGIN ) );
-			/**
-			 * Filters the plugin's textdomain.
-			 *
-			 * @param {string} $domain Plugin's textdomain.
-			 *
-			 * @return {string} Maybe changed plugin's textdomain.
-			 *
-			 * @since 1.3.x
-			 * @hook um_language_textdomain
-			 *
-			 * @example <caption>Change UM language locale.</caption>
-			 * function my_um_language_textdomain( $domain ) {
-			 *     $domain = 'ultimate-member-custom';
-			 *     return $domain;
-			 * }
-			 * add_filter( 'um_language_textdomain', 'my_um_language_textdomain' );
-			 */
-			$domain = apply_filters( 'um_language_textdomain', $default_domain );
-
-			// Unload textdomain if it has already loaded.
-			if ( is_textdomain_loaded( $domain ) ) {
-				unload_textdomain( $domain, true );
-			}
-			load_plugin_textdomain( $domain, false, $default_domain . '/languages' );
-		}
+//		public function localize() {
+//			$default_domain = dirname( plugin_basename( UM_PLUGIN ) );
+//			/**
+//			 * Filters the plugin's textdomain.
+//			 *
+//			 * @param {string} $domain Plugin's textdomain.
+//			 *
+//			 * @return {string} Maybe changed plugin's textdomain.
+//			 *
+//			 * @since 1.3.x
+//			 * @hook um_language_textdomain
+//			 *
+//			 * @example <caption>Change UM language locale.</caption>
+//			 * function my_um_language_textdomain( $domain ) {
+//			 *     $domain = 'ultimate-member-custom';
+//			 *     return $domain;
+//			 * }
+//			 * add_filter( 'um_language_textdomain', 'my_um_language_textdomain' );
+//			 */
+//			$domain = apply_filters( 'um_language_textdomain', $default_domain );
+//
+//			// Unload textdomain if it has already loaded.
+//			if ( is_textdomain_loaded( $domain ) ) {
+//				unload_textdomain( $domain, true );
+//			}
+//			load_plugin_textdomain( $domain, false, $default_domain . '/languages' );
+//		}
 
 		/**
 		 * 1.3.x active extensions deactivate for properly running 2.0.x AJAX upgrades
@@ -502,7 +503,10 @@ if ( ! class_exists( 'UM' ) ) {
 		 */
 		public function includes() {
 
+			$this->maybe_action_scheduler();
+
 			$this->common()->includes();
+
 			$this->access();
 
 			if ( $this->is_request( 'ajax' ) ) {
@@ -544,7 +548,6 @@ if ( ! class_exists( 'UM' ) ) {
 			$this->password();
 			$this->rewrite();
 			$this->mail();
-			$this->rest_api();
 			$this->shortcodes();
 			$this->roles();
 			$this->user();
@@ -561,11 +564,15 @@ if ( ! class_exists( 'UM' ) ) {
 			$this->blocks();
 			$this->secure();
 
-			//if multisite networks active
+			// If multisite networks active
 			if ( is_multisite() ) {
 				$this->multisite();
 			}
 
+			// Call only when REST_API request
+			if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+				$this->rest_api();
+			}
 		}
 
 
@@ -997,14 +1004,12 @@ if ( ! class_exists( 'UM' ) ) {
 			return $this->classes['config'];
 		}
 
-
 		/**
 		 * @since 2.0
 		 *
 		 * @return um\core\rest\API_v1|um\core\rest\API_v2
 		 */
-		function rest_api() {
-
+		public function rest_api() {
 			$api_version = $this->options()->get( 'rest_api_version' );
 
 			if ( empty( $this->classes['rest_api'] ) ) {
@@ -1019,7 +1024,6 @@ if ( ! class_exists( 'UM' ) ) {
 
 			return $this->classes['rest_api'];
 		}
-
 
 		/**
 		 * @since 2.0
@@ -1439,6 +1443,19 @@ if ( ! class_exists( 'UM' ) ) {
 			return $this->classes['multisite'];
 		}
 
+		/**
+		 * Maybe include and init Action Scheduler.
+		 *
+		 * @since 2.9.0
+		 *
+		 * @return um\action_scheduler\Init
+		 */
+		public function maybe_action_scheduler() {
+			if ( empty( $this->classes['action_scheduler'] ) ) {
+				$this->classes['action_scheduler'] = new um\action_scheduler\Init();
+			}
+			return $this->classes['action_scheduler'];
+		}
 
 		/**
 		 * Include files with hooked filters/actions

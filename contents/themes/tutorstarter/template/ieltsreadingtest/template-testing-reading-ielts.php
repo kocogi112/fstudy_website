@@ -532,7 +532,7 @@ body {
 
     
 <!--Note: Database nen them phan loai : VD multiple choice, gap filling,...-->
-    <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/scripta9.js"></script>
+    <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/script.js"></script>
 </body>
 <script>
     // function save data qua ajax

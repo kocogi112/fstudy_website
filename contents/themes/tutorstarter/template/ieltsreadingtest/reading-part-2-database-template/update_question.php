@@ -11,7 +11,7 @@ $part = wp_kses_post($_POST['part']);
 $duration = wp_kses_post($_POST['duration']);
 $number_question_of_this_part = wp_kses_post($_POST['number_question_of_this_part']);
 $paragraph = wp_kses_post($_POST['paragraph']);
-//$group_question = wp_kses_post($_POST['group_question']);
+$group_question = wp_unslash(wp_kses_post($_POST['group_question']));
 $category = wp_kses_post($_POST['category']);
 
 // Prepare the data for updating
@@ -21,7 +21,7 @@ $data = array(
     'duration' => $duration,
     'number_question_of_this_part' => $number_question_of_this_part,
     'paragraph' => $paragraph,
-   // 'group_question' => $group_question,
+   'group_question' => $group_question,
     'category' => $category,
 );
 

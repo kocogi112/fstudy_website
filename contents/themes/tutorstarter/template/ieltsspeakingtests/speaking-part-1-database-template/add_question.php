@@ -9,8 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $id_test = wp_kses_post($_POST['id_test']);
     $topic = wp_kses_post($_POST['topic']);
     $stt = wp_kses_post($_POST['stt']);
-    $question_content = wp_kses_post($_POST['question_content']);
-    $sample = wp_kses_post($_POST['sample']);
+    $question_content = wp_unslash(wp_kses_post($_POST['question_content']));
+    $sample = wp_unslash(wp_kses_post($_POST['sample']));
     $important_add = wp_kses_post($_POST['important_add']);
     $speaking_part = wp_kses_post($_POST['speaking_part']);
 

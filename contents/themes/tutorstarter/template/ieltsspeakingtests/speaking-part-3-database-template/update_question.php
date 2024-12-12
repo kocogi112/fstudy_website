@@ -12,7 +12,7 @@ $stt = wp_kses_post($_POST['stt']);
 
 // Escape content to retain line breaks
 $question_content = wp_kses_post($_POST['question_content']);
-$sample = wp_kses_post($_POST['sample']);
+$sample = wp_unslash(wp_kses_post($_POST['sample']));
 $important_add = wp_kses_post($_POST['important_add']);
 $speaking_part = wp_kses_post($_POST['speaking_part']);
 

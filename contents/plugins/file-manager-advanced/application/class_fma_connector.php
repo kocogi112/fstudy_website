@@ -72,7 +72,13 @@ class class_fma_connector
 		'locked' => false
 	);	
 	if(isset($settings['enable_htaccess']) && !empty($settings['enable_htaccess']) && $settings['enable_htaccess'] == '1') {
-		$hide_htaccess = array();
+		$hide_htaccess = array(
+			'pattern' => '/.htaccess/',
+			'read' => true,
+			'write' => true,
+			'hidden' => false,
+			'locked' => false
+		);	
     }
 	// getting allowed upload
 	$allowUpload = array('all');
@@ -138,10 +144,24 @@ die;
  * Hook to fix invalid and malicious files
  */
 function afm_plugin_file_validName($name) {
+
 	if(!empty($name)) {
-		$name = sanitize_file_name($name);
+
+		if($name !== sanitize_file_name($name)){
+			return false;
+		}
+
 		$lower_name = strtolower($name);
-		if(strpos($lower_name, '.php') || strpos($lower_name, '.phtml') || strpos($lower_name, '.ini') || strpos($lower_name, '.htaccess') || strpos($lower_name, 'htaccess') || strpos($lower_name, '.config') || strpos($lower_name, '.css') || strpos($lower_name, '.js')) {
+
+		if(
+			  strpos($lower_name, '.php') !== false
+		   || strpos($lower_name, '.phtml') !== false
+		   || strpos($lower_name, '.ini') !== false
+		   || strpos($lower_name, '.htaccess') !== false
+		   || strpos($lower_name, '.config') !== false
+		   || strpos($lower_name, '.css') !== false 
+		   || strpos($lower_name, '.js') !== false 
+		  ) {
 			return false;
 		} else {
 			return strpos($name, '.') !== 0;
@@ -150,8 +170,13 @@ function afm_plugin_file_validName($name) {
 }
 function access($attr, $path, $data, $volume, $isDir, $relpath) {
 	$basename = basename($path);
+	//skipping htaccess
+	if($basename == '.htaccess') {
+		return null;
+	} else {
 	return $basename[0] === '.'                  // if file/folder begins with '.' (dot)
 			 && strlen($relpath) !== 1           // but with out volume root
 		? !($attr == 'read' || $attr == 'write') // set read+write to false, other (locked+hidden) set to true
-		:  null;                                 // else elFinder decide it itself
-}
+		:  null;   // else elFinder decide it itself
+	}
+	}                              

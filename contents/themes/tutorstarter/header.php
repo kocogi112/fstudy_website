@@ -24,9 +24,7 @@ $trans_header_toggle = ( ! empty( $page_meta['header_trans_toggle'] ) ? $page_me
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="profile" href="http://gmpg.org/xfn/11">
 	<link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>">
-	
 	<?php wp_head(); ?>
-	
 </head>
 
 <body <?php body_class(); ?>>
@@ -39,7 +37,7 @@ $trans_header_toggle = ( ! empty( $page_meta['header_trans_toggle'] ) ? $page_me
 <?php
 if ( false === $disable_header ) {
 	if ( true === $trans_header_toggle ) {
-	get_template_part( 'views/partials/header/header_transparent' );
+		get_template_part( 'views/partials/header/header_transparent' );
 	} else {
 		$header_style = get_theme_mod( 'header_type_select', 'header_default' );
 		'header_transparent' === $header_style ? get_template_part( 'views/partials/header/header_transparent' ) : get_template_part( 'views/partials/header/header_default' );

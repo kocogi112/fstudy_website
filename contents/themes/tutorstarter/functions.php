@@ -12,8 +12,6 @@ if ( ! isset( $content_width ) ) {
 	$content_width = apply_filters( 'tutorstarter_content_width', get_theme_mod( 'content_width_value', 1140 ) );
 }
 
-
-
 // Theme GLOBALS.
 $theme = wp_get_theme();
 define( 'TUTOR_STARTER_VERSION', $theme->get( 'Version' ) );
@@ -32,8 +30,3 @@ endif;
 if ( class_exists( 'Tutor_Starter\\Init' ) ) :
 	Tutor_Starter\Init::register_services();
 endif;
-
-
-add_filter('rest_url_prefix', function() {
-    return 'api'; // Change 'api' to your desired prefix
-});
