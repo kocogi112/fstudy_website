@@ -153,7 +153,6 @@ $conn->close();
     justify-content: center;
     font-size: 20px;
     width: 60%;
-    height: 400px;
     perspective: 1000px;
    /* margin-bottom: 50px; */
 }
@@ -297,7 +296,7 @@ $conn->close();
     font-size: 18px; /* Kích thước biểu tượng */
 }
 
-#nextButton {
+#next {
     display: inline-flex; /* Nội dung nằm ngang */
     align-items: center; /* Căn giữa dọc */
     gap: 8px; /* Khoảng cách giữa icon và chữ */
@@ -310,11 +309,11 @@ $conn->close();
     transition: background-color 0.3s ease;
 }
 
-#nextButton:hover {
+#next:hover {
     background-color: #e0e0e0; /* Hiệu ứng khi rê chuột */
 }
 
-#nextButton i {
+#next i {
     font-size: 18px; /* Kích thước biểu tượng */
 }
 .tabs {
@@ -362,6 +361,22 @@ table th {
     background-color: #f9f9f9;
 }
 
+.choice {
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+.choice:hover {
+    background-color: #f0f0f0; /* Màu khi hover */
+}
+
+.choice.selected {
+    background-color: #d1e7dd; /* Màu nền cho lựa chọn được chọn */
+    border-color: #0f5132;    /* Màu viền */
+    color: #0f5132;           /* Màu chữ */
+}
 
 </style>
 <body>
@@ -377,6 +392,7 @@ table th {
             <p id="explanationText"></p>
             <p id="definitionText"></p>
             <p id="exampleText"></p>
+            <p id="vocabText"></p>
             <input type="text" id="vocabInput" placeholder="Nhập câu trả lời của bạn ...">
             <!-- Nút kiểm tra -->
            
@@ -390,7 +406,7 @@ table th {
             </button>
 
   
-            <button id="nextButton" >
+            <button id="next" >
                 Bỏ qua →
             </button>
       
@@ -412,7 +428,7 @@ table th {
         <p>Thời gian hoàn thành: <span id="completionTime"></span> giây</p>
         <p>Trạng thái: <span id="status"></span></p>
     </div>
-    <script src="http://localhost/wordpress/contents/themes/tutorstarter/study_vocabulary_toolkit/test-new-word/script9.js"></script>
+    <script src="http://localhost/wordpress/contents/themes/tutorstarter/study_vocabulary_toolkit/test-new-word/script_6.js"></script>
 
 </body>
 </html>

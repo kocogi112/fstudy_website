@@ -20,29 +20,6 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Prepare the SQL query to fetch question_content and stt where id_test matches the custom_number
-$sql = "SELECT stt, question_content, topic, speaking_part, sample  FROM ielts_speaking_part_1_question WHERE id_test = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $custom_number); // 'i' is used for integer
-$stmt->execute();
-$result1 = $stmt->get_result();
-
-// Prepare the SQL query to fetch question_content and stt where id_test matches the custom_number
-$sql2 = "SELECT question_content, topic, speaking_part, sample  FROM ielts_speaking_part_2_question WHERE id_test = ?";
-$stmt2 = $conn->prepare($sql2);
-$stmt2->bind_param("i", $custom_number); // 'i' is used for integer
-$stmt2->execute();
-$result2 = $stmt2->get_result();
-
-
-// Prepare the SQL query to fetch question_content and stt where id_test matches the custom_number
-$sql3 = "SELECT stt, question_content, topic, speaking_part, sample  FROM ielts_speaking_part_3_question WHERE id_test = ?";
-$stmt3 = $conn->prepare($sql3);
-$stmt3->bind_param("i", $custom_number); // 'i' is used for integer
-$stmt3->execute();
-$result3 = $stmt3->get_result();
-
-
 
 
 
@@ -59,7 +36,7 @@ $conn->close();
 
     // Get results for the current user and specific idtest (custom_number)
     $results_query = $wpdb->prepare("
-        SELECT * FROM save_user_result_ielts_speaking 
+        SELECT * FROM save_user_result_ielts_reading 
         WHERE username = %s 
         AND idtest = %d
         ORDER BY dateform DESC",
@@ -238,6 +215,8 @@ $conn->close();
                             <th>Ngày làm</th>
                             <th>Kết quả</th>
                             <th>Điểm thành phần</th>
+                            <th>Chi tiết bài làm</th>
+
                         </tr>
                     </thead>
                     <tbody>
@@ -247,8 +226,13 @@ $conn->close();
                         ?>
                         <tr>
                             <td><?php echo esc_html($result->dateform); ?></td>
-                            <td><?php echo esc_html($result->resulttest); ?></td>
-                            <td><?php echo esc_html($result->band_detail); ?></td>
+                            <td><?php echo esc_html($result->overallband); ?></td>
+                            <td><?php echo esc_html($result->correct_percentage); ?></td>
+                            <td>
+                                <a href="<?php echo esc_url(get_permalink()) . 'result/' . esc_html($result->testsavenumber); ?>">
+                                    Xem bài làm
+                                </a>
+                            </td>
                         </tr>
                         <?php
                     }

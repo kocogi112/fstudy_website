@@ -160,7 +160,6 @@ const quizData = {
 
 
 
-
 // save date (ngày làm bài cho user)
 const currentDate = new Date();
 
@@ -171,7 +170,7 @@ const year = currentDate.getFullYear();
 
             // Display the date
 const dateElement = document.getElementById('date');
-dateElement.innerHTML = `${day}/${month}/${year}`;
+dateElement.innerHTML = `${year}/${month}/${day}`;
 
 
 
@@ -182,9 +181,7 @@ let currentPartIndex = 0;
 
 function loadPart(partIndex) {
     const part = quizData.part[partIndex];
-    console.log(part); // Add this line
-
-    console.log(part.group_question); // Add this line
+    console.log("Passed LoadPart");
 
     // Display the paragraph
     document.getElementById('paragraph-container').innerHTML = `<p>${part.paragraph}</p>`;
@@ -194,7 +191,7 @@ function loadPart(partIndex) {
 
     // Update the question range and add the timer
     const timerHtml = `<span id="timer" style="font-weight: bold></span>`;
-    document.getElementById('question-range-of-part').innerHTML = `<b>Part ${partIndex + 1}</b> <br>Read the text and answer questionss ${questionRange} `;
+    document.getElementById('question-range-of-part').innerHTML = `<b>Part ${partIndex + 1}</b> <br>Read the text and answer questions ${questionRange} `;
 
     // Start the timer
     // Display the groups and questions
@@ -212,50 +209,48 @@ function loadPart(partIndex) {
             <h4>Question ${group.group}:</h4>
             <p>${group.question_group_content}</p>
         `;
-        if (Array.isArray(part.group_question)) {
 
-            group.questions.forEach((question, questionIndex) => {
-                const questionElement = document.createElement('div');
-                questionElement.classList.add('question');
+        group.questions.forEach((question, questionIndex) => {
+            const questionElement = document.createElement('div');
+            questionElement.classList.add('question');
 
-                // Multi-select questions
-                if (group.type_group_question === "multi-select") {
-                    const answerChoiceCount = parseInt(question.number_answer_choice) || 1;
-                    const questionRange = `${currentQuestionNumber}-${currentQuestionNumber + answerChoiceCount - 1}`;
+            // Multi-select questions
+            if (group.type_group_question === "multi-select") {
+                const answerChoiceCount = parseInt(question.number_answer_choice) || 1;
+                const questionRange = `${currentQuestionNumber}-${currentQuestionNumber + answerChoiceCount - 1}`;
 
-                    questionElement.innerHTML = `<p  id ="question-id-${questionRange}"><b>${questionRange}.</b> ${question.question}</p>`;
+                questionElement.innerHTML = `<p  id ="question-id-${questionRange}"><b>${questionRange}.</b> ${question.question}</p>`;
 
-                    question.answers.forEach((answer, answerIndex) => {
-                        const answerOption = document.createElement('div');
-                        //const inputId = `multiselect-${partIndex}-${groupIndex}-${questionIndex}-${answerIndex}`;
-                        const inputId = `answer-input-${questionRange}-${answerIndex + 1}`;
+                question.answers.forEach((answer, answerIndex) => {
+                    const answerOption = document.createElement('div');
+                    //const inputId = `multiselect-${partIndex}-${groupIndex}-${questionIndex}-${answerIndex}`;
+                    const inputId = `answer-input-${questionRange}-${answerIndex + 1}`;
 
 
-                        answerOption.innerHTML = `
-                            <label>
-                                <input type="checkbox" id="${inputId}" name="question-${currentQuestionNumber}" value="${answer[0]}">
-                                ${answer[0]}
-                            </label>
-                        `;
+                    answerOption.innerHTML = `
+                        <label>
+                            <input type="checkbox" id="${inputId}" name="question-${currentQuestionNumber}" value="${answer[0]}">
+                            ${answer[0]}
+                        </label>
+                    `;
 
-                        const checkbox = answerOption.querySelector('input');
-                        checkbox.addEventListener('change', (event) => {
-                            saveUserAnswer(partIndex, groupIndex, questionIndex, answerIndex, event.target.checked);
-                        });
-
-                        // Restore the saved answer
-                        if (isAnswerSelected(partIndex, groupIndex, questionIndex, answerIndex)) {
-                            checkbox.checked = true;
-                        }
-
-                        questionElement.appendChild(answerOption);
+                    const checkbox = answerOption.querySelector('input');
+                    checkbox.addEventListener('change', (event) => {
+                        saveUserAnswer(partIndex, groupIndex, questionIndex, answerIndex, event.target.checked);
                     });
 
-                    currentQuestionNumber += answerChoiceCount;
-                }
+                    // Restore the saved answer
+                    if (isAnswerSelected(partIndex, groupIndex, questionIndex, answerIndex)) {
+                        checkbox.checked = true;
+                    }
 
-            // Completion questions
-                // Completion questions
+                    questionElement.appendChild(answerOption);
+                });
+
+                currentQuestionNumber += answerChoiceCount;
+            }
+
+           // Completion questions
            if (group.type_group_question === "completion") {
             let questionContent = question.question;
             const completionInputIds = []; // Lưu trữ danh sách các ID để kiểm tra sau
@@ -297,53 +292,52 @@ function loadPart(partIndex) {
             // Tăng số thứ tự câu hỏi
             currentQuestionNumber += question.box_answers.length;
         }
+        
+        
+        
+        
 
-                // Multiple-choice questions (single-select)
-                if (group.type_group_question === "multiple-choice") {
-                    questionElement.innerHTML = `<p  id ="question-id-${currentQuestionNumber}"><b>${currentQuestionNumber}.</b> ${question.question}</p>`;
+            // Multiple-choice questions (single-select)
+            if (group.type_group_question === "multiple-choice") {
+                questionElement.innerHTML = `<p  id ="question-id-${currentQuestionNumber}"><b>${currentQuestionNumber}.</b> ${question.question}</p>`;
 
-                    question.answers.forEach((answer, answerIndex) => {
-                        const answerElement = document.createElement('label');
-                        //const inputId = `${partIndex}-${groupIndex}-${questionIndex}-${answerIndex}`;
-                        const inputId = `${currentQuestionNumber}-${answerIndex + 1}`;
-                    /* answerElement.innerHTML = `
-                            <input type="radio" name="multiplechoice-${partIndex}-${groupIndex}-${questionIndex}" value="${answer[0]}" id="${inputId}">
-                            ${answer[0]}
-                        `;*/
-                        answerElement.innerHTML = `
-                            <input type="radio" name="question-${currentQuestionNumber}"  value="${answer[0]}" id="answer-input-${inputId}">
-                            ${answer[0]}
-                        `;
+                question.answers.forEach((answer, answerIndex) => {
+                    const answerElement = document.createElement('label');
+                    //const inputId = `${partIndex}-${groupIndex}-${questionIndex}-${answerIndex}`;
+                    const inputId = `${currentQuestionNumber}-${answerIndex + 1}`;
+                   /* answerElement.innerHTML = `
+                        <input type="radio" name="multiplechoice-${partIndex}-${groupIndex}-${questionIndex}" value="${answer[0]}" id="${inputId}">
+                        ${answer[0]}
+                    `;*/
+                     answerElement.innerHTML = `
+                        <input type="radio" name="question-${currentQuestionNumber}"  value="${answer[0]}" id="answer-input-${inputId}">
+                        ${answer[0]}
+                    `;
 
-                        answerElement.querySelector('input').addEventListener('change', (event) => {
-                            saveUserAnswer(partIndex, groupIndex, questionIndex, answerIndex, event.target.checked || event.target.value);
-                        });
-
-                        // Restore saved multiple-choice answer
-                        if (isAnswerSelected(partIndex, groupIndex, questionIndex, answerIndex)) {
-                            answerElement.querySelector('input').checked = true;
-                        }
-
-                        questionElement.appendChild(answerElement);
+                    answerElement.querySelector('input').addEventListener('change', (event) => {
+                        saveUserAnswer(partIndex, groupIndex, questionIndex, answerIndex, event.target.value);
                     });
+            
+                    // Restore the saved answer if it exists
+                    if (isAnswerSelected(partIndex, groupIndex, questionIndex, answerIndex)) {
+                        answerElement.querySelector('input').checked = true;
+                    }
+            
+                    questionElement.appendChild(answerElement);
+                });
 
-                    currentQuestionNumber++;
-                }
-
-                groupContainer.appendChild(questionElement);
-            });}
-            else {
-                console.error("group_question is not an array", part.group_question);
+                currentQuestionNumber++;
             }
 
-            questionsContainer.appendChild(groupContainer);
+            groupContainer.appendChild(questionElement);
         });
-    
-    
+
+        questionsContainer.appendChild(groupContainer);
+    });
+
     document.getElementById("test-prepare").style.display = "none";
     document.getElementById("content").style.display = "block";
 }
-
 
 // Function to calculate the starting question number for a part
 function getStartingQuestionNumber(partIndex) {
@@ -412,15 +406,20 @@ let userAnswers = {}; // Object to store user answers
 
 // Save the user's answer selection for multiple-choice and multi-select
 function saveUserAnswer(partIndex, groupIndex, questionIndex, answerIndex, value) {
+    // Ensure we save the most recent answer chosen by the user
     if (!userAnswers[partIndex]) {
-        userAnswers[partIndex] = {};
+        userAnswers[partIndex] = [];
     }
     if (!userAnswers[partIndex][groupIndex]) {
-        userAnswers[partIndex][groupIndex] = {};
+        userAnswers[partIndex][groupIndex] = [];
     }
     if (!userAnswers[partIndex][groupIndex][questionIndex]) {
         userAnswers[partIndex][groupIndex][questionIndex] = [];
     }
+
+    // Save the answer, ensuring only the selected one is marked as true
+    userAnswers[partIndex][groupIndex][questionIndex] = answerIndex;
+    console.log('Answer saved:', userAnswers);
 
     // For multi-select, toggle answer in array; for single-select, save the answer directly
     if (Array.isArray(userAnswers[partIndex][groupIndex][questionIndex])) {
@@ -457,7 +456,8 @@ function saveCompletionAnswer(partIndex, groupIndex, questionIndex, boxIndex, va
 // Check if an answer is already selected
 function isAnswerSelected(partIndex, groupIndex, questionIndex, answerIndex) {
     const selected = userAnswers?.[partIndex]?.[groupIndex]?.[questionIndex];
-    return selected && (Array.isArray(selected) ? selected.includes(answerIndex) : selected === answerIndex);
+    return userAnswers[partIndex]?.[groupIndex]?.[questionIndex] === answerIndex;
+
 }
 let timerInterval; // Declare timer interval globally
 
@@ -495,6 +495,8 @@ function startTimer(duration) {
 let totalCorrectAnswers = 0;
 let totalIncorrectAnswers = 0;
 let totalQuestionsCount = 0;
+let totalSkipAnswers = 0;
+
 function logUserAnswers(partIndex) {
     let userAnswerdiv = document.getElementById('useranswerdiv');
     const endTime = Date.now(); // Lấy thời gian hiện tại
@@ -506,9 +508,10 @@ function logUserAnswers(partIndex) {
 
     const part = quizData.part[partIndex];
     
-    // Initialize variables for correct and incorrect answers
+    // Initialize variables for correct, incorrect, and skipped answers
     let correctCount = 0;
     let incorrectCount = 0;
+    let skippedCount = 0; // New variable for skipped answers
     let totalQuestions = 0; // Total question count
 
     // Initialize the current question number for this part
@@ -528,11 +531,9 @@ function logUserAnswers(partIndex) {
                 const correctAnswers = [];
 
                 question.answers.forEach((answer, answerIndex) => {
-                    // Check if this answer is selected by the user
                     if (isAnswerSelected(partIndex, groupIndex, questionIndex, answerIndex)) {
                         selectedAnswers.push(answer[0]);
                     }
-                    // Check if this answer is marked as correct
                     if (answer[1] === true) {
                         correctAnswers.push(answer[0]);
                     }
@@ -541,42 +542,42 @@ function logUserAnswers(partIndex) {
                 userAnswer = selectedAnswers.length > 0 ? selectedAnswers.join(', ') : "Not answered";
                 correctAnswer = correctAnswers.length > 0 ? correctAnswers.join(', ') : "Not available";
 
-                // Compare userAnswer and correctAnswer, case-insensitive
                 if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
-                    correctCount += answerChoiceCount; // Count as multiple questions
+                    correctCount += answerChoiceCount;
+                } else if (userAnswer === "Not answered") {
+                    skippedCount += answerChoiceCount; // Increment skipped count
                 } else {
                     incorrectCount += answerChoiceCount;
                 }
 
-                console.log(`Question ${questionNumber}: User Answer: ${userAnswer}, Correct Answer: ${correctAnswer}`);
-                userAnswerdiv.innerHTML += `Question ${questionNumber}: User Answer: ${userAnswer}, Correct Answer: ${correctAnswer}<br>`;
-
-                currentQuestionNumber += answerChoiceCount; // Increment the question number
-                totalQuestions += answerChoiceCount; // Count total number of questions
+                userAnswerdiv.innerHTML += `Question: ${questionNumber}, Part: ${partIndex+1}, User Answer: ${userAnswer} <br>`;
+                currentQuestionNumber += answerChoiceCount;
+                totalQuestions += answerChoiceCount;
             }
 
             // Handle completion questions
             else if (group.type_group_question === "completion") {
                 question.box_answers.forEach((boxAnswer, boxIndex) => {
-                    const completionNumber = currentQuestionNumber + boxIndex; // This matches how loadPart handles completion inputs
+                    const completionNumber = currentQuestionNumber + boxIndex;
                     const savedAnswer = userAnswers?.[partIndex]?.[groupIndex]?.[questionIndex]?.[boxIndex];
 
                     userAnswer = savedAnswer ? savedAnswer : "Not answered";
-                    correctAnswer = boxAnswer.answer ? boxAnswer.answer : "Not available"; // Assume correct answer is in `boxAnswer.answer`
+                    correctAnswer = boxAnswer.answer ? boxAnswer.answer : "Not available";
 
-                    // Compare userAnswer and correctAnswer, case-insensitive
                     if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
                         correctCount++;
+                    } else if (userAnswer === "Not answered") {
+                        skippedCount++; // Increment skipped count
                     } else {
                         incorrectCount++;
                     }
 
                     console.log(`Question ${completionNumber}: User Answer: ${userAnswer}, Correct Answer: ${correctAnswer}`);
-                    userAnswerdiv.innerHTML += `Question ${completionNumber}: User Answer: ${userAnswer}, Correct Answer: ${correctAnswer}<br>`;
+                    userAnswerdiv.innerHTML += `Question: ${completionNumber}, Part: ${partIndex+1}, User Answer: ${userAnswer} <br>`;
                 });
 
-                currentQuestionNumber += question.box_answers.length; // Increment by the number of boxes
-                totalQuestions += question.box_answers.length; // Count total number of completion questions
+                currentQuestionNumber += question.box_answers.length;
+                totalQuestions += question.box_answers.length;
             }
 
             // Handle multiple-choice questions
@@ -585,52 +586,50 @@ function logUserAnswers(partIndex) {
                 const savedAnswerIndex = question.answers.findIndex((answer, answerIndex) => isAnswerSelected(partIndex, groupIndex, questionIndex, answerIndex));
                 userAnswer = savedAnswerIndex !== -1 ? question.answers[savedAnswerIndex][0] : "Not answered";
                 
-                const correctAnswerIndex = question.answers.findIndex(answer => answer[1] === true); // Find the correct answer
+                const correctAnswerIndex = question.answers.findIndex(answer => answer[1] === true);
                 correctAnswer = correctAnswerIndex !== -1 ? question.answers[correctAnswerIndex][0] : "Not available";
 
-                // Compare userAnswer and correctAnswer, case-insensitive
                 if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
                     correctCount++;
+                } else if (userAnswer === "Not answered") {
+                    skippedCount++; // Increment skipped count
                 } else {
                     incorrectCount++;
                 }
 
                 console.log(`Question ${questionNumber}: User Answer: ${userAnswer}, Correct Answer: ${correctAnswer}`);
-                userAnswerdiv.innerHTML += `Question ${questionNumber}: User Answer: ${userAnswer}, Correct Answer: ${correctAnswer}<br>`;
-
-                currentQuestionNumber++; // Increment the question number for the next question
-                totalQuestions++; // Count as a single question
+                userAnswerdiv.innerHTML += `Question: ${questionNumber}, Part: ${partIndex+1}, User Answer: ${userAnswer} <br>`;
+                currentQuestionNumber++;
+                totalQuestions++;
             }
         });
     });
-     // Cộng dồn kết quả cho cả bài kiểm tra
-     totalCorrectAnswers += correctCount;
-     totalIncorrectAnswers += incorrectCount;
-     totalQuestionsCount += totalQuestions;
 
-    // Log the number of correct and incorrect answers
+    // Update total counts for the entire test
+    totalCorrectAnswers += correctCount;
+    totalIncorrectAnswers += incorrectCount;
+    totalQuestionsCount += totalQuestions;
+    totalSkipAnswers += skippedCount;
+
+    
+    // Log the results
     console.log(`Total correct answers: ${correctCount}`);
     console.log(`Total incorrect answers: ${incorrectCount}`);
+    console.log(`Total skipped answers: ${skippedCount}`); // Log skipped answers
     console.log(`Total questions: ${totalQuestions}`);
-
-   /* userAnswerdiv.innerHTML += `<br>Total correct answers: ${correctCount}<br>`;
-    userAnswerdiv.innerHTML += `Total incorrect answers: ${incorrectCount}<br>`;
-    userAnswerdiv.innerHTML += `Total questions: ${totalQuestions}<br>`;*/
 
     console.log(`Overall Total correct answers: ${totalCorrectAnswers}`);
     console.log(`Overall Total incorrect answers: ${totalIncorrectAnswers}`);
+    console.log(`Overall Total skipped answers: ${totalSkipAnswers}`);
     console.log(`Overall Total questions: ${totalQuestionsCount}`);
-
-    
 }
+
 
 let ieltsBandScore;
 function fulltestResult(){
     // In kết quả cuối cùng vào HTML nếu cần
-    /*const userAnswerdiv = document.getElementById('useranswerdiv');
-    userAnswerdiv.innerHTML += `<br><strong>Overall Total correct answers: ${totalCorrectAnswers}</strong><br>`;
-    userAnswerdiv.innerHTML += `<strong>Overall Total incorrect answers: ${totalIncorrectAnswers}</strong><br>`;
-    userAnswerdiv.innerHTML += `<strong>Overall Total questions: ${totalQuestionsCount}</strong><br>`;*/
+    const userAnswerdiv = document.getElementById('useranswerdiv');
+
 
     if(totalCorrectAnswers  == 3){
         ieltsBandScore = 2;
@@ -680,7 +679,6 @@ function fulltestResult(){
     else{
         ieltsBandScore = 0;
     }
-   // userAnswerdiv.innerHTML += `<h3>Overall band: ${ieltsBandScore}</h3>`
 
 }
 
@@ -700,15 +698,23 @@ function ResultInput() {
     var contentToCopy7 = document.getElementById("correctanswerdiv").textContent;
 */
 
-    
-    document.getElementById("overallband").value = ieltsBandScore;
     document.getElementById("correct_percentage").value = `${totalCorrectAnswers}/${totalQuestionsCount}`;
+
+
+    document.getElementById("total_question_number").value = `${totalQuestionsCount}`;
+    document.getElementById("correct_number").value = `${totalCorrectAnswers}`;
+    document.getElementById("incorrect_number").value = `${totalIncorrectAnswers}`;
+    document.getElementById("skip_number").value = `${totalSkipAnswers}`;
+
+
+    document.getElementById("overallband").value = `${ieltsBandScore}`;
 
     document.getElementById("dateform").value = contentToCopy2;
     document.getElementById("testname").value = contentToCopy4;
     document.getElementById("idtest").value = contentToCopy6;
     document.getElementById("useranswer").value = contentToCopy8;
     document.getElementById("timedotest").value = contentToCopy3;
+    
   /*  
     document.getElementById("idcategory").value = contentToCopy5;
     document.getElementById("idtest").value = contentToCopy6;
@@ -720,7 +726,7 @@ function ResultInput() {
 setTimeout(function() {
 // Automatically submit the form
 jQuery('#saveReadingResult').submit();
-}, 5000); // 5000 milliseconds = 5 seconds
+}, 100000); // 5000 milliseconds = 5 seconds
 }
           
 // Event listener for the submit button
@@ -729,6 +735,7 @@ function main(){
     console.log("Passed Main");
     
     for(let i = 0; i < quizData.part.length; i ++){
+        console.log(quizData.part[1].duration);
         full_time += quizData.part[i].duration;
     }
     console.log("Full test time:", full_time)
@@ -741,5 +748,4 @@ function main(){
     }, 2000);
     
 }
-
 

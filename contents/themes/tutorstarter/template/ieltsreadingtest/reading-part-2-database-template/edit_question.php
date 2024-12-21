@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 ?>
         <form method="post" action="update_question.php">
             <input type="hidden" name="number" value="<?php echo esc_attr($row['number']); ?>">
-            ID Test: <input type="text" name="id_test" value="<?php echo esc_attr($row['id_test']); ?>" required><br>
+            ID Test: <input type="text" name="id_part" value="<?php echo esc_attr($row['id_part']); ?>" required><br>
             Part: <input type="text" name="part" value="<?php echo esc_attr($row['part']); ?>" required><br>
             Duration: <input type="number" name="duration" value="<?php echo esc_attr($row['duration']); ?>" required><br>
             Number questions: <textarea name="number_question_of_this_part" required><?php echo esc_textarea($row['number_question_of_this_part']); ?></textarea><br>

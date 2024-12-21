@@ -60,7 +60,7 @@ if ($result->num_rows > 0) {
     foreach ($questions as $question_id) {
         if (strpos($question_id, "vocabulary") === 0) {
             // Query list_vocabulary table
-            $sql_question = "SELECT id, new_word, language_new_word, vietnamese_meaning, english_explanation, image_link 
+            $sql_question = "SELECT id, new_word, language_new_word, vietnamese_meaning, english_explanation, image_link, example 
                              FROM list_vocabulary 
                              WHERE id = ?";
             $stmt_question = $conn->prepare($sql_question);
@@ -73,7 +73,8 @@ if ($result->num_rows > 0) {
                 echo "vocabList.push(" . json_encode([
                     'vocab' => $question_data['new_word'],
                     'explanation' => $question_data['english_explanation'],
-                    'vietnamese_meaning' => $question_data['vietnamese_meaning']
+                    'vietnamese_meaning' => $question_data['vietnamese_meaning'],
+                    'example' => $question_data['example']
                 ]) . ");";
             }
             $stmt_question->close();
@@ -259,17 +260,19 @@ $conn->close();
         <table id="vocabTable" class="vocab-table">
             <thead>
                 <tr>
-                    <th>Số thứ tự</th>
+                    <th>Number</th>
                     <th>Vocab</th>
                     <th>Vietnamese Meaning</th>
                     <th>Explanation</th>
-                    <th>Phát âm</th>
+                    <th>Example</th>
+                    <th>Pronunciation</th>
+                    
                 </tr>
             </thead>
             <tbody></tbody>
         </table>
     </div>
-    <script src="http://localhost/wordpress/contents/themes/tutorstarter/study_vocabulary_toolkit/flash-card-app/script2.js"></script>
+    <script src="http://localhost/wordpress/contents/themes/tutorstarter/study_vocabulary_toolkit/flash-card-app/script3.js"></script>
 </body>
 </html>
 

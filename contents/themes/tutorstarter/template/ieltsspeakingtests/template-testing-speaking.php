@@ -489,7 +489,7 @@ dateElement.innerHTML = `${day}/${month}/${year}`;
     
     document.addEventListener('DOMContentLoaded', function () {
         getOS();
-        //checkLocationAndIpAdress();   
+        checkLocationAndIpAddress();   
             
     // Get the video element
     const videoElement = document.getElementById('examinerVideo');
@@ -1513,8 +1513,8 @@ function recordWord(expectedWord, buttonElement) {
 <script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\summarynew.js"></script>
 <script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\overalltab.js"></script>
 <script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\sample-tab.js"></script>
-<script src = "\wordpress\contents\themes\tutorstarter\scan-device\location_and_ip.js"></script>
-<script src = "\wordpress\contents\themes\tutorstarter\scan-device\system_os_2.js"></script>
+<script src = "\wordpress\contents\themes\tutorstarter\scan-device\location_ip.js"></script>
+<script src = "\wordpress\contents\themes\tutorstarter\scan-device\system_os.js"></script>
 
 
 <!--

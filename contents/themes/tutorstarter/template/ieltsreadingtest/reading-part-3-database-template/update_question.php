@@ -6,17 +6,17 @@ global $wpdb;
 
 // Get the data from the POST request
 $number = wp_kses_post($_POST['number']);
-$id_test = wp_kses_post($_POST['id_test']);
+$id_part = wp_kses_post($_POST['id_part']);
 $part = wp_kses_post($_POST['part']);
 $duration = wp_kses_post($_POST['duration']);
 $number_question_of_this_part = wp_kses_post($_POST['number_question_of_this_part']);
-$paragraph = wp_kses_post($_POST['paragraph']);
-$group_question = wp_unslash(wp_kses_post($_POST['group_question']));
+$paragraph = wp_unslash($_POST['paragraph']);
+$group_question = wp_unslash($_POST['group_question']);
 $category = wp_kses_post($_POST['category']);
 
 // Prepare the data for updating
 $data = array(
-    'id_test' => $id_test,
+    'id_part' => $id_part,
     'part' => $part,
     'duration' => $duration,
     'number_question_of_this_part' => $number_question_of_this_part,

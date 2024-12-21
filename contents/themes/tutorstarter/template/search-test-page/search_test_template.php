@@ -9,6 +9,7 @@ $post_types = [
     'ieltsreadingtest' => 'Ielts Reading',
     'ieltswritingtests' => 'Ielts Writing',
     'dictationexercise' => 'Dictation Exercise',
+    'studyvocabulary' => 'Study Vocabulary',
 
 ];
 
@@ -51,20 +52,63 @@ $query = new WP_Query($args);
     <!--<h1><?php echo ucfirst($current_post_type) ?: 'Tests'; ?> Results</h1> -->
     <?php if ($query->have_posts()) : ?>
         <div class="test-grid">
-            <?php while ($query->have_posts()) : $query->the_post(); ?>
-                <div class="test-item">
-                    <h2><?php the_title(); ?></h2>
-                    <div class="test-meta">
-                        <p>⏱️ <?php echo get_post_meta(get_the_ID(), '_duration', true) ?: '60 phút'; ?></p>
-                        <p>📄 <?php echo get_post_meta(get_the_ID(), '_total_questions', true) ?: '22 phần thi | 22 câu hỏi'; ?></p>
-                        <p>💬 <?php echo get_post_meta(get_the_ID(), '_comments_count', true) ?: '4'; ?></p>
-                    </div>
-                    <div class="test-tags">
-                        <?php the_tags('<span>#', '</span> <span>#', '</span>'); ?>
-                    </div>
-                    <a href="<?php the_permalink(); ?>" class="detail-button">Chi tiết</a>
-                </div>
-            <?php endwhile; ?>
+        <?php 
+        global $wpdb;
+        $current_user = wp_get_current_user(); // Lấy thông tin user đang đăng nhập
+        $username = $current_user->user_login; // Lấy username để đối chiếu trong bảng lưu kết quả
+        
+        while ($query->have_posts()) : $query->the_post(); 
+    $post_id = get_the_ID();
+    $custom_number = get_post_meta($post_id, "_{$current_post_type}_custom_number", true);
+
+    // Kiểm tra xem người dùng đã làm bài kiểm tra này hay chưa
+    $is_completed = false;
+
+    if ($current_post_type === 'digitalsat') {
+        $table_name = 'save_user_result_digital_sat';
+        $query_result = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) 
+                FROM {$table_name} 
+                WHERE username = %s 
+                AND idtest = %s 
+                AND resulttest != ''", // Kiểm tra resulttest không trống
+                $username, $custom_number
+            )
+        );
+        $is_completed = $query_result > 0; // Nếu tìm thấy kết quả, đánh dấu là đã làm bài
+    }
+    
+    // Sử dụng $is_completed để đánh dấu hoặc hiển thị trạng thái bài kiểm tra
+
+
+        ?>
+    <div class="test-item">
+        <!-- Hiển thị Custom Number -->
+        <?php if ($is_completed): ?>
+            <div class="completed-icon">
+               
+                <i class="fa-solid fa-check" style="color: #63E6BE;"></i>
+            </div>
+
+            
+        <?php endif; ?>
+        <div class="custom-number"><?php echo esc_html($custom_number); ?></div>
+
+        <h2><?php the_title(); ?></h2>
+        <div class="test-meta">
+            <p>⏱️ <?php echo get_post_meta(get_the_ID(), '_duration', true) ?: '60 phút'; ?></p>
+            <p>📄 <?php echo get_post_meta(get_the_ID(), '_total_questions', true) ?: '22 phần thi | 22 câu hỏi'; ?></p>
+            <p>💬 <?php echo get_post_meta(get_the_ID(), '_comments_count', true) ?: '4'; ?></p>
+        </div>
+        <div class="test-tags">
+            <?php the_tags('<span>#', '</span> <span>#', '</span>'); ?>
+        </div>
+        <a href="<?php the_permalink(); ?>" class="detail-button">Take Test</a>
+    </div>
+<?php endwhile; ?>
+
+
         </div>
 
         <!-- Pagination -->
@@ -86,7 +130,10 @@ $query = new WP_Query($args);
 
     <?php wp_reset_postdata(); ?>
 </div>
+<script>
+    console.log('<?php echo esc_js($username); ?>');
 
+</script>
 <style>
     .post-type-navigation {
         display: flex;
@@ -199,6 +246,52 @@ $query = new WP_Query($args);
     background-color: #0073aa;
     color: white;
     border-radius: 4px;
+}
+.post-id {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #f1f1f1;
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #333;
+}
+.test-item {
+    position: relative;
+    padding-top: 40px;
+}
+.custom-number {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #0073aa;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.test-item {
+    position: relative; /* Để custom number nằm trong item */
+    padding-top: 40px; /* Dành không gian cho custom number */
+}
+.completed-icon {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #fff;
+    color: #63E6BE;
+    padding: 5px;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+}
+.test-item {
+    position: relative; /* Giúp biểu tượng nằm trong item */
+    padding-top: 40px; /* Dành không gian cho biểu tượng */
 }
 
 </style>

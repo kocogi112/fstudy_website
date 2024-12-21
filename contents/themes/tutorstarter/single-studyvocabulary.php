@@ -61,12 +61,9 @@ if (is_user_logged_in()) {
 
         // Fetch result and store in variables
         if ($row = $result->fetch_assoc()) {
-            $script_paragraph = $row['script_paragraph'];
             $test_type = $row['test_type'];
             $testname = $row['testname'];
-        } else {
-            $script_paragraph = "No content available.";
-        }
+        } 
         // Đóng kết nối
         $conn->close();
 

@@ -1,6 +1,6 @@
 <?php
 /*
- * Template Name: Doing Template Speaking
+ * Template Name: Doing Template Reading Test
  * Template Post Type: ieltsreadingtest
  
  */
@@ -12,133 +12,123 @@ if (is_user_logged_in()) {
     $user_id = get_current_user_id();
     $additional_info = get_post_meta($post_id, '_ieltsreadingtest_additional_info', true);
 
-   
-$post_id = get_the_ID();
-// Get the custom number field value
-$custom_number = get_post_meta($post_id, '_ieltsreadingtest_custom_number', true);
+    $post_id = get_the_ID();
+    // Lấy giá trị custom number từ custom field
+    $custom_number = get_post_meta($post_id, '_ieltsreadingtest_custom_number', true);
+    
+    // Thông tin kết nối database
+    $servername = "localhost";
+    $username = "root";
+    $password = ""; // No password by default
+    $dbname = "wordpress";
+    
+    // Tạo kết nối
+    $conn = new mysqli($servername, $username, $password, $dbname);
+    
+    // Kiểm tra kết nối
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+    
+// Truy vấn `question_choose` từ bảng `ielts_reading_test_list` theo `id_test`
+$sql_test = "SELECT question_choose FROM ielts_reading_test_list WHERE id_test = ?";
+$stmt_test = $conn->prepare($sql_test);
 
-// Database credentials (update with your own database details)
-$servername = "localhost";
-$username = "root";
-$password = ""; // No password by default
-$dbname = "wordpress";
-
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+if ($stmt_test === false) {
+    die('Lỗi MySQL prepare: ' . $conn->error);
 }
 
-$sql = "SELECT part, duration, number_question_of_this_part, paragraph, group_question, category FROM ielts_reading_part_1_question WHERE id_test = ?";
-$sql2 = "SELECT part, duration, number_question_of_this_part, paragraph, group_question, category FROM ielts_reading_part_2_question WHERE id_test = ?";
-$sql3 = "SELECT part, duration, number_question_of_this_part, paragraph, group_question, category FROM ielts_reading_part_3_question WHERE id_test = ?";
+$stmt_test->bind_param("i", $custom_number);
+$stmt_test->execute();
+$result_test = $stmt_test->get_result();
 
+if ($result_test->num_rows > 0) {
+    // Lấy các ID từ question_choose (ví dụ: "1001,2001,3001")
+    $row_test = $result_test->fetch_assoc();
+    $question_choose = $row_test['question_choose'];
+    $id_parts = explode(",", $question_choose); // Chuyển thành mảng ID
 
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $custom_number); // 'i' is used for integer
-$stmt->execute();
-$result = $stmt->get_result();
+    $part = []; // Mảng chứa dữ liệu của các phần
 
-$stmt2 = $conn->prepare($sql2);
-$stmt2->bind_param("i", $custom_number); // 'i' is used for integer
-$stmt2->execute();
-$result2 = $stmt2->get_result();
+    // Lặp qua từng id_part và truy vấn bảng tương ứng
+    foreach ($id_parts as $index => $id_part) {
+        // Xác định bảng và câu lệnh SQL tương ứng dựa trên index của part
+        switch ($index) {
+            case 0:
+                $sql_part = "SELECT part, duration, number_question_of_this_part, paragraph, group_question, category 
+                             FROM ielts_reading_part_1_question WHERE id_part = ?";
+                break;
+            case 1:
+                $sql_part = "SELECT part, duration, number_question_of_this_part, paragraph, group_question, category 
+                             FROM ielts_reading_part_2_question WHERE id_part = ?";
+                break;
+            case 2:
+                $sql_part = "SELECT part, duration, number_question_of_this_part, paragraph, group_question, category 
+                             FROM ielts_reading_part_3_question WHERE id_part = ?";
+                break;
+            default:
+                continue 2; // Nếu có nhiều hơn 3 phần, bỏ qua
+        }
 
-$stmt3 = $conn->prepare($sql3);
-$stmt3->bind_param("i", $custom_number); // 'i' is used for integer
-$stmt3->execute();
-$result3 = $stmt3->get_result();
+        // Chuẩn bị và thực thi câu lệnh SQL cho từng phần
+        $stmt_part = $conn->prepare($sql_part);
+        if ($stmt_part === false) {
+            die('Lỗi MySQL prepare: ' . $conn->error);
+        }
 
+        $stmt_part->bind_param("i", $id_part);
+        $stmt_part->execute();
+        $result_part = $stmt_part->get_result();
 
-$part = []; // Initialize the array for storing questions
+        // Nếu có kết quả, thêm vào mảng part
+        while ($row = $result_part->fetch_assoc()) {
+            $entry = [
+                'part_number' => $row['part'],
+                'paragraph' => $row['paragraph'],
+                'number_question_of_this_part' => $row['number_question_of_this_part'],
+                'duration' => $row['duration'],
+                'category' => $row['category'],
+                'group_question' => $row['group_question']
+            ];
 
-while ($row = $result->fetch_assoc()) {
-    // Create an associative array for each row
-    $entry = [
-        'part_number' => $row['part'],
-        'paragraph' => $row['paragraph'],
-        'number_question_of_this_part' => $row['number_question_of_this_part'],
-        'duration' => $row['duration'],
-    ];
+            if (!empty($row['group_question'])) {
+                $decoded = json_decode($row['group_question'], true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $entry['group_question'] = $decoded;
+                } else {
+                    // Log the error and set group_question to null
+                    error_log('JSON decode error: ' . json_last_error_msg());
+                    $entry['group_question'] = null;
+                }
+            } else {
+                $entry['group_question'] = null;
+            }
+            
 
-    // Kiểm tra nếu group_question là chuỗi JSON hợp lệ, chuyển thành mảng hoặc đối tượng PHP
-    if (!empty($row['group_question'])) {
-        $entry['group_question'] = json_decode($row['group_question'], true); // Chuyển từ JSON string thành array
-    } else {
-        $entry['group_question'] = null; // Đặt là null nếu không có dữ liệu
+            // Thêm phần vào mảng part
+            $part[] = $entry;
+        }
     }
 
-    // Add the entry to the $part array
-    $part[] = $entry;
+    // Xuất mảng quizData dưới dạng JavaScript
+    echo '<script type="text/javascript">
+    const quizData = {
+        part: ' . json_encode($part, JSON_UNESCAPED_SLASHES) . '
+    };
+
+    console.log(quizData);
+    </script>';
+} else {
+    echo '<script type="text/javascript">console.error("Không tìm thấy test với custom number: ' . $custom_number . '");</script>';
 }
-
-
-
-
-while ($row = $result2->fetch_assoc()) {
-    // Create an associative array for each row
-    $entry = [
-        'part_number' => $row['part'],
-        'paragraph' => $row['paragraph'],
-        'number_question_of_this_part' => $row['number_question_of_this_part'],
-        'duration' => $row['duration'],
-    ];
-
-    // Kiểm tra nếu group_question là chuỗi JSON hợp lệ, chuyển thành mảng hoặc đối tượng PHP
-    if (!empty($row['group_question'])) {
-        $entry['group_question'] = json_decode($row['group_question'], true); // Chuyển từ JSON string thành array
-    } else {
-        $entry['group_question'] = null; // Đặt là null nếu không có dữ liệu
-    }
-
-    // Add the entry to the $part array
-    $part[] = $entry;
-}
-
-
-
-
-while ($row = $result3->fetch_assoc()) {
-    // Create an associative array for each row
-    $entry = [
-        'part_number' => $row['part'],
-        'paragraph' => $row['paragraph'],
-        'number_question_of_this_part' => $row['number_question_of_this_part'],
-        'duration' => $row['duration'],
-    ];
-
-    // Kiểm tra nếu group_question là chuỗi JSON hợp lệ, chuyển thành mảng hoặc đối tượng PHP
-    if (!empty($row['group_question'])) {
-        $entry['group_question'] = json_decode($row['group_question'], true); // Chuyển từ JSON string thành array
-    } else {
-        $entry['group_question'] = null; // Đặt là null nếu không có dữ liệu
-    }
-
-    // Add the entry to the $part array
-    $part[] = $entry;
-}
-
-
-
-
-
-// Output the quizData as JavaScript
-echo '<script type="text/javascript">
-const quizData = {
-    part: ' . json_encode($part, JSON_UNESCAPED_SLASHES) . '
-};
-
-console.log(quizData);
-</script>';
-
-
 
 // Đóng kết nối
 $conn->close();
 
 ?>
+    
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -430,7 +420,7 @@ body {
                     <button id="next-btn" style="display: none;" >Next</button>
                     <h5  id="time-result"></h5>
 
-                    <h5 id ="useranswerdiv">Here: </h5>
+                    <h5 id ="useranswerdiv"></h5>
                      <!-- giấu form send kết quả bài thi -->
 
 
@@ -438,85 +428,93 @@ body {
   
      <span id="message" style="display:none" ></span>
      <form id="saveReadingResult" >
-             <div class="card">
-                 <div class="card-header">Form lưu kết quả</div>
-                 <div class="card-body" >
+                <div class="card">
+                    <div class="card-header">Form lưu kết quả</div>
+                    <div class="card-body" >
+        
+                <div class = "form-group" >
+                    <input   type="text" id="overallband" name="overallband" placeholder="Kết quả"  class="form-control form_data" />
+                    <span id="result_error" class="text-danger" ></span>
+            
+                </div>
+            
+            
+                <div class = "form-group">
+                    <input type="text" id="dateform" name="dateform" placeholder="Ngày"  class="form-control form_data"  />
+                    <span id="date_error" class="text-danger" ></span>
+                </div>
+            
+                
+            
+                <div class = "form-group"  >
+                    <input type="text" id="timedotest" name="timedotest" placeholder="Thời gian làm bài"  class="form-control form_data" />
+                    <span id="time_error" class="text-danger"></span>
+                </div>
+            
+                <div class = "form-group" >
+                    <input type="text" id="idtest" name="idtest" placeholder="Id test"  class="form-control form_data" />
+                    <span id="idtest_error" class="text-danger" ></span>
+                </div>
+            
+                <div class = "form-group" >
+                    <input type="text" id="idcategory" name="idcategory" placeholder="Id category"  class="form-control form_data" />
+                    <span id="idcategory_error" class="text-danger"></span>
+                </div>
+            
+                <div class = "form-group"   >
+                    <input type="text"  id="testname" name="testname" placeholder="Test Name"  class="form-control form_data" />
+                    <span id="testname_error" class="text-danger"></span>
+                </div>
+                <div class = "form-group"   >
+                    <input type="text"  id="useranswer" name="useranswer" placeholder="User Answer"  class="form-control form_data" />
+                    <span id="useranswer_error" class="text-danger"></span>
+            </div>
+            
+            <div class = "form-group"   >
+                    <input type="text"  id="correct_percentage" name="correct_percentage" placeholder="Correct percentage"  class="form-control form_data" />
+                    <span id="correctanswer_error" class="text-danger"></span>  
+                </div>
+          
+
+            <div class = "form-group"   >
+                    <input type="text"  id="total_question_number" name="total_question_number" placeholder="Total Number"  class="form-control form_data" />
+                    <span id="total_question_number_error" class="text-danger"></span>  
+                </div>
+           
+
+            <div class = "form-group"   >
+                    <input type="text"  id="correct_number" name="correct_number" placeholder="Correct Number"  class="form-control form_data" />
+                    <span id="correctanswer_error" class="text-danger"></span>  
+                </div>
+            
+            <div class = "form-group"   >
+                    <input type="text"  id="incorrect_number" name="incorrect_number" placeholder="Incorrect Number"  class="form-control form_data" />
+                    <span id="incorrect_number_error" class="text-danger"></span>  
+                </div>
+        
+
+            <div class = "form-group"   >
+                    <input type="text"  id="skip_number" name="skip_number" placeholder="Skip Number"  class="form-control form_data" />
+                    <span id="skip_number_error" class="text-danger"></span>  
+                </div>
+           
+        
+        <div class="card-footer">
+            <!--  <button type="button" name="submit" id="submit" class="btn btn-primary" onclick="save_data(); return false;">Save</button>-->
+                            <td><input type="submit" id="submit" name="submit"/></td> 
     
-        <div class = "form-group" >
-             <input   type="text" id="overallband" name="overallband" placeholder="Kết quả"  class="form-control form_data" />
-             <span id="result_error" class="text-danger" ></span>
-    
+            </div>
+                
         </div>
-    
-    
-        <div class = "form-group">
-             <input type="text" id="dateform" name="dateform" placeholder="Ngày"  class="form-control form_data"  />
-             <span id="date_error" class="text-danger" ></span>
-        </div>
-    
-         
-    
-        <div class = "form-group"  >
-             <input type="text" id="timedotest" name="timedotest" placeholder="Thời gian làm bài"  class="form-control form_data" />
-             <span id="time_error" class="text-danger"></span>
-        </div>
-    
-        <div class = "form-group" >
-             <input type="text" id="idtest" name="idtest" placeholder="Id test"  class="form-control form_data" />
-             <span id="idtest_error" class="text-danger" ></span>
-        </div>
-    
-        <div class = "form-group" >
-             <input type="text" id="idcategory" name="idcategory" placeholder="Id category"  class="form-control form_data" />
-             <span id="idcategory_error" class="text-danger"></span>
-        </div>
-    
-         <div class = "form-group"   >
-             <input type="text"  id="testname" name="testname" placeholder="Test Name"  class="form-control form_data" />
-             <span id="testname_error" class="text-danger"></span>
-        </div>
-        <div class = "form-group"   >
-            <input type="text"  id="useranswer" name="useranswer" placeholder="User Answer"  class="form-control form_data" />
-            <span id="useranswer_error" class="text-danger"></span>
-       </div>
-    
-       <div class = "form-group"   >
-            <input type="text"  id="correct_percentage" name="correct_percentage" placeholder="Correct percentage"  class="form-control form_data" />
-            <span id="correctanswer_error" class="text-danger"></span>  
-        </div>
-    
-    
-      
-    
-      
-    
-    
-    
-    
-        </div>
-    
-       <div class="card-footer">
-           <!--  <button type="button" name="submit" id="submit" class="btn btn-primary" onclick="save_data(); return false;">Save</button>-->
-                          <td><input type="submit" id="submit" name="submit"/></td> 
-    
-         </div>
-             
-     </div>
-     <div id="result_msg" ></div>
+        <div id="result_msg" ></div>
     </form>
     <!-- kết thúc send form -->
 
                 </div> 
-
-                
-
                 <div id="results-container"></div>
             </div>       
 
-
         </div>
-        
-
         <div id="question-nav-container" class="fixed-bottom">
             <!-- <span id="part-label"></span>
             <div id="question-nav"></div> -->
@@ -526,12 +524,6 @@ body {
         </div>
     </div>
 
-    
-        
-
-
-    
-<!--Note: Database nen them phan loai : VD multiple choice, gap filling,...-->
     <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/script.js"></script>
 </body>
 <script>
