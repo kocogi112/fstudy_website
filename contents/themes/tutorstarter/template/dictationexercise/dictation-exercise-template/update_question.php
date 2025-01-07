@@ -9,15 +9,17 @@ $number = wp_kses_post($_POST['number']);
 $id_test = wp_kses_post($_POST['id_test']);
 $type_test = wp_kses_post($_POST['type_test']);
 $testname = wp_kses_post($_POST['testname']);
-$script_paragraph = wp_kses_post($_POST['script_paragraph']);
-
+$id_video = wp_kses_post($_POST['id_video']);
+$transcript = wp_unslash($_POST['transcript']);
 
 // Prepare the data for updating
 $data = array(
     'id_test' => $id_test,
     'type_test' => $type_test,
     'testname' => $testname,
-    'script_paragraph' => $script_paragraph,
+    'id_video' => $id_video,
+    'transcript' => $transcript,
+
 );
 
 // Update the record in the database

@@ -4,7 +4,7 @@ Tags: dark, dark mode, night mode, dark theme, accessibility
 Requires at least: 5.0
 Tested up to: 6.7
 Requires PHP: 5.6
-Stable tag: 5.2.3
+Stable tag: 5.2.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -178,6 +178,10 @@ Yes, You can toggle the dark mode/ light mode by keyboard shortcut `(Ctrl + Alt 
 7. Dark Mode color presets
 
 == Changelog == 
+
+= 5.2.4 – 2 JAN 2025 =
+* **Fix:** Responsive images are not replacing.
+* **Fix:** Fixed minor issues and maintenance update.
 
 = 5.2.3 – 15 DEC 2024 =
 * **New:** Added support for replacing responsive and dynamic images using image replacement feature

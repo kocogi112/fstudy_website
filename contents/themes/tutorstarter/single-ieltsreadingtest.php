@@ -19,12 +19,31 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
+// Truy vấn `question_choose` từ bảng `ielts_reading_test_list` theo `id_test`
+$sql_test = "SELECT question_choose FROM ielts_reading_test_list WHERE id_test = ?";
+$stmt_test = $conn->prepare($sql_test);
+
+if ($stmt_test === false) {
+    die('Lỗi MySQL prepare: ' . $conn->error);
+}
 
 
-
+$stmt_test->bind_param("i", $custom_number);
+$stmt_test->execute();
+$result_test = $stmt_test->get_result();
+// Fetch the result
+$question_choose = '';
+if ($result_test->num_rows > 0) {
+    $row = $result_test->fetch_assoc();
+    $question_choose = $row['question_choose']; // Comma-separated string
+}
 
 // Close the database connection
 $conn->close();
+
+// Split the comma-separated string into an array
+$parts = explode(',', $question_choose);
+
 
 
 
@@ -227,7 +246,7 @@ $conn->close();
                         <tr>
                             <td><?php echo esc_html($result->dateform); ?></td>
                             <td><?php echo esc_html($result->overallband); ?></td>
-                            <td><?php echo esc_html($result->correct_percentage); ?></td>
+                            <td><?php echo esc_html($result->correct_number) ;?>/ <?php echo esc_html($result->total_question_number); ?></td>
                             <td>
                                 <a href="<?php echo esc_url(get_permalink()) . 'result/' . esc_html($result->testsavenumber); ?>">
                                     Xem bài làm
@@ -256,7 +275,7 @@ $conn->close();
             <span class="option active" id="full-test">Làm full test</span>  
             <span class="option" id="practice">Luyện tập</span> 
             <span class="option" id="discussion">Thảo luận</span>
-            <span class="option" id="preview_test" ><a href="javascript:void(0)" onclick="toggle_visibility('popup-box3');">Xem trước các câu hỏi</a></span>
+            <span class="option" id="preview_test" >Tải bản PDF</span>
 
         </p>
 
@@ -294,6 +313,20 @@ $conn->close();
                 </select><br><br>      
                 <button class="btn-submit" type="submit" value="Start test">Luyện tập</button>
             </form>
+
+            <!-- HTML Form to display checkboxes -->
+<form method="get" action="">
+    <?php
+    foreach ($parts as $part) {
+        echo '<label>';
+        echo '<input type="checkbox" name="part[]" value="' . esc_attr($part) . '"> ' . esc_html($part);
+        echo '</label><br>';
+    }
+    ?>
+    <button type="submit">Submit</button>
+</form>
+
+
         </div>
     </div>
 </div>

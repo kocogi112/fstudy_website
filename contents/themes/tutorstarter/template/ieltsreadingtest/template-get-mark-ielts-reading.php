@@ -45,7 +45,8 @@ if ($result_test->num_rows > 0) {
     $id_parts = explode(",", $question_choose); // Chuyển thành mảng ID
 
     $part = []; // Mảng chứa dữ liệu của các phần
-
+    $previous_part_questions = 0; // Biến lưu trữ số câu hỏi của phần trước
+    $filterTypeQuestion = [];
     // Lặp qua từng id_part và truy vấn bảng tương ứng
     foreach ($id_parts as $index => $id_part) {
         // Xác định bảng và câu lệnh SQL tương ứng dựa trên index của part
@@ -99,7 +100,28 @@ if ($result_test->num_rows > 0) {
             } else {
                 $entry['group_question'] = null;
             }
-            
+            if (!empty($row['category'])) {
+                $categoryData = json_decode($row['category'], true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $entry['question_types'] = [];
+                    foreach ($categoryData as $category) {
+                        // Cộng thêm số câu hỏi của phần trước đó vào start và end
+                        $start = $category['start'] + $previous_part_questions;
+                        $end = $category['end'] + $previous_part_questions;
+
+                        for ($i = $start; $i <= $end; $i++) {
+                            $entry['question_types'][$i] = $category['type'];
+                            $filterTypeQuestion[] = [$i => $category['type']]; // Sử dụng dạng key-value
+
+                        }
+                    }
+                } else {
+                    error_log('JSON decode error in category: ' . json_last_error_msg());
+                }
+            }
+
+            // Cập nhật số câu hỏi của phần hiện tại để cộng vào phần tiếp theo
+            $previous_part_questions += $row['number_question_of_this_part'];
 
             // Thêm phần vào mảng part
             $part[] = $entry;
@@ -109,7 +131,9 @@ if ($result_test->num_rows > 0) {
     // Xuất mảng quizData dưới dạng JavaScript
     echo '<script type="text/javascript">
     const quizData = {
-        part: ' . json_encode($part, JSON_UNESCAPED_SLASHES) . '
+        part: ' . json_encode($part, JSON_UNESCAPED_SLASHES) . ',
+        filterTypeQuestion: ' . json_encode($filterTypeQuestion, JSON_UNESCAPED_SLASHES) . '
+
     };
 
     console.log(quizData);
@@ -128,6 +152,13 @@ global $wpdb; // Use global wpdb object to query the DB
 
 // Get testsavenumber from URL
 $testsavenumber = get_query_var('testsavereadingnumber');
+echo '
+<script>
+    // Truyền giá trị PHP sang JavaScript
+    var testSaveNumber = ' . json_encode($testsavenumber) . ';
+    console.log("Test Save Number:", testSaveNumber);
+</script>
+';
 
 // Query database to find results by testsavenumber
 $results = $wpdb->get_results(
@@ -136,12 +167,44 @@ $results = $wpdb->get_results(
         $testsavenumber
     )
 );
-if (!empty($results)) {
-    // Display results
-    foreach ($results as $result) {
-        echo '<b style = "text-transform: uppercase;">Result and Explanation: ' . esc_html($result->testname) . '</b>';
 
-        echo '
+
+if (!empty($results)) {
+    $permissionLink = esc_html($results[0]->permission_link); // Lấy giá trị permission_link từ kết quả đầu tiên
+    $test_username = esc_html($results[0]->username); // Lấy giá trị permission_link từ kết quả đầu tiên
+    $current_user = wp_get_current_user();
+    $current_user_name = $current_user->user_login;
+    $post_id = get_the_ID();
+    $testsavenumber = esc_html($results[0]->testsavenumber);
+
+    // Lấy liên kết của bài viết hiện tại
+    $post_link = get_permalink($post_id);
+    echo '
+    <script>
+        var permissionLink = "' . $permissionLink . '";
+        console.log("Permission Link:", permissionLink);
+        
+        var linkTest = "' . $post_link . '";
+        var currentUsername = "' . $test_username . '";
+        console.log("Current Username:", currentUsername);
+
+        var testsavenumber = "' . $testsavenumber . '";
+        var ajaxurl = "' . admin_url('admin-ajax.php') . '";
+        
+        console.log("Test Save Number:", testsavenumber);
+        console.log("AJAX URL:", ajaxurl);
+    </script>
+';
+
+
+
+    if(($permissionLink == "private" && $test_username == $current_user_name) || $permissionLink == "public" ||  current_user_can('administrator'))
+    {
+    // Display results
+      foreach ($results as $result) {
+          echo '<b style = "text-transform: uppercase;">Result and Explanation: ' . esc_html($result->testname) . '</b>';
+
+          echo '
             <div class="result-score-details">
                     <div class="row">
                         <div class="col-12 col-md-3">
@@ -215,8 +278,10 @@ if (!empty($results)) {
                     </div>
                 </div>
         ';
-
-
+        echo'<button class="button-10" onclick ="redirectToTest()"> Làm lại bài thi </button>';
+        echo'<button class="button-10" onclick = "opensharePermission()">Chia sẻ bài làm</button>';
+        echo'<button class="button-10" onclick = "openRemarkTest()" >Chấm lại </button>';
+        echo'<button class="button-10"> Làm lại các câu sai</button><br><br>';
 
     
         // Process user answers
@@ -224,7 +289,7 @@ if (!empty($results)) {
         $questions = explode('Question:', $userAnswers); // Split by "Question:"
     
         // Group questions by parts
-        $groupedQuestions = [];
+        $groupedQuestions = [];  // Initialize as an empty array
         foreach ($questions as $questionData) {
             if (trim($questionData) === '') continue;
     
@@ -240,9 +305,27 @@ if (!empty($results)) {
                     'questionNumber' => $questionNumber,
                     'userAnswer' => $userAnswer,
                 ];
+                $groupedQuestionsForRemark[] = [
+                    'questionNumber' => $questionNumber,
+                    'userAnswer' => $userAnswer,
+                ];
             }
         }
-    
+        $encodedGroupedQuestions = json_encode($groupedQuestionsForRemark, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+
+        echo '<script type="text/javascript">
+            // Chuyển dữ liệu PHP thành JSON và gán cho biến JavaScript
+            var groupedQuestions = ' . $encodedGroupedQuestions . ';
+            </script>';
+
+
+            echo '<b>Thống kê nhanh  </b>';
+            echo 
+            '<div id = "quick-statistic">
+                <div class="tabs" id="tabs-container"></div>
+                <div id="tab-content"></div>
+            </div>';
+
         // Display questions grouped by parts
         foreach ($groupedQuestions as $partNumber => $questions) {
 
@@ -263,8 +346,7 @@ if (!empty($results)) {
                         echo '</span>';
 
                         echo ' <span style="color: green;" id="correct-answer-' . esc_html($questionNumber) . '"></span>: ';
-                        echo '<i >'. esc_html($userAnswer) . '</i> ' ;
-
+                        echo '<span><i>' . esc_html($userAnswer) . '</i> <div id="check-correct-' . esc_html($questionNumber) . '" style="display: inline;"></div></span>';
                         echo '</li>';
                     echo '</div>';
                 }
@@ -274,7 +356,7 @@ if (!empty($results)) {
 
         }
     }
-    
+
 
     ?>
 
@@ -484,6 +566,26 @@ body {
 }
 
 
+.popup-content {
+    background-color: #fefefe;
+    margin: 5% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    max-height: 70%;
+    overflow: auto;
+    width: 70%; /* Could be more or less, depending on screen size */
+}
+.popup {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
 
 /* Container that includes the quiz content */
 .quiz-container {
@@ -635,12 +737,176 @@ body {
 .correct-ans{
     color: green
 }
+
+
+
+/* CSS */
+.button-10 {
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 14px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+  border-radius: 6px;
+  border: none;
+
+  color: #fff;
+  background: linear-gradient(180deg, #4B91F7 0%, #367AF6 100%);
+   background-origin: border-box;
+  box-shadow: 0px 0.5px 1.5px rgba(54, 122, 246, 0.25), inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.button-10:focus {
+  box-shadow: inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2), 0px 0.5px 1.5px rgba(54, 122, 246, 0.25), 0px 0px 0px 3.5px rgba(58, 108, 217, 0.5);
+  outline: 0;
+}
+
+
+.group-control-part-btn{
+    /*position: fixed;*/
+    bottom: 70px;
+    right: 10px;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+}
+.control-part-btn{
+    background-color:black;
+    color: #ffffff;
+    height:60px;
+    width: 60px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+/* Bố trí toggle switch và nhãn trên cùng một dòng */
+.permission-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.permission-row p {
+  margin: 0;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+
     </style>
 </head>
 <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 
 <body onload ="main()">
     
+<div id="remark_popup" class="popup">
+    <div class="popup-content">
+        <span class="close" onclick="closeRemarkTest()">&times;</span>
+        <i>Một số đề thi sau khi được sửa lại đáp án nhưng vẫn chưa được cập nhập ở bài làm của bạn<br> Bạn có thể sử dụng nút ở dưới để chấm bài cũ và nhận điểm mới !</i>
+        <br>
+        <button onclick = "remarkTest()"id = "remarkTest" class = "remarkTestBtn">Chấm lại bài</button>
+        <div id = "remarkArea">
+            <div id = "remarkPoint" style = "display:none">
+                <p id ="test-type">Loại đề</p>
+                <div id ="old-res">
+                    <b>Lưu đáp án cũ</b>
+                    <p id = "old-correct-ans">Số câu đúng cũ: </p> 
+                    <p id = "old-incorrect-ans">Số câu sai cũ: </p>
+                    <p id = "old-skip-ans">Số câu bỏ qua cũ: </p>
+                    <p id = "old-overall">Tổng điểm Overall cũ: </p>
+                </div>
+
+                <div id ="new-res">
+                    <b>Lưu đáp án mới</b>
+                    <p id = "new-correct-ans">Số câu đúng mới: </p>
+                    <p id = "new-incorrect-ans">Số câu sai mới: </p>
+                    <p id = "new-skip-ans">Số câu bỏ qua mói: </p>
+                    <p id = "new-overall">Tổng điểm Overall mới: </p>
+                </div>
+                <div id ="track_change_ans">
+                    <p id = "track_change_note"></p>
+                    <button id ="saveNewBtn" style = "display:none">Lưu kết quả mới</button>
+                </div>
+            </div>
+            <div id ="warningRemark"></div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div id="share_popup" class="popup">
+    <div class="popup-content">
+        <span class="close" onclick="closesharePermission()">&times;</span>
+        <i>Đáp án bài thi của bạn được đặt mặc định là Private (Riêng tư)</i>
+        <div id="permissionShareContent"></div>
+        <button onclick="coppyShareContentBtn()">Copy Link</button>
+        <div id="coppyShareContent"></div>
+        <div id="warningRemark"></div>
+    </div>
+</div>
+
+
 
 <b>Detail and Explanation</b>
 <div id = "detail-display" class = "detail-display">
@@ -663,9 +929,6 @@ body {
                     
                     <button id="next-btn" style="display: none;" >Next</button>
                     <h5  id="time-result"></h5>
-
-
-    
   
                 </div> 
 
@@ -687,22 +950,43 @@ body {
     </div>
 
 </div>
+ 
+
+    </body>
+
+    <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/script_result.js"></script>
+<script>
+        var ajaxUrl = <?php echo json_encode(admin_url("admin-ajax.php")); ?>;
+        const oldCorrectNumber = <?php echo json_encode(esc_html($result->correct_number)); ?>;
+        const oldIncorrectNumber = <?php echo json_encode(esc_html($result->incorrect_number)); ?>;
+        const oldSkipNumber = <?php echo json_encode(esc_html($result->skip_number)); ?>;
+        const oldOverallBand = <?php echo json_encode(esc_html($result->overallband)); ?>;
+
         
 
 
-    </body>
-    <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/script_result_1.js"></script>
 
+</script>
 </html>
 
 <?php
-
-
-} else {
-    // If no results with testsavenumber
-    echo '<p>Không có test nào với testsavenumber này.</p>';
-}
 if ( comments_open() || get_comments_number() ) :
     comments_template();
 endif; 
 get_footer();
+
+}
+else{
+    get_header();
+    echo'<b>You have no permission to view this test</b><br>';
+    echo"<i>This test's result is on private mode. This mean only owner of this test can view it. If you are owner of this test, you should login at that account. Otherwise, you may contact the owner to change setting of this result to Public mode so anyone can view it</i>";
+    
+} 
+}else {
+    header("Location: http://localhost/wordpress/404");
+    die();
+
+    // If no results with testsavenumber
+   // echo '<p>Không có test nào với testsavenumber này.</p>';
+}
+

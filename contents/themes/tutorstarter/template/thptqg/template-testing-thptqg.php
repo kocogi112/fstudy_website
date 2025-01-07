@@ -554,7 +554,7 @@ const year = currentDate.getFullYear();
 
             // Display the date
 const dateElement = document.getElementById('date');
-dateElement.innerHTML = `${day}/${month}/${year}`;
+dateElement.innerHTML = `${year}-${month}-${day}`;
 var nametest = document.getElementById('name_test');
 var subjectTest = document.getElementById('subject_test');
 var examuuid =  document.getElementById('exam_uuid');

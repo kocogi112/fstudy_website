@@ -4,31 +4,39 @@ require_once('C:\xampp\htdocs\wordpress\wp-load.php'); // Adjust the path as nec
 
 global $wpdb;
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Get the input data and sanitize it
-    $id_part = wp_kses_post($_POST['id_part']);
-    $part = wp_kses_post($_POST['part']);
-    $duration = wp_kses_post($_POST['duration']);
-    $number_question_of_this_part = wp_kses_post($_POST['number_question_of_this_part']);
-    $paragraph = wp_unslash($_POST['paragraph']);
-    $group_question = wp_unslash($_POST['group_question']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Get and sanitize input data
+    $id_part = isset($_POST['id_part']) ? wp_kses_post($_POST['id_part']) : '';
+    $part = isset($_POST['part']) ? wp_kses_post($_POST['part']) : '';
+    $duration = isset($_POST['duration']) ? wp_kses_post($_POST['duration']) : '';
+    $number_question_of_this_part = isset($_POST['number_question_of_this_part']) ? wp_kses_post($_POST['number_question_of_this_part']) : '';
+    $paragraph = isset($_POST['paragraph']) ? wp_unslash($_POST['paragraph']) : '';
+    $group_question = isset($_POST['group_question']) ? wp_unslash($_POST['group_question']) : '';
+    $note = isset($_POST['note']) ? wp_unslash($_POST['note']) : '';
 
-    $category = wp_kses_post($_POST['category']);
+    // Decode and validate the category JSON data
+    $category = isset($_POST['category']) ? wp_unslash($_POST['category']) : '';
+
+ 
 
     // Prepare the data for insertion
-    $data = array(
+    $data = [
         'id_part' => $id_part,
         'part' => $part,
         'duration' => $duration,
         'number_question_of_this_part' => $number_question_of_this_part,
         'paragraph' => $paragraph,
         'group_question' => $group_question,
+        'category' => $category,
+        'note' => $note,
+    ];
 
-        'category' => $category
-    );
+    // Define the data format
+    $format = ['%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s'];
 
     // Insert the data into the database
-    $inserted = $wpdb->insert('ielts_reading_part_2_question', $data);
+    $table_name = 'ielts_reading_part_2_question'; // Ensure table name has the correct prefix
+    $inserted = $wpdb->insert($table_name, $data, $format);
 
     if ($inserted) {
         echo "New record created successfully";

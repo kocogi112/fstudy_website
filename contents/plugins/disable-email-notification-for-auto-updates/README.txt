@@ -4,25 +4,24 @@ Donate link: https://ideastocode.com/
 Tags: Disable update notification Emails, Block Specific Plugin updates, Block WordPress Core updates, Block Themes updates, Hide Updates from Dashboard
 Requires at least: 5.5
 Tested up to: 6.7
-Stable tag:   1.0.4
+Stable tag:   1.0.5
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-This plugin disables email notifications for auto-updates and blocks updates for specific plugins, WordPress core, and themes.
+This plugin disables email notifications for auto-updates and blocks updates for specific plugins, hide plugins, WordPress core, and themes.
 
 == Description ==
 
 Key Features:
 - Disable Email Notifications for Auto-Updates
-- Block Specific Plugin Updates: You can choose plugins to block
+- Block/hide Specific Plugin Updates: You can choose plugins to block/hide (plugin's list)
 - Block WordPress Core and Theme Updates
 - Remove Update Buttons from Admin Panel (under Dashboard menu)
 
 **Check Our Another Plugin**
-
-- <a href="https://wordpress.org/plugins/enable-svg-webp-ico-upload/" target="_blank">Enable SVG, WebP, and ICO Upload</a>
-- You can also <a href="https://wordpress.org/plugins/enable-svg-webp-ico-upload/?preview=1" target="_blank">Live Preview It</a>
+- <a href="https://wordpress.org/plugins/improve-website-security/" target="_blank">Improve Website Security</a> | <a href="https://wordpress.org/plugins/improve-website-security/?preview=1" target="_blank">Live Preview It</a>
+- <a href="https://wordpress.org/plugins/enable-svg-webp-ico-upload/" target="_blank">Enable SVG, WebP, and ICO Upload</a> | <a href="https://wordpress.org/plugins/enable-svg-webp-ico-upload/?preview=1" target="_blank">Live Preview It</a>
 
 **Disable Email Notifications for Auto-Updates:**
 With the introduction of WordPress 5.5, the auto-update feature was enabled, and email notifications started being sent for every update made. By simply installing this plugin, you can stop receiving these annoying notifications for every auto-update made to plugins, themes, or even the WordPress core. Please note that this plugin will not affect the auto-update feature of WordPress if it is enabled.
@@ -88,6 +87,9 @@ No, this plugin will only disable the email notifications that you receive after
 
 == Changelog ==
 
+= 1.0.5 =
+* Hide Plugin from the Plugin's List
+
 = 1.0.4 =
 * Minor updates and added FAQs
 
@@ -104,4 +106,4 @@ No, this plugin will only disable the email notifications that you receive after
 * Initial release.
 
 == Upgrade Notice ==
-Please update to the latest version 1.0.4
+Please update to the latest version 1.0.5

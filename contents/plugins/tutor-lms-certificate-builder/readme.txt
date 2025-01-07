@@ -3,9 +3,9 @@ Contributors: themeum
 Donate link: https://www.themeum.com
 Tags: lms, course, elearning, education, learning management system, certificate
 Requires at least: 4.5
-Tested up to: 5.8
+Tested up to: 6.5
 Requires PHP: 7.0
-Stable tag: 1.0.5
+Stable tag: 1.1.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -76,6 +76,20 @@ If you’re using a responsive theme, then Tutor LMS will look great across all 
 Tutor enables you to use any third party plugins without facing any compatibility issues. You can integrate and use the WordPress LMS plugin easily in your existing site without any trouble.
 
 == Changelog ==
+
+= 1.1.2 - September 12, 2024 =
+
+Fix: Nonce verification failed fixed
+
+= 1.1.1 - July 15, 2024 =
+
+Fix: Certificate issue date showing current date
+
+= 1.1.0 - June 13, 2024 =
+
+New: Certificate duplicate option added
+Fix: Translation issue fixed for course time and duration
+Fix: Translation issue fixed for the certificate editor
 
 = 1.0.5 - October 16, 2023 =
 

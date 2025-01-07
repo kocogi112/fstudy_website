@@ -109,12 +109,15 @@ trait Header_Components {
 				'title' => __( 'Dashboard', 'tutorstarter' ),
 				'icon'  => 'tutor-icon-settings',
 			),
+
+			
+
 			'settings'       => array(
 				'title' => __( 'Account Settings', 'tutorstarter' ),
 				'icon'  => 'tutor-icon-settings',
 			),
 			'logout'         => array(
-				'title' => __( 'Logout', 'tutorstarter' ),
+				'title' => __( 'Đăng xuất', 'tutorstarter' ),
 				'icon'  => 'tutor-icon-signout',
 			),
 		);
@@ -172,6 +175,15 @@ trait Header_Components {
 				'title' => __( 'Dashboard', 'tutorstarter' ),
 				'icon'  => 'tutor-icon-dashboard',
 			),
+			'analysis_test' => array(
+				'title' => __( 'Kết quả luyện thi', 'tutorstarter' ),
+				'icon'  => 'fa-solid fa-square-poll-vertical',
+			),
+			'notification' => array(
+				'title' => __( 'Thông báo', 'tutorstarter' ),
+				'icon'  => 'fa-solid fa-envelope',
+			),
+			
 			'my-profile'       => array(
 				'title' => __( 'My profile', 'tutorstarter' ),
 				'icon'  => 'tutor-icon-user-bold',
@@ -181,7 +193,7 @@ trait Header_Components {
 				'icon'  => 'tutor-icon-gear',
 			),
 			'logout'         => array(
-				'title' => __( 'Logout', 'tutorstarter' ),
+				'title' => __( 'Đăng xuất', 'tutorstarter' ),
 				'icon'  => 'tutor-icon-signout',
 			),
 		);

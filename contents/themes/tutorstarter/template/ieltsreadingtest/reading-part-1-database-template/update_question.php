@@ -4,18 +4,23 @@ require_once('C:\xampp\htdocs\wordpress\wp-load.php'); // Adjust the path as nec
 
 global $wpdb;
 
-// Get the data from the POST request
-$number = wp_kses_post($_POST['number']);
-$id_part = wp_kses_post($_POST['id_part']);
-$part = wp_kses_post($_POST['part']);
-$duration = wp_kses_post($_POST['duration']);
-$number_question_of_this_part = wp_kses_post($_POST['number_question_of_this_part']);
-$paragraph = wp_unslash($_POST['paragraph']);
-$group_question = wp_unslash($_POST['group_question']);
-$category = wp_kses_post($_POST['category']);
+// Validate and sanitize POST inputs
+$number = isset($_POST['number']) ? wp_kses_post($_POST['number']) : '';
+$id_part = isset($_POST['id_part']) ? wp_kses_post($_POST['id_part']) : '';
+$part = isset($_POST['part']) ? wp_kses_post($_POST['part']) : '';
+$duration = isset($_POST['duration']) ? wp_kses_post($_POST['duration']) : '';
+$number_question_of_this_part = isset($_POST['number_question_of_this_part']) ? wp_kses_post($_POST['number_question_of_this_part']) : '';
+$paragraph = isset($_POST['paragraph']) ? wp_unslash($_POST['paragraph']) : '';
+$group_question = isset($_POST['group_question']) ? wp_unslash($_POST['group_question']) : '';
+$note = isset($_POST['note']) ? wp_kses_post($_POST['note']) : '';
+
+// Decode and validate the category JSON
+
+$category = isset($_POST['category']) ? wp_unslash($_POST['category']) : '';
+
 
 // Prepare the data for updating
-$data = array(
+$data = [
     'id_part' => $id_part,
     'part' => $part,
     'duration' => $duration,
@@ -23,11 +28,18 @@ $data = array(
     'paragraph' => $paragraph,
     'group_question' => $group_question,
     'category' => $category,
-);
+    'note' => $note,
+];
 
 // Update the record in the database
-$wpdb->update('ielts_reading_part_1_question', $data, array('number' => $number));
+$table_name = 'ielts_reading_part_1_question'; // Use table prefix for compatibility
+$where = ['number' => $number];
+$updated = $wpdb->update($table_name, $data, $where);
 
-// Return a response
-echo json_encode(array('status' => 'success'));
+// Check for errors or success
+if ($updated !== false) {
+    echo json_encode(['status' => 'success', 'message' => 'Record updated successfully']);
+} else {
+    echo json_encode(['status' => 'error', 'message' => $wpdb->last_error]);
+}
 ?>

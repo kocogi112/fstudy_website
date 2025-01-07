@@ -1,4 +1,13 @@
 <?php
+
+add_filter('document_title_parts', function ($title) {
+ 
+        $title['title'] = sprintf('Test Library');
+    
+    return $title;
+});
+
+
 get_header();
 // Define the post types with labels for the navigation
 $post_types = [
@@ -10,6 +19,7 @@ $post_types = [
     'ieltswritingtests' => 'Ielts Writing',
     'dictationexercise' => 'Dictation Exercise',
     'studyvocabulary' => 'Study Vocabulary',
+    'conversation_ai' => 'Speak With AI',
 
 ];
 
@@ -73,6 +83,21 @@ $query = new WP_Query($args);
                 WHERE username = %s 
                 AND idtest = %s 
                 AND resulttest != ''", // Kiểm tra resulttest không trống
+                $username, $custom_number
+            )
+        );
+        $is_completed = $query_result > 0; // Nếu tìm thấy kết quả, đánh dấu là đã làm bài
+    }
+
+    else if ($current_post_type === 'ieltsreadingtest') {
+        $table_name = 'save_user_result_ielts_reading';
+        $query_result = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) 
+                FROM {$table_name} 
+                WHERE username = %s 
+                AND idtest = %s 
+                AND overallband != ''", // Kiểm tra resulttest không trống
                 $username, $custom_number
             )
         );

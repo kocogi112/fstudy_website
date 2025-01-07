@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name: Tutor LMS Certificate Builder
- * Plugin URI: https://www.themeum.com/product/tutor-lms/
+ * Plugin URI: https://tutorlms.com/certificate-builder/
  * Description: Tutor Drag and Drop Certificate Builder
- * Version: 1.0.5
+ * Version: 1.1.2
  * Author: Themeum
  * Author URI: https://themeum.com/
  * Text Domain: tutor-lms-certificate-builder
@@ -20,7 +20,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Define the required plugin constants
  */
-define( 'TUTOR_CB_VERSION', '1.0.5');
+define( 'TUTOR_CB_VERSION', '1.1.2' );
 define( 'TUTOR_CB_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'TUTOR_CB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'TUTOR_CB_BASENAME', plugin_basename( __FILE__ ) );

@@ -3,8 +3,37 @@
 Template Name: Notifications Template
 */
 
+
+add_filter('document_title_parts', function ($title) {
+ 
+    $title['title'] = sprintf('Notification');
+
+return $title;
+});
+
+
+
+
+
+
+
+
+
+
+
+
+/* 
+
+Cần thêm file tương tự notification.php ở plugin -> tutor -> templates -> dashboard 
+
+
+
+*/
+
+
+
+
 get_header();
-echo '<title>Notification</title>';
 
 // Kiểm tra nếu người dùng đã đăng nhập
 if (!is_user_logged_in()) {
@@ -49,7 +78,7 @@ $notifications = $wpdb->get_results("
 
 ?>
 <div class="notifications">
-    <h1>Thông báo của bạn</h1>
+    <b>Thông báo của bạn</b>
     <?php if (!empty($notifications)) : ?>
         <ul>
             <?php foreach ($notifications as $notification) : ?>

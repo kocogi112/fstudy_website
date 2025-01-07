@@ -76,7 +76,9 @@ $class = 'wp-dark-mode-promo-campaign';
 			</div>
 		</div>
 
-		<a href="https://go.wppool.dev/LaSV" target="_blank"><?php echo $is_campaign ? esc_html__('Claim 50% Discount', 'wp-dark-mode') : wp_sprintf( 'Claim %s%s Discount', esc_html( $data['discount'] ), '%' ); ?></a>
+		<a class="wpdm-popup-button" href="https://go.wppool.dev/LaSV" target="_blank"><?php echo $is_campaign ? esc_html__('Claim 50% Discount', 'wp-dark-mode') : wp_sprintf( 'Claim %s%s Discount', esc_html( $data['discount'] ), '%' ); ?></a>
+
+		<a class="wpdm-popup-demo-link" href="https://go.wppool.dev/bjxy" target="_blank">Try a FREE demo</a>
 	</div>
 
 	<style>

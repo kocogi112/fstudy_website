@@ -17,6 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $correct_answer = wp_kses_post($_POST['correct_answer']);
     $explanation = wp_kses_post($_POST['explanation']);
     $image_link = wp_kses_post($_POST['image_link']);
+    $category = wp_kses_post($_POST['category']);
+
     // Prepare the data for insertion
     $data = array(
         'id_question' => $id_question,
@@ -28,7 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'answer_4' => $answer_4,
         'correct_answer' => $correct_answer,
         'explanation' => $explanation,
-        'image_link' => $image_link
+        'image_link' => $image_link,
+        'category' => $category,
+
     );
 
     // Insert the data into the database

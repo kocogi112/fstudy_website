@@ -99,26 +99,24 @@ $result = $conn->query($sql);
     <?php
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
-                // Process "Sample" and "Important Add" columns
-                $sample_words = explode(' ', $row['testname']);
-                $sample_display = count($sample_words) > 20 ? implode(' ', array_slice($sample_words, 0, 20)) . '...' : $row['testname'];
-                $sample_view_more = count($sample_words) > 20 ? "<button class='btn btn-link' onclick='showFullContent(\"Test Name\", \"{$row['testname']}\")'>View More</button>" : '';
-
-                $important_words = explode(',', $row['question_choose']);
-                if (count($important_words) > 3) {
-                    $important_display = implode(',', array_slice($important_words, 0, 3)) . '...';
-                    $important_view_more = "<button class='btn btn-link' onclick='showFullContent(\"Question Choose\", \"{$row['question_choose']}\")'>View More</button>";
-                } else {
-                    $important_display = $row['question_choose'];
-                    $important_view_more = '';
-                }
-
                 echo "<tr id='row_{$row['number']}'>
                         <td>{$row['number']}</td>
                         <td>{$row['id_test']}</td>
                         <td>{$row['testname']}</td>
                         <td>{$row['test_type']}</td>
-                        <td>{$important_display} $important_view_more</td>          
+                        <td>";
+        
+                // Split the question_choose and generate links for each question
+                $questions = explode(',', $row['question_choose']); // Tách các số trong question_choose
+                foreach ($questions as $index => $question) {
+                    $templatePart = 'reading-part-' . ($index + 1) . '-database-template';
+                    echo "<a href='http://localhost/wordpress/contents/themes/tutorstarter/template/ieltsreadingtest/$templatePart/database-question-content-sample.php?id_part_filter=$question' target='_blank'>$question</a>";
+                    if ($index < count($questions) - 1) {
+                        echo ", "; // Thêm dấu phẩy nếu chưa đến số cuối
+                    }
+                }
+        
+                echo "</td>
                         <td>{$row['tag']}</td>
                         <td>{$row['book']}</td>
                         <td>
@@ -130,6 +128,7 @@ $result = $conn->query($sql);
         } else {
             echo "<tr><td colspan='9'>No data found</td></tr>";
         }
+        
         ?>
 
 

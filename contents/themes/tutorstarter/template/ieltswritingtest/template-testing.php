@@ -31,6 +31,32 @@ if ($conn->connect_error) {
 }
 
 $id_test = $custom_number;
+ // Get current time (hour, minute, second)
+ $hour = date('H'); // Giờ
+ $minute = date('i'); // Phút
+ $second = date('s'); // Giây
+
+ // Generate random two-digit number
+ $random_number = rand(10, 99);
+ // Handle user_id and id_test error, set to "00" if invalid
+ if (!$user_id) {
+    $user_id = '00'; // Set user_id to "00" if invalid
+}
+
+if (!$id_test) {
+    $id_test = '00'; // Set id_test to "00" if invalid
+}
+
+
+ // Create result_id
+ $result_id = $hour . $minute . $second . $id_test . $user_id . $random_number;
+
+ echo "<script> 
+        var resultId = '" . $result_id . "';
+        console.log('Result ID: ' + resultId);
+    </script>";
+
+
 
 // Fetch the question_choose and time for the given id_test
 $sql = "SELECT question_choose,testname, time, test_type, tag,book  FROM ielts_writing_test_list WHERE id_test = ?";
@@ -766,6 +792,11 @@ $conn->close();
                         <span id="correctanswer_error" class="text-danger"></span>  
                     </div>
 
+                    <div class = "form-group"   >
+                        <textarea type="text"  id="testsavenumber" name="testsavenumber" placeholder="testsavenumber"  class="form-control form_data" ></textarea>
+                        <span id="testsavenumber_error" class="text-danger"></span>  
+                    </div>
+
 
                     
 
@@ -858,7 +889,7 @@ const year = currentDate.getFullYear();
 
             // Display the date
 const dateElement = document.getElementById('date-div');
-dateElement.innerHTML = `${day}/${month}/${year}`;
+dateElement.innerHTML = `${year}-${month}-${day}`;
 
 
         
@@ -1484,7 +1515,7 @@ The given table compares different means of transportation in terms of the annua
 
 
     <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/full_overall_chart/full_band_chart.js"></script>
-    <script  src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/process_new.js"></script>
+    <script  src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/processnew.js"></script>
     
 
 
@@ -1494,7 +1525,7 @@ The given table compares different means of transportation in terms of the annua
     <script  src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/right_bar_feature/change-mode.js"></script>
 
 
-  <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/submitTest.js"></script>
+  <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/submitTest1.js"></script>
 
 
 

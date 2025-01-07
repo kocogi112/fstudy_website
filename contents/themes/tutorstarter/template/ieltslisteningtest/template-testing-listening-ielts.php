@@ -604,7 +604,7 @@ img{
     
     <!-- kết thúc send form -->
         
-     <script src="\wordpress\contents\themes\tutorstarter\ielts-listening-toolkit\script.js"></script>  
+     <script src="\wordpress\contents\themes\tutorstarter\ielts-listening-toolkit\script1.js"></script>  
 
 
 </body>

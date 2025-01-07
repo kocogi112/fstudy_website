@@ -44,8 +44,8 @@ async function GetSummaryPart1(i) {
     let highlightedAnswer = answer;
 
     try {
-       // const response = await fetch('https://fstudy-speaking-ielts-check.onrender.com/check-speaking', {
-        const response = await fetch('http://localhost:3000/check-speaking', {
+        const response = await fetch('https://fstudy-speaking-ielts-check.onrender.com/check-speaking', {
+       // const response = await fetch('http://localhost:3000/check-speaking', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

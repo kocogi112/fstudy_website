@@ -50,7 +50,7 @@ if (is_user_logged_in()) {
             die("Connection failed: " . $conn->connect_error);
         }
 
-        $sql = "SELECT type_test, testname, script_paragraph FROM dictation_question WHERE id_test = ?";
+        $sql = "SELECT type_test, testname, transcript FROM dictation_question WHERE id_test = ?";
 
 
         $stmt = $conn->prepare($sql);
@@ -61,11 +61,11 @@ if (is_user_logged_in()) {
 
         // Fetch result and store in variables
         if ($row = $result->fetch_assoc()) {
-            $script_paragraph = $row['script_paragraph'];
+            $transcript = $row['transcript'];
             $type_test = $row['type_test'];
             $testname = $row['testname'];
         } else {
-            $script_paragraph = "No content available.";
+            $transcript = "No content available.";
         }
         // Đóng kết nối
         $conn->close();

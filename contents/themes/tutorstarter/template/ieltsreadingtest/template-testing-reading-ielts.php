@@ -5,7 +5,7 @@
  
  */
 
- //get_header(); // Gọi phần đầu trang (header.php)
+ get_header(); // Gọi phần đầu trang (header.php)
 
 if (is_user_logged_in()) {
     $post_id = get_the_ID();
@@ -38,6 +38,34 @@ if ($stmt_test === false) {
     die('Lỗi MySQL prepare: ' . $conn->error);
 }
 
+
+ // Get current time (hour, minute, second)
+ $hour = date('H'); // Giờ
+ $minute = date('i'); // Phút
+ $second = date('s'); // Giây
+
+ // Generate random two-digit number
+ $random_number = rand(10, 99);
+ // Handle user_id and id_test error, set to "00" if invalid
+ if (!$user_id) {
+    $user_id = '00'; // Set user_id to "00" if invalid
+}
+
+if (!$custom_number) {
+    $custom_number = '00'; // Set id_test to "00" if invalid
+}
+
+
+ // Create result_id
+ $result_id = $hour . $minute . $second . $custom_number . $user_id . $random_number;
+
+ echo "<script> 
+        var resultId = '" . $result_id . "';
+        console.log('Result ID: ' + resultId);
+    </script>";
+
+
+
 $stmt_test->bind_param("i", $custom_number);
 $stmt_test->execute();
 $result_test = $stmt_test->get_result();
@@ -49,6 +77,8 @@ if ($result_test->num_rows > 0) {
     $id_parts = explode(",", $question_choose); // Chuyển thành mảng ID
 
     $part = []; // Mảng chứa dữ liệu của các phần
+    $previous_part_questions = 0; // Biến lưu trữ số câu hỏi của phần trước
+    $filterTypeQuestion = [];
 
     // Lặp qua từng id_part và truy vấn bảng tương ứng
     foreach ($id_parts as $index => $id_part) {
@@ -104,6 +134,29 @@ if ($result_test->num_rows > 0) {
                 $entry['group_question'] = null;
             }
             
+            if (!empty($row['category'])) {
+                $categoryData = json_decode($row['category'], true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $entry['question_types'] = [];
+                    foreach ($categoryData as $category) {
+                        // Cộng thêm số câu hỏi của phần trước đó vào start và end
+                        $start = $category['start'] + $previous_part_questions;
+                        $end = $category['end'] + $previous_part_questions;
+
+                        for ($i = $start; $i <= $end; $i++) {
+                            $entry['question_types'][$i] = $category['type'];
+                            $filterTypeQuestion[] = [$i => $category['type']]; // Sử dụng dạng key-value
+
+                        }
+                    }
+                } else {
+                    error_log('JSON decode error in category: ' . json_last_error_msg());
+                }
+            }
+
+            // Cập nhật số câu hỏi của phần hiện tại để cộng vào phần tiếp theo
+            $previous_part_questions += $row['number_question_of_this_part'];
+
 
             // Thêm phần vào mảng part
             $part[] = $entry;
@@ -113,7 +166,9 @@ if ($result_test->num_rows > 0) {
     // Xuất mảng quizData dưới dạng JavaScript
     echo '<script type="text/javascript">
     const quizData = {
-        part: ' . json_encode($part, JSON_UNESCAPED_SLASHES) . '
+        part: ' . json_encode($part, JSON_UNESCAPED_SLASHES) . ',
+        filterTypeQuestion: ' . json_encode($filterTypeQuestion, JSON_UNESCAPED_SLASHES) . '
+
     };
 
     console.log(quizData);
@@ -137,6 +192,8 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ielts Reading Computer </title>
     <style>
+      
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -145,7 +202,53 @@ body {
 
 }
 
+.form-group{
+ 
+ position: relative;
+ font-size: 15px;
+ color: #666;
+ &+&{
+   margin-top: 30px;
+ }
+ 
+ 
+}
 
+
+.form-label{
+   position: absolute;
+   z-index: 1;
+   left: 0;
+   top: 5px;
+   @include transition(.3s);
+   
+ }
+ 
+ .form-control{
+   width: 100%;
+   position: relative;
+   z-index: 3;
+   height: 35px;
+   background: none;
+   border:none;
+   padding: 5px 0;
+   @include transition(.3s);
+   border-bottom: 1px solid #777;
+   color: #555;
+   &:invalid{outline: none;}
+   
+   &:focus , &:valid{
+     outline: none;
+
+     @include box-shadow(0 1px $primary);
+     border-color:$primary;
+     + .form-label{
+       font-size: 12px;
+       color: $primary;
+       @include translateY(-15px);
+     }
+   }
+ }
 .content-left {
     width: 50%;
     padding: 20px;
@@ -215,18 +318,108 @@ body {
 }
 
 
-.question-range {
+
+.above-test {
     background-color: #e9ecef; /* Màu xám cho phần câu hỏi */
     padding: 14px; /* Khoảng cách bên trong */
     margin-top: 30px; /* Tăng giá trị để tránh che khuất bởi header */
-    width: 97%; /* Không chiếm chiều rộng đầy đủ */
     margin: 0 auto; /* Căn giữa */
+    display: flex; /* Sử dụng flexbox để căn chỉnh các phần tử con */
+    justify-content: space-between; /* Đưa icon và thời gian ra hai bên */
+    align-items: center; /* Căn chỉnh theo chiều dọc */
+}
+
+.above-test .fa-regular.fa-clock {
+    margin-right: 10px; /* Tạo khoảng cách giữa fa-clock và timer */
+}
+
+.above-test .timer {
+    margin-right: 20px; /* Tạo khoảng cách giữa timer và fa-bug */
+}
+
+.above-test .fa-solid.fa-bug {
+    margin-right: 20px; /* Tạo khoảng cách giữa fa-bug và fa-circle-info */
+}
+
+#question-range-of-part {
+    flex-grow: 1; /* Cho phép phần tử này chiếm không gian còn lại */
+}
+html {
+  scroll-behavior: smooth;
+}
+
+.question-checkbox {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #282828;
+    flex-shrink: 0;
+    background-color: #fff;
+    cursor: pointer;
+    opacity: 1;
+    font-family: "Montserrat", Helvetica, Arial, sans-serif;
+    -moz-transition: all ease 0.2s;
+    -o-transition: all ease 0.2s;
+    -webkit-transition: all ease 0.2s;
+    transition: all ease 0.2s;
+    font-size: 12px;
+    border: 1px solid #EAECEF;
+}
+
+.number-question {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #282828;
+    flex-shrink: 0;
+    background-color: #fff;
+    cursor: pointer;
+    opacity: 1;
+    font-family: "Montserrat", Helvetica, Arial, sans-serif;
+    -moz-transition: all ease 0.2s;
+    -o-transition: all ease 0.2s;
+    -webkit-transition: all ease 0.2s;
+    transition: all ease 0.2s;
+    font-size: 12px;
+    border: 1px solid #EAECEF;
+}
+.highlight-marked {
+    background-color: yellow !important;
+}
+
+.checkbox-marked {
+    background-color: yellow !important;
 }
 
 
-#content {
+
+.highlight-current-question {
+    font-weight: bold; /* In đậm */
+    border: 2px solid #ffcc00; /* Viền ngoài sáng màu vàng */
+    border-radius: 5px; /* Bo tròn góc */
+    padding: 5px; /* Tạo khoảng cách giữa chữ và viền */
+    background-color: #f9f6e8; /* Thêm nền nhạt */
+    transition: all 0.3s ease; /* Hiệu ứng mượt */
+}
+.checkbox-answered {
+    background-color: #e6f7ff; /* Màu nền xanh nhạt */
+    border-color: #1890ff;    /* Viền xanh đậm */
+    color: #1890ff;           /* Chữ màu xanh */
+}
+
+
+#content1 {
     display: none;
-    padding-top: 70px; /* Thêm padding trên cùng để tránh che khuất bởi header */
     width: 100%;
 }
 #header{
@@ -340,6 +533,7 @@ body {
 }
 
 #part-navigation {
+    overflow: auto;
     display: flex;
     justify-content: space-between; /* Ensure even spacing */
     width: 100%;
@@ -373,7 +567,152 @@ body {
     border: 1px solid #0073e6;
 }
 
-    </style>
+
+.tooltip {
+    position: relative;
+    cursor: pointer;
+    background-color: yellow;
+
+  }
+  
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 150px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 10px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* Position above the span */
+    left: 50%;
+    margin-left: -75px; /* Center the tooltip */
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  .tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%; /* Arrow at the bottom */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+  }
+  
+  .tooltip.active .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+  
+  .tooltiptext button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin: 2px 0;
+    font-size: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .tooltiptext button:hover {
+    background-color: #3e8e41;
+  }
+
+#highlight-icon-modify{
+    width : 20px;
+    height: 20px;
+}
+.tooltiptext img {
+    display: inline-block;
+    width: 20px;  /* Set the desired width */
+    height: 20px; /* Set the desired height */
+    margin-right: 5px; /* Add some space between images */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    vertical-align: middle; /* Align images vertically in the middle */
+}
+.group-control-part-btn{
+    position: fixed;
+    bottom: 70px;
+    right: 10px;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+}
+.control-part-btn{
+    background-color:black;
+    color: #ffffff;
+    height:60px;
+    width: 60px;
+}
+
+.bookmark-btn{
+    height: 30px;
+}
+
+
+
+.start_test {
+  appearance: none;
+  background-color: #2ea44f;
+  border: 1px solid rgba(27, 31, 35, .15);
+  border-radius: 6px;
+  box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: -apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 20px;
+  padding: 6px 16px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.start_test:focus:not(:focus-visible):not(.focus-visible) {
+  box-shadow: none;
+  outline: none;
+}
+
+.start_test:hover {
+  background-color: #2c974b;
+}
+
+.start_test:focus {
+  box-shadow: rgba(46, 164, 79, .4) 0 0 0 3px;
+  outline: none;
+}
+
+.start_test:disabled {
+  background-color: #94d3a2;
+  border-color: rgba(27, 31, 35, .1);
+  color: rgba(255, 255, 255, .8);
+  cursor: default;
+}
+
+.start_test:active {
+  background-color: #298e46;
+  box-shadow: rgba(20, 70, 32, .2) 0 1px 0 inset;
+}
+
+
+</style>
 </head>
 <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 
@@ -381,27 +720,40 @@ body {
     <div id = "test-prepare">
         <div class="loader"></div>
         <h3>Your test will begin shortly</h3>
+        <div id = "quick-instruction">
+            <i>Quick Instruction:<br>
+            - If you find any errors from test (image,display,text,...), please let us know by clicking icon <i class="fa-solid fa-bug"></i><br> 
+            - Incon <i class="fa-solid fa-circle-info"></i> will give you a guide tour, in which you can understand the structure of test, include test's type, formation and how to answer questions<br>
+            - All these two icons are at the right-above side of test.
+        </i>
+
+        </div>
         <div style="display: none;" id="date" style="visibility:hidden;"></div>
         <div style="display: none;" id="title" style="visibility:hidden;"><?php the_title(); ?></div>
         <div  style="display: none;"  id="id_test"  style="visibility:hidden;"><?php echo esc_html($custom_number);?></div>
+        <button  style="display: none;" class ="start_test" id="start_test"  onclick = "startTest()">Start test</button>
+        <i id = "welcome" style = "display:none">Click Start Test button to start the test now. Good luck</i>
+
 
     </div>
 
 
-    <div id="header" class="fixed-above">
-        <div class="header-content">
-            
-            <div class="test-taker-id">Test taker ID</div>
-            <span id="timer" class="timer" style="font-weight: bold"></span>
-        </div>
-    </div>
     
     
-    <div id="content" style="display: none;">
-            <div id="question-range-of-part" class="question-range"></div>
     
+    <div id="content1" style="display: none;">
+            <div class = "above-test">
+                <div id="question-range-of-part" class="question-range"></div>
+                <i class="fa-regular fa-clock"></i><span id="timer" class="timer" style="font-weight: bold"></span>
+                <i class="fa-solid fa-bug"></i>
+                <i class="fa-solid fa-circle-info"></i>
+            </div>
+
         <div class="quiz-container">
-            
+            <div class = "group-control-part-btn">
+                <button id="prev-btn" class= "control-part-btn" ><i class="fa-solid fa-arrow-left fa-xl"></i></button>
+                <button id="next-btn" class= "control-part-btn" ><i class="fa-solid fa-arrow-right  fa-xl"></i></button>
+            </div>
 
             <div class="content-left">
 
@@ -414,10 +766,10 @@ body {
                     <!-- Questions will be loaded dynamically -->
                 </div>
 
+
              <div class="pagination-container">
-                    <button id="prev-btn" style="display: none;" >Previous</button>
-                    
-                    <button id="next-btn" style="display: none;" >Next</button>
+                   
+
                     <h5  id="time-result"></h5>
 
                     <h5 id ="useranswerdiv"></h5>
@@ -427,7 +779,7 @@ body {
     
   
      <span id="message" style="display:none" ></span>
-     <form id="saveReadingResult" >
+     <form id="saveReadingResult" style="display:none" >
                 <div class="card">
                     <div class="card-header">Form lưu kết quả</div>
                     <div class="card-body" >
@@ -497,6 +849,12 @@ body {
                     <input type="text"  id="skip_number" name="skip_number" placeholder="Skip Number"  class="form-control form_data" />
                     <span id="skip_number_error" class="text-danger"></span>  
                 </div>
+
+                <div class = "form-group"   >
+                    <input type="text"  id="testsavenumber" name="testsavenumber" placeholder="Result Number"  class="form-control form_data" />
+                    <span id="testsavenumber_error" class="text-danger"></span>  
+                </div>
+           
            
         
         <div class="card-footer">
@@ -515,6 +873,9 @@ body {
             </div>       
 
         </div>
+        
+
+
         <div id="question-nav-container" class="fixed-bottom">
             <!-- <span id="part-label"></span>
             <div id="question-nav"></div> -->
@@ -524,7 +885,13 @@ body {
         </div>
     </div>
 
-    <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/script.js"></script>
+    <script>
+            let highlights = {}; // Object để lưu trữ các highlight
+
+    </script>
+    <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/script_1.js"></script>
+    <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/highlight_text.js"></script>
+
 </body>
 <script>
     // function save data qua ajax

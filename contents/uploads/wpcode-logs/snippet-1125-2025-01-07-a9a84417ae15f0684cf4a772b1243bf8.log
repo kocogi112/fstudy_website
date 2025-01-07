@@ -1,0 +1,11 @@
+2025-01-07T12:11:42+00:00 Uncaught Error: Object of class stdClass could not be converted to string in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\video_system\template-play.php:45
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers-3\includes\class-wpcode-snippet-execute.php(411) : eval()'d code(1212): include()
+#1 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): my_video_template_redirect('')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#3 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#5 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#7 {main}
+  thrown

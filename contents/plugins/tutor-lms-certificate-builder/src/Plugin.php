@@ -25,7 +25,7 @@ class Plugin {
 	 *
 	 * @since 1.0.0
 	 */
-	const SLUG = 'tutor-certificate-builder';
+	const SLUG = 'tutor-lms-certificate-builder';
 
 	/**
 	 * Plugin editor action

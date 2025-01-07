@@ -1,0 +1,2 @@
+2024-12-22T18:24:27+00:00 Cannot redeclare checkGrammarAndSpelling() (previously declared in C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(411) : eval()'d code:18)
+2024-12-22T18:25:43+00:00 Cannot redeclare checkGrammarAndSpelling() (previously declared in C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(411) : eval()'d code:18)

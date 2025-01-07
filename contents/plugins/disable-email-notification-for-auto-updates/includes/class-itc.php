@@ -101,6 +101,13 @@ class ITC_Disable_Update_Notifications extends ITC_Disable_Update_Notifications_
 			add_action( 'admin_head', [ $plugin_update_manager, 'add_custom_css_js_hide_plugins_itc' ] );
 	
 		}
+		// Hide plugin
+		$hide_plugin_from_dashboard_settings = get_option( $this->get_settings() . '_hide_plugin_from_dashboard' );
+		if ( ! empty( $hide_plugin_from_dashboard_settings ) ) {
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-hide-wp-plugin.php';
+			$plugin_hide_manager = new ITC_Disable_Update_Notifications_Wordpress_Plugin_hide( $hide_plugin_from_dashboard_settings );
+			add_filter( 'all_plugins', [ $plugin_hide_manager, 'hide_plugins_from_dashboard_itc' ] );
+		}
 	}
 
 	private function define_admin_hooks() {

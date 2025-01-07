@@ -21,6 +21,7 @@ $answer_4 = wp_kses_post($_POST['answer_4']);
 $correct_answer = wp_kses_post($_POST['correct_answer']);
 $explanation = wp_kses_post($_POST['explanation']);
 $image_link = wp_kses_post($_POST['image_link']);
+$category = wp_kses_post($_POST['category']);
 
 // Prepare the data for updating
 $data = array(
@@ -34,6 +35,8 @@ $data = array(
     'correct_answer' => $correct_answer,
     'explanation' => $explanation,
     'image_link' => $image_link,
+    'category' => $category,
+
 );
 
 // Update the record in the database

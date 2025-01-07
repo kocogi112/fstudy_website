@@ -253,7 +253,7 @@ if (is_user_logged_in()) {
                 <h4 class="alert-heading">Pro tips:</h4> <hr>
                 <p>Sẵn sàng để bắt đầu làm full test? Để đạt được kết quả tốt nhất, bạn cần dành ra 40 phút cho bài test này.</p>
             </div><br>
-            <a class="btn-submit" href="doing">Bắt đầu bài thi</a>
+            <a class="btn-submit" href="start/">Bắt đầu bài thi</a>
         </div>
 
         <div id="practice-content" style="display: none;">
@@ -263,7 +263,7 @@ if (is_user_logged_in()) {
             </div><br>
 
             <p class="h2-test">Giới hạn thời gian (Để trống để làm bài không giới hạn):</p>
-            <form action="doing" method="get">
+            <form action="start/" method="get">
                 <label style="font-size: 18px;" for="timer"></label>
 
                 <select id="timer" name="option">

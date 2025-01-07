@@ -39,6 +39,33 @@ if ($conn->connect_error) {
 
 $id_test = $custom_number;
 
+ // Get current time (hour, minute, second)
+ $hour = date('H'); // Giờ
+ $minute = date('i'); // Phút
+ $second = date('s'); // Giây
+
+ // Generate random two-digit number
+ $random_number = rand(10, 99);
+ // Handle user_id and id_test error, set to "00" if invalid
+ if (!$user_id) {
+    $user_id = '00'; // Set user_id to "00" if invalid
+}
+
+if (!$id_test) {
+    $id_test = '00'; // Set id_test to "00" if invalid
+}
+
+
+ // Create result_id
+ $result_id = $hour . $minute . $second . $id_test . $user_id . $random_number;
+
+ echo "<script> 
+        var resultId = '" . $result_id . "';
+        console.log('Result ID: ' + resultId);
+    </script>";
+
+
+
 // Fetch the question_choose and time for the given id_test
 $sql = "SELECT id_test, question_choose,testname, test_type, tag,book  FROM ielts_speaking_test_list WHERE id_test = ?";
 $stmt = $conn->prepare($sql);
@@ -438,8 +465,11 @@ $conn->close();
                     <div class = "form-group"   >
                         <textarea type="text"  id="user_answer_and_comment" name="user_answer_and_comment" placeholder="Data Save Speaking"  class="form-control form_data"></textarea>
                         <span id="useranswer_error" class="text-danger"></span>
-                </div>
-
+                    </div>
+                     <div class = "form-group"   >
+                        <textarea type="text"  id="testsavenumber" name="testsavenumber" placeholder="testsavenumber"  class="form-control form_data"></textarea>
+                        <span id="testsavenumber_error" class="text-danger"></span>
+                    </div>
                 
 
 
@@ -481,8 +511,8 @@ const year = currentDate.getFullYear();
 
 // Display the date
 const dateElement = document.getElementById('date');
-dateElement.innerHTML = `${day}/${month}/${year}`;
 
+dateElement.innerHTML = `${year}-${month}-${day}`;
 
 
     let os = null; 
@@ -1085,6 +1115,9 @@ function stopRecording() {
         else if(os == 'iOS'){
             responsiveVoice.speak(text);
         }
+        else{
+            responsiveVoice.speak(text);
+        }
 
 
 
@@ -1407,7 +1440,8 @@ function ResultInput() {
     document.getElementById("band_detail").value = contentToCopy8;
     document.getElementById("test_type").value = contentToCopy9;
 
-    
+    document.getElementById("testsavenumber").value = resultId;
+
    /* // Add a delay before submitting the form
 setTimeout(function() {
 // Automatically submit the form
@@ -1514,7 +1548,7 @@ function recordWord(expectedWord, buttonElement) {
 <script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\overalltab.js"></script>
 <script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\sample-tab.js"></script>
 <script src = "\wordpress\contents\themes\tutorstarter\scan-device\location_ip.js"></script>
-<script src = "\wordpress\contents\themes\tutorstarter\scan-device\system_os.js"></script>
+<script src = "\wordpress\contents\themes\tutorstarter\scan-device\system_check.js"></script>
 
 
 <!--

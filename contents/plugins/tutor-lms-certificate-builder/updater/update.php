@@ -10,7 +10,7 @@
             private $url_slug;
             private $license_field_name;
             private $nonce_field_name;
-            private $api_end_point = 'https://www.themeum.com/wp-json/themeum-license/v2/';
+            private $api_end_point = 'https://tutorlms.com/wp-json/themeum-products/v1/';
             private $error_message_key;
             private $themeum_response_data;
             public $is_valid;
@@ -91,57 +91,21 @@
                 }
 
                 $license_info = $this->get_license();
-                $license_key = $license_info ? $license_info['license_key'] : '';
+                $license_key  = $license_info ? $license_info['license_key'] : '';
 
                 $params = array(
                     'body' => array(
-                        'license_key'   => $license_key,
-                        'product_slug'  => $this->product_slug,
+                        'license_key'  => $license_key,
+                        'product_slug' => $this->product_slug,
                     ),
+                    'headers' => array(
+                        'Secret-Key' => 't344d5d71sae7dcb546b8cf55e594808'
+                    )
                 );
 
                 // Make the POST request
-                $is_free = isset($this->meta['is_product_free']) && $this->meta['is_product_free']===true;
-                $access_slug = $is_free ? 'check-update-free' : 'check-update';
-                $request = wp_remote_post($this->api_end_point . $access_slug, $params);
-                $request_body = false;
-                
-                // Check if response is valid
-                if (!is_wp_error($request) || wp_remote_retrieve_response_code($request) === 200) {
-                    $request_body = json_decode($request['body']);
-                    $response_data = $request_body->data;
-
-                    if(is_object($response_data) && property_exists($response_data, 'dependency_products') && property_exists($response_data, 'option_keymap')) {
-                        $dependency_products = array();
-                        $option_keymap = (array)$response_data->option_keymap;
-                        
-                        // Loop through all the dependencies and prepare license keys
-                        foreach((array)$response_data->dependency_products as $dependency) {
-                            $dependency = (array)$dependency;
-                            $option_key = isset($option_keymap[$dependency['slug']]) ? $option_keymap[$dependency['slug']] : null;
-                            
-                            if($option_key) {
-                                $license = $this->get_license($option_key);
-                                !is_array($license) ? $license=array() : 0;
-
-                                $license['blog_url'] = get_home_url();
-                                $dependency_products[$dependency['slug']] = $license;
-                            }
-                        }
-
-                        // Call again with dependency product data
-                        $params['body']['dependency_products'] = $dependency_products;
-                        $request = wp_remote_post($this->api_end_point . $access_slug, $params);
-
-                        if (!is_wp_error($request) || wp_remote_retrieve_response_code($request) === 200) {
-                            $request_body = json_decode($request['body']);
-                        }
-                    }
-                    
-                }
-
-                $this->themeum_response_data = $request_body;
-                return $this->themeum_response_data;
+                $access_slug = 'check-update';
+                return wp_remote_post( $this->api_end_point . $access_slug, $params );
             }
 
             public function check_license_key() {
@@ -229,22 +193,27 @@
                     return $res;
                 }
 
-                $remote = $this->check_for_update_api();
+                $response = $this->check_for_update_api();
 
-                if (!is_wp_error($remote)) {
+                if (!is_wp_error($response)) {
+                    $response    = json_decode( wp_remote_retrieve_body( $response ) );
+                    $status_code = $response->status;
+                    if (200 === $status_code) {
+                        $body = $response->body_response;
 
-                    $res = new \stdClass();
-                    $res->name = $remote->data->plugin_name;
-                    $res->slug = $this->product_slug;
-                    $res->version = $remote->data->version;
-                    $res->last_updated = $remote->data->updated_at;
-                    $res->sections = array(
-                        'changelog' => $remote->data->change_log,
-                    );
-
-                    return $res;
+                        $res = new \stdClass();
+                        $res->name = $body->plugin_name;
+                        $res->slug = $this->product_slug;
+                        $res->version = $body->version;
+                        $res->last_updated = $body->updated_at;
+                        $res->sections = array(
+                            'changelog' => $body->change_log,
+                        );
+                        return $res;
+                    } else {
+                        return false;
+                    }
                 }
-
                 return false;
             }
 
@@ -257,23 +226,30 @@
 
                 $base_name = $this->meta['product_basename'];
 
-                $request_body = $this->check_for_update_api();
+                $response = $this->check_for_update_api();
 
-                if (!empty($request_body->success) && $request_body->success) {
-                    if (version_compare($this->meta['current_version'], $request_body->data->version, '<')) {
+                if ( is_wp_error( $response ) ) {
+                    return $transient;
+                } else {
+                    $response    = json_decode( wp_remote_retrieve_body( $response ) );
+                    $status_code = $response->status;
+
+                    if ( 200 === $status_code ) {
+                        $body = $response->body_response;
 
                         $update_info = array(
-                            'new_version'   => $request_body->data->version,
-                            'package'       => $request_body->data->download_url,
-                            'tested'        => $request_body->data->tested_wp_version,
+                            'new_version'   => $body->version,
+                            'package'       => $body->download_url,
+                            'tested'        => $body->tested_wp_version,
                             'slug'          => $base_name,
-                            'url'           => $request_body->data->url,
+                            'url'           => $body->url,
                         );
 
-                        $transient->response[$base_name] = $this->meta['product_type']=='plugin' ? (object)$update_info : $update_info;
-
-                        $error_mesage = empty($request_body->data->error_message) ? null : $request_body->data->error_message;
-                        update_option( $this->error_message_key, $error_mesage );
+                        // Compare version.
+                        $version = $update_info['new_version'];
+                        if ( version_compare( $version, TUTOR_CB_VERSION, '>' ) ) {
+                            $transient->response[$base_name] = $this->meta['product_type']=='plugin' ? (object)$update_info : $update_info;
+                        }
                     }
                 }
                 return $transient;
@@ -289,9 +265,8 @@
                 }
             }
 
-            private function get_license($option_key = null ) {
-                !$option_key ? $option_key = $this->meta['license_option_key'] : 0;
-                $license_option = get_option($option_key, null);
+            private function get_license() {
+                $license_option = get_option('tutor_license_info', null);
 
                 if(!$license_option) {
                     // Not submitted yet

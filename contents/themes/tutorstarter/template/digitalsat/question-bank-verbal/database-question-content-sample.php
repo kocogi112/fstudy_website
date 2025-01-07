@@ -20,7 +20,7 @@ if ($conn->connect_error) {
 $id_question_filter = isset($_GET['id_question_filter']) ? $_GET['id_question_filter'] : '';
 
 // Pagination logic
-$limit = 10; // Number of records per page
+$limit = 20; // Number of records per page
 $page = isset($_GET['page']) ? $_GET['page'] : 1; // Current page number
 $offset = ($page - 1) * $limit; // Calculate offset
 
@@ -105,6 +105,8 @@ $result = $conn->query($sql);
         <th>Correct Answer</th>
         <th>Explanation</th>
         <th>Image Link (if have)</th>
+        <th>Phân loại câu hỏi</th>
+
     </tr>
 
     <?php
@@ -145,6 +147,7 @@ $result = $conn->query($sql);
                         <td>{$row['correct_answer']}</td>
                         <td>{$explanation_display} $explanation_view_more</td>
                         <td>{$image_link_display} $image_link_view_more</td>
+                        <td>{$row['category']}</td>
                         <td>
                             <button class='btn btn-primary btn-sm' onclick='openEditModal({$row['number']})'>Edit</button>
                             <button class='btn btn-danger btn-sm' onclick='deleteRecord({$row['number']})'>Delete</button>
@@ -162,23 +165,41 @@ $result = $conn->query($sql);
 
 </table>
   <!-- Pagination buttons -->
-  <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-            <?php if ($page > 1): ?>
-                <li class="page-item"><a class="page-link" href="?page=<?php echo $page - 1; ?>&id_question_filter=<?php echo $id_question_filter; ?>">Previous</a></li>
-            <?php endif; ?>
+  <!-- Pagination buttons -->
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        <?php if ($page > 1): ?>
+            <li class="page-item">
+                <a class="page-link" href="?page=1&id_question_filter=<?php echo $id_question_filter; ?>">First</a>
+            </li>
 
-            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                <li class="page-item <?php if ($i == $page) echo 'active'; ?>">
-                    <a class="page-link" href="?page=<?php echo $i; ?>&id_question_filter=<?php echo $id_question_filter; ?>"><?php echo $i; ?></a>
-                </li>
-            <?php endfor; ?>
+            <li class="page-item">
+                <a class="page-link" href="?page=<?php echo $page - 1; ?>&id_question_filter=<?php echo $id_question_filter; ?>">Previous</a>
+            </li>
+        <?php endif; ?>
 
-            <?php if ($page < $total_pages): ?>
-                <li class="page-item"><a class="page-link" href="?page=<?php echo $page + 1; ?>&id_question_filter=<?php echo $id_question_filter; ?>">Next</a></li>
-            <?php endif; ?>
-        </ul>
-    </nav>
+        <?php 
+        // Define the range of page buttons to display
+        $start_page = max(1, $page - 2);
+        $end_page = min($total_pages, $page + 2);
+
+        for ($i = $start_page; $i <= $end_page; $i++): ?>
+            <li class="page-item <?php if ($i == $page) echo 'active'; ?>">
+                <a class="page-link" href="?page=<?php echo $i; ?>&id_question_filter=<?php echo $id_question_filter; ?>"><?php echo $i; ?></a>
+            </li>
+        <?php endfor; ?>
+
+        <?php if ($page < $total_pages): ?>
+            <li class="page-item">
+                <a class="page-link" href="?page=<?php echo $page + 1; ?>&id_question_filter=<?php echo $id_question_filter; ?>">Next</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page=<?php echo $total_pages; ?>&id_question_filter=<?php echo $id_question_filter; ?>">Last</a>
+            </li>
+        <?php endif; ?>
+    </ul>
+</nav>
+
 <!-- Button to Add New Record -->
 <button class="btn btn-success" onclick="openAddModal()">Add New Question</button>
 <!-- View More Modal -->
@@ -232,6 +253,21 @@ $result = $conn->query($sql);
                     explanation: <textarea  id="edit_explanation" name="explanation" class="form-control"   required></textarea><br>
                     image_link: <input type="text" id="edit_image_link" name="image_link" class="form-control"  ></input><br>
 
+                    Phân loại câu hỏi:
+                    <select id="edit_category" name="category" class="form-control" required>
+                        <option value=""></option>
+                        <option value="Boundaries">Boundaries</option>
+                        <option value="Central ideas and detail">Central ideas and detail</option>
+                        <option value="Form, Structure and Sense">Form, Structure and Sense</option>
+                        <option value="Inferences">Inferences</option>
+                        <option value="Cross Text Connections">Cross Text Connections</option>
+                        <option value="Words in context">Words in context</option>
+                        <option value="Text Structure and Purpose">Text Structure and Purpose</option>
+                        <option value="Transition">Transition</option>
+                        <option value="Rhetorical Analysis">Rhetorical Analysis</option>
+
+                    </select><br>
+
                     
 
                 </form>
@@ -278,6 +314,21 @@ $result = $conn->query($sql);
                     </select><br>                   
                     explanation: <textarea id="add_explanation" name="explanation" class="form-control"   required></textarea><br>
                     image_link: <input type="text" id="add_image_link" name="image_link" class="form-control"  ></input><br>
+                    Phân loại câu hỏi:
+                    <select id="add_category" name="category" class="form-control" required>
+                        <option value=""></option>
+                        <option value="Boundaries">Boundaries</option>
+                        <option value="Central ideas and detail">Central ideas and detail</option>
+                        <option value="Form, Structure and Sense">Form, Structure and Sense</option>
+                        <option value="Inferences">Inferences</option>
+                        <option value="Cross Text Connections">Cross Text Connections</option>
+                        <option value="Words in context">Words in context</option>
+                        <option value="Text Structure and Purpose">Text Structure and Purpose</option>
+                        <option value="Transition">Transition</option>
+                        <option value="Rhetorical Analysis">Rhetorical Analysis</option>
+
+                    </select><br>
+                
                 </form>
 
             </div>

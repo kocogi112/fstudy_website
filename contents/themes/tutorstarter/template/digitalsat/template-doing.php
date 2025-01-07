@@ -36,6 +36,31 @@ if (is_user_logged_in()) {
 // Set custom_number as id_test
 $id_test = $custom_number;
 
+ // Get current time (hour, minute, second)
+ $hour = date('H'); // Giờ
+ $minute = date('i'); // Phút
+ $second = date('s'); // Giây
+
+ // Generate random two-digit number
+ $random_number = rand(10, 99);
+ // Handle user_id and id_test error, set to "00" if invalid
+ if (!$user_id) {
+    $user_id = '00'; // Set user_id to "00" if invalid
+}
+
+if (!$id_test) {
+    $id_test = '00'; // Set id_test to "00" if invalid
+}
+
+
+ // Create result_id
+ $result_id = $hour . $minute . $second . $id_test . $user_id . $random_number;
+
+ echo "<script> 
+        var resultId = '" . $result_id . "';
+        console.log('Result ID: ' + resultId);
+    </script>";
+
 // Prepare the SQL statement
 $sql = "SELECT testname, time, test_type, question_choose, tag, number_question FROM digital_sat_test_list WHERE id_test = ?";
 $stmt = $conn->prepare($sql);
@@ -73,7 +98,7 @@ if ($result->num_rows > 0) {
     foreach ($questions as $question_id) {
         if (strpos($question_id, "verbal") === 0) {
             // Query only from digital_sat_question_bank_verbal table
-            $sql_question = "SELECT id_question, type_question, question_content, answer_1, answer_2, answer_3, answer_4, correct_answer, explanation, image_link FROM digital_sat_question_bank_verbal WHERE id_question = ?";
+            $sql_question = "SELECT id_question, type_question, question_content, answer_1, answer_2, answer_3, answer_4, correct_answer, explanation, image_link, category FROM digital_sat_question_bank_verbal WHERE id_question = ?";
             $stmt_question = $conn->prepare($sql_question);
             $stmt_question->bind_param("s", $question_id);
             $stmt_question->execute();
@@ -91,6 +116,7 @@ if ($result->num_rows > 0) {
                 echo "'image': " . json_encode($question_data['image_link']) . ",";
                 echo "'question_category': '',";
                 echo "'id_question': " . json_encode($question_data['id_question']) . ",";
+                echo "'category': " . json_encode($question_data['category']) . ",";
 
                 echo "'answer': [";
                 echo "['" . $question_data['answer_1'] . "', '" . ($question_data['correct_answer'] == 'answer_1' ? "true" : "false") . "'],";
@@ -108,6 +134,7 @@ if ($result->num_rows > 0) {
 
     // Close the questions array and the main object
     echo "]};";
+
     echo "</script>";
 } else {
     echo "<script>console.log('No data found for the given id_test');</script>";
@@ -143,7 +170,7 @@ if (window.MathJax) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title></title>
-    <link rel="stylesheet" href="/wordpress/contents/themes/tutorstarter/system-test-toolkit/style/style2.css">
+    <link rel="stylesheet" href="/wordpress/contents/themes/tutorstarter/system-test-toolkit/style/style_1.css">
     <style type="text/css">
 
 #time-remaining-container {
@@ -181,9 +208,7 @@ if (window.MathJax) {
     
 
 }
-        
-.questions{
-}
+
 
 .quiz-section {
                display: flex;
@@ -280,8 +305,9 @@ if (window.MathJax) {
 
           .rd-fm:checked + label:before,
           .cb-fm:checked + label:before {
-              background-color: #2d2f31;
+              background-color:blue;
               border-color: #2d2f31;
+              color: white;
           }
 
           .cb-fm:checked + label:before {
@@ -324,13 +350,12 @@ if (window.MathJax) {
             transform: translateY(-50%);
             font-weight: bold; /* Bold font for the label */
             font-size: 12px; /* Adjust font size */
-            color: #2d2f31; /* Text color */
         }
         
 .question {
               margin: 3%;
               font-size: 20px;
-              font-family: 'Georgia', serif;;
+              font-family: Arial, Helvetica, sans-serif;
              
 
               /*
@@ -500,6 +525,8 @@ if (window.MathJax) {
    </style>
 
 </head>
+
+
 <script src="https://kit.fontawesome.com/acfb8e1879.js" crossorigin="anonymous"></script>
 
     <body onload="main()">
@@ -752,19 +779,24 @@ if (window.MathJax) {
          
          
          
-         
          <div id="checkbox-popup" class="popup-checkbox">
-         <span class="close-checkbox" onclick="closeCheckboxPopup()">&times;</span>
+       
+
+
+                <span class="close-checkbox" onclick="closeCheckboxPopup()">&times;</span>
                 <b style="color: rgb(248, 23, 23);">Bạn có thể chuyển câu hỏi nhanh bằng cách ấn vào các câu tương ứng</b>
-                <div id="checkboxes-container"></div>
+
+                <div class="icon-detail">
+		                <div class="single-detail"><i class="fa-regular fa-flag"></i><span>Current</span></div>
+                        <div class="single-detail"><div class="dashed-square"></div><span>Unanswered</span></div> 
+                        <div class="single-detail"><i class="fa-solid fa-bookmark" style="color: #c33228;"></i><span>For Review</span></div>
+                    </div>
+
+
+                <div id="checkboxes-container" class = "checkboxes-container" ></div>
                 <p style="text-align: center; justify-content: center; display: none;">Chú thích</p>
 
-                <div id="checkbox-explain">
-                    <div class ="checkbox-container noanswer"></div>
-                    <div class ="checkbox-container answered"></div>
-                    <div class ="checkbox-container checkboxed"></div>
-
-                </div>
+                
                 
                 
          </div>
@@ -927,8 +959,8 @@ if (window.MathJax) {
 
     
   
- <span id="message" style="display:none" ></span>
- <form id="frmContactUs"  style="display:none">
+ <span id="message"  style = "display:none" ></span>
+ <form id="frmContactUs"  style = "display:none">
          <div class="card">
              <div class="card-header">Form lưu kết quả</div>
              <div class="card-body" >
@@ -980,7 +1012,39 @@ if (window.MathJax) {
    </div>
 
   
+   <div class = "form-group"   >
+        <input type="text"  id="total_question_number" name="total_question_number" placeholder="Total Number"  class="form-control form_data" />
+        <span id="total_question_number_error" class="text-danger"></span>  
+    </div>
+           
 
+    <div class = "form-group"   >
+        <input type="text"  id="correct_number" name="correct_number" placeholder="Correct Number"  class="form-control form_data" />
+        <span id="correctanswer_error" class="text-danger"></span>  
+    </div>
+            
+    <div class = "form-group"   >
+        <input type="text"  id="incorrect_number" name="incorrect_number" placeholder="Incorrect Number"  class="form-control form_data" />
+        <span id="incorrect_number_error" class="text-danger"></span>  
+    </div>
+        
+
+    <div class = "form-group"   >
+        <input type="text"  id="skip_number" name="skip_number" placeholder="Skip Number"  class="form-control form_data" />
+        <span id="skip_number_error" class="text-danger"></span>  
+    </div>
+
+    <div class = "form-group"   >
+        <input type="text"  id="save_specific_time" name="save_specific_time" placeholder="save_specific_time"  class="form-control form_data" />
+        <span id="save_specific_time_error" class="text-danger"></span>  
+    </div>
+
+
+    <div class = "form-group"   >
+        <input type="text"  id="testsavenumber" name="testsavenumber" placeholder="Result Number"  class="form-control form_data" />
+        <span id="testsavenumber_error" class="text-danger"></span>  
+    </div>
+           
 
 
 
@@ -1115,11 +1179,9 @@ const year = currentDate.getFullYear();
             // Display the date
 const dateElement = document.getElementById('date');
 const dateElement2 = document.getElementById('date-table-result');
-dateElement.innerHTML = `${day}/${month}/${year}`;
 
-dateElement2.innerHTML = `${day}/${month}/${year}`;
-
-
+dateElement.innerHTML = `${year}-${month}-${day}`;
+dateElement2.innerHTML = `${year}-${month}-${day}`;
 
 
 
@@ -1189,22 +1251,91 @@ document.getElementById('change_appearane_1').addEventListener('click', function
 });  
 
 // css cho questions nếu muốn block/none
+let saveSpecificTime = "";
+let questionStartTime = {};  // Để lưu trữ thời gian bắt đầu cho từng câu hỏi
+let questionTimes = {}; // Đối tượng lưu trữ tổng thời gian của mỗi câu hỏi
 
 
 function showPrevQuestion() {
+    countTimeSpecific(currentQuestionIndex);
+
     if (currentQuestionIndex > 0) {
         currentQuestionIndex--;
-
         showQuestion(currentQuestionIndex);
+
     }
 }
 
 function showNextQuestion() {
+    countTimeSpecific(currentQuestionIndex);
+
     if (currentQuestionIndex < quizData.questions.length - 1) {
         currentQuestionIndex++;
         showQuestion(currentQuestionIndex);
     }
 }
+
+
+// Hàm để cộng thời gian cho từng câu hỏi
+function addTimeForQuestion(questionIndex, timeSpent) {
+    if (!questionTimes[questionIndex]) {
+        questionTimes[questionIndex] = 0;
+    }
+    questionTimes[questionIndex] += timeSpent;
+}
+function startQuestionTimer(questionIndex) {
+    questionStartTime[questionIndex] = performance.now(); // Lấy thời gian hiện tại chính xác
+}
+
+// Hàm tính tổng thời gian cho tất cả các câu hỏi
+// Hàm tính tổng thời gian cho tất cả các câu hỏi
+function calculateTotalTimeForEachQuestion() {
+    const questionTimeArray = []; // Mảng lưu thời gian của từng câu hỏi
+
+    // Duyệt qua từng câu hỏi trong questionTimes và log tổng thời gian của từng câu hỏi
+    for (let questionIndex in questionTimes) {
+        const timeSpent = questionTimes[questionIndex].toFixed(2); // Lấy thời gian đã tính
+        console.log(`Question ${questionIndex}: total time: ${timeSpent} seconds`);
+        
+        // Thêm đối tượng thời gian vào mảng
+        questionTimeArray.push({ question: parseInt(questionIndex), time: parseFloat(timeSpent) });
+    }
+
+    // Chuyển mảng thành chuỗi JSON
+    saveSpecificTime = JSON.stringify(questionTimeArray);
+    console.log("saveSpecificTime:", saveSpecificTime);
+}
+
+// Ví dụ gọi hàm
+function countTimeSpecific(currentQuestionIndex) {
+    // Lưu thời gian bắt đầu cho câu hỏi hiện tại
+    if (!questionStartTime[currentQuestionIndex]) {
+        questionStartTime[currentQuestionIndex] = Date.now();
+    }
+
+    // Đợi cho người dùng chuyển sang câu hỏi tiếp theo hoặc hoàn thành
+    const questionEndTime = Date.now();
+    const timeSpent = (questionEndTime - questionStartTime[currentQuestionIndex]) / 1000; // Thời gian tính bằng giây
+
+    // Log ra câu hỏi và thời gian đã sử dụng
+    console.log(`Question ${currentQuestionIndex + 1}: time: ${timeSpent.toFixed(3)} seconds`);
+
+    // Cộng thời gian cho câu hỏi hiện tại
+    addTimeForQuestion(currentQuestionIndex + 1, timeSpent);
+
+
+    // Cập nhật thời gian bắt đầu cho câu hỏi tiếp theo
+    // Cập nhật thời gian bắt đầu cho câu hỏi tiếp theo
+    questionStartTime[currentQuestionIndex + 1] = Date.now();
+    questionStartTime[currentQuestionIndex] = Date.now();
+    questionStartTime[currentQuestionIndex - 1] = Date.now();
+}
+function showTotalTime() {
+    calculateTotalTimeForEachQuestion();
+}
+
+
+
 
 dragElement(document.getElementById("calculator"));
 
@@ -1361,7 +1492,7 @@ function startTest() {
         </script>
 
 <!--<script type="text/javascript" src="function/alert_leave_page.js"></script> -->
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/main1.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/main_.js"></script>
 
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/translate.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/zoom-text.js"></script>
@@ -1370,7 +1501,7 @@ function startTest() {
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/report-error.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/note-sidebar.js"></script>
 
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/submit-answer__1.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/submit-answer.js"></script>
 <!--<script type="module" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/check_dev_tool.js"></script>
     -->
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/highlight-text-2.js"></script>
@@ -1378,7 +1509,7 @@ function startTest() {
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/format-time.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/draft-popup.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/color-background.js"></script>
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/startTest.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/start-Test.js"></script>
 <!-- <script type="text/javascript" src="function/quick-view-answer.js"></script> -->
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/checkbox_remember.js"></script>
 
@@ -1394,6 +1525,8 @@ function startTest() {
 </script>
 
     </body>
+
+
 </html>
 
 <?php

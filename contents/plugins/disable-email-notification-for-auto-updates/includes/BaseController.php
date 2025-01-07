@@ -1,15 +1,15 @@
 <?php
 if( ! class_exists( 'ITC_Disable_Update_Notifications_BaseController' ) ) {
 	class ITC_Disable_Update_Notifications_BaseController{
-		private $plugin_name_parent = 'ideastocode_module_settings';
+		private $plugin_name_parent = 'disable_email_notification_for_auto_updates_module_settings';
 		private $plugin_detail;
 
 		function __construct() {
 			$this->plugin_detail = array(
 				'name'      => 'itc_disable_update_notifications',
-				'title'     => __( 'Disable Email Notifications and Block Plugin, WP Core, and Theme Updates', 'disable-email-notification-for-auto-updates' ),
+				'title'     => esc_html__( 'Disable Email Notifications and Block Plugin, WP Core, and Theme Updates', 'disable-email-notification-for-auto-updates' ),
 				'slug'      => 'itc-disable_update_notifications',
-				'version'   => ( defined( 'ITC_DISABLE_UPDATE_NOTIFICATIONS_VERSION' ) ) ? ITC_DISABLE_UPDATE_NOTIFICATIONS_VERSION : '1.0.4',
+				'version'   => ( defined( 'ITC_DISABLE_UPDATE_NOTIFICATIONS_VERSION' ) ) ? ITC_DISABLE_UPDATE_NOTIFICATIONS_VERSION : '1.0.5',
 				'settings'  => 'itc_disable_update_notifications_settings',
 			);
 		}
@@ -101,20 +101,20 @@ if( ! class_exists( 'ITC_Disable_Update_Notifications_BaseController' ) ) {
 			return $settings;
 		}
 
-		// This is to display a message after plugin activation.
+		//This is to display msg after plugin activation.
 		public function set_transient(){
-			$notice_dismiss_index = $this->get_settings() . "_notice_dismiss";
-			set_transient( $notice_dismiss_index, true, 5 ); // Notice will show only once after plugin activation.
+			$notice_dismiss_index = $this->get_settings().'_notice_dismiss';
+			set_transient( 'disable-email-notification-for-auto-updates' . $notice_dismiss_index, true, 5 ); // Prefixed transient name
 		}
-
+		
 		public function get_transient(){
-			$notice_dismiss_index = $this->get_settings() . "_notice_dismiss";
-			return get_transient( $notice_dismiss_index );
+			$notice_dismiss_index = $this->get_settings().'_notice_dismiss';
+			return get_transient( 'disable-email-notification-for-auto-updates' . $notice_dismiss_index );
 		}
-
+		
 		public function remove_transient(){
-			$notice_dismiss_index = $this->get_settings() . "_notice_dismiss";
-			delete_transient( $notice_dismiss_index );
+			$notice_dismiss_index = $this->get_settings().'_notice_dismiss';
+			delete_transient( 'disable-email-notification-for-auto-updates' . $notice_dismiss_index );
 		}
 	}
 }

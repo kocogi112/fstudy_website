@@ -100,6 +100,7 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flashcard App</title>
+    
     <!--<link rel="stylesheet" href="http://localhost/wordpress/contents/themes/tutorstarter/study_vocabulary_toolkit/flash-card-app/styles.css">-->
 </head>
 <style>
@@ -271,9 +272,10 @@ $conn->close();
             </thead>
             <tbody></tbody>
         </table>
+        
     </div>
-    <script src="http://localhost/wordpress/contents/themes/tutorstarter/study_vocabulary_toolkit/flash-card-app/script3.js"></script>
-</body>
+    <script src="http://localhost/wordpress/contents/themes/tutorstarter/study_vocabulary_toolkit/flash-card-app/script.js"></script>
+    <script type="text/javascript">var lbplugin_event_opt={"extension_enable":true,"dict_type":1,"dbclk_event":{"trigger":"none","enable":false,"display":2},"select_event":{"trigger":"none","enable":true,"display":2}};function loadScript(t,e){var n=document.createElement("script");n.type="text/javascript",n.readyState?n.onreadystatechange=function(){("loaded"===n.readyState||"complete"===n.readyState)&&(n.onreadystatechange=null,e())}:n.onload=function(){e()},n.src=t,document.getElementsByTagName("head")[0].appendChild(n)}setTimeout(function(){null==document.getElementById("lbdictex_find_popup")&&loadScript("https://stc-laban.zdn.vn/dictionary/js/plugin/lbdictplugin.min.js?"+Date.now()%1e4,function(){lbDictPlugin.init(lbplugin_event_opt)})},1e3);</script></body>
 </html>
 
 

@@ -45,7 +45,7 @@ $result = $conn->query($sql);
 
 <head>
     <meta charset="UTF-8">
-    <title>IELTS Reading Part 1 Questions Database</title>
+    <title>Dictaion Questions Database</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
@@ -89,24 +89,27 @@ $result = $conn->query($sql);
         <th>ID Test</th>
         <th>Type Test</th>
         <th>Test name</th>
-        <th>Paragraph</th>
-        
+        <th>ID Video</th>
+        <th>Transcript</th>
+
     </tr>
 
     <?php
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
                 // Process "Sample" and "Important Add" columns
-                $sample_words = explode(' ', $row['script_paragraph']);
-                $sample_display = count($sample_words) > 20 ? implode(' ', array_slice($sample_words, 0, 20)) . '...' : $row['script_paragraph'];
-                $sample_view_more = count($sample_words) > 20 ? "<button class='btn btn-link' onclick='showFullContent(\"Sample\", \"{$row['script_paragraph']}\")'>View More</button>" : '';
+                $sample_words = explode(' ', $row['transcript']);
+                $sample_display = count($sample_words) > 20 ? implode(' ', array_slice($sample_words, 0, 20)) . '...' : $row['transcript'];
+                $sample_view_more = count($sample_words) > 20 ? "<button class='btn btn-link' onclick='showFullContent(\"Sample\", \"{$row['transcript']}\")'>View More</button>" : '';
 
                 echo "<tr id='row_{$row['number']}'>
                         <td>{$row['number']}</td>
                         <td>{$row['id_test']}</td>
                         <td>{$row['type_test']}</td>
                         <td>{$row['testname']}</td>
+                        <td>{$row['id_video']}</td>
                         <td>{$sample_display} $sample_view_more</td>
+
                         <td>
                             <button class='btn btn-primary btn-sm' onclick='openEditModal({$row['number']})'>Edit</button>
                             <button class='btn btn-danger btn-sm' onclick='deleteRecord({$row['number']})'>Delete</button>
@@ -172,9 +175,19 @@ $result = $conn->query($sql);
                 <form id="editForm">
                     <input type="hidden" id="edit_number" name="number">
                     ID Test: <input type="text" id="edit_id_test" name="id_test" class="form-control" required><br>
-                    Type Test: <input type="text" id="edit_type_test" name="type_test" class="form-control" required><br>
+
+                    <select id="edit_type_test" name="type_test" class="form-control" required>
+                        <option value="">Type Test:</option>
+                        <option value="Ted Talk">Ted Talk</option>
+                        <option value="Ielts">Ielts</option>
+                     
+
+                    </select><br>
+
                     Test name: <input type="text" id="edit_testname" name="testname" class="form-control" required><br>
-                    Paragraph: <textarea id="edit_script_paragraph" name="script_paragraph" class="form-control"></textarea><br>
+                    ID Video: <textarea id="edit_id_video" name="id_video" class="form-control"></textarea><br>
+                    Transcript: <textarea id="edit_transcript" name="transcript" class="form-control"></textarea><br>
+
                 </form>
             </div>
             <div class="modal-footer">
@@ -206,7 +219,10 @@ $result = $conn->query($sql);
 
 
                     Test name: <input type="text" id="add_testname" name="testname" class="form-control" required><br>
-                    Paragraph: <textarea id="add_script_paragraph" name="script_paragraph" class="form-control"></textarea><br>
+                    ID Video: <textarea id="add_id_video" name="id_video" class="form-control"></textarea><br>
+                    Transcript: <textarea id="add_transcript" name="transcript" class="form-control"></textarea><br>
+
+
                 </form>
             </div>
             <div class="modal-footer">
@@ -232,7 +248,9 @@ function openEditModal(number) {
             $('#edit_id_test').val(data.id_test);
             $('#edit_type_test').val(data.type_test);
             $('#edit_testname').val(data.testname);
-            $('#edit_script_paragraph').val(data.script_paragraph);
+            $('#edit_id_video').val(data.id_video);
+            $('#edit_transcript').val(data.transcript);
+
             $('#editModal').modal('show');
         }
     });

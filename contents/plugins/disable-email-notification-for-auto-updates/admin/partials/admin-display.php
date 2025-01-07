@@ -1,12 +1,14 @@
 <?php 
 $availableTabs = array(
-	'settings' => __('Settings', 'disable-email-notification-for-auto-updates'),
-	'disable_plugin_updates' => __('Block Plugin Updates', 'disable-email-notification-for-auto-updates'),
-	'youtube' => __('YouTube', 'disable-email-notification-for-auto-updates'),
-	'other_plugins' => __('Other Plugins', 'disable-email-notification-for-auto-updates'),
-	'about' => __('About', 'disable-email-notification-for-auto-updates'),
+    'settings' => esc_html__('Settings', 'disable-email-notification-for-auto-updates'),
+    'disable_plugin_updates' => esc_html__('Block Plugin Updates', 'disable-email-notification-for-auto-updates'),
+    'hide_plugin_from_dashboard' => esc_html__('Hide Plugins', 'disable-email-notification-for-auto-updates'),
+    'youtube' => esc_html__('YouTube', 'disable-email-notification-for-auto-updates'),
+    'other_plugins' => esc_html__('Other Plugins', 'disable-email-notification-for-auto-updates'),
+    'about' => esc_html__('About', 'disable-email-notification-for-auto-updates'),
 );
-$active_tab = __( 'settings', 'disable-email-notification-for-auto-updates' ); // default tab
+$active_tab = esc_html__('settings', 'disable-email-notification-for-auto-updates'); // default tab
+
 $plugin_slug_name = $this->get_plugin_slug();
 
 if (isset($_GET['tab'])) {
