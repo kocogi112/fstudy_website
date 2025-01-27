@@ -29,8 +29,8 @@ if (is_user_logged_in()) {
 $post_id = get_the_ID();
 
 // Get the custom number field value
-$custom_number = get_post_meta($post_id, '_digitalsat_custom_number', true);
-
+//$custom_number = get_post_meta($post_id, '_digitalsat_custom_number', true);
+$custom_number =intval(get_query_var('id_test'));
     ?>
 
 <!DOCTYPE html>

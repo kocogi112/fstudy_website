@@ -7,19 +7,19 @@ global $wpdb;
 // Get the data from the POST request
 $number = wp_kses_post($_POST['number']);
 
-$id_question = wp_kses_post($_POST['id_question']);
+$id_question = wp_unslash($_POST['id_question']);
 
-$type_question = wp_kses_post($_POST['type_question']);
+$type_question = wp_unslash($_POST['type_question']);
 
-$question_content = wp_kses_post($_POST['question_content']);
+$question_content = wp_unslash($_POST['question_content']);
 
-$answer_1 = wp_kses_post($_POST['answer_1']);
+$answer_1 = wp_unslash($_POST['answer_1']);
 
-$answer_2 = wp_kses_post($_POST['answer_2']);
-$answer_3 = wp_kses_post($_POST['answer_3']);
-$answer_4 = wp_kses_post($_POST['answer_4']);
-$correct_answer = wp_kses_post($_POST['correct_answer']);
-$explanation = wp_kses_post($_POST['explanation']);
+$answer_2 = wp_unslash($_POST['answer_2']);
+$answer_3 = wp_unslash($_POST['answer_3']);
+$answer_4 = wp_unslash($_POST['answer_4']);
+$correct_answer = wp_unslash($_POST['correct_answer']);
+$explanation = wp_unslash($_POST['explanation']);
 $image_link = wp_kses_post($_POST['image_link']);
 $category = wp_kses_post($_POST['category']);
 

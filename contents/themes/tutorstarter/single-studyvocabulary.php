@@ -1,27 +1,73 @@
-
-
 <?php
-get_header(); // Gọi phần đầu trang (header.php)
-$post_id = get_the_ID();
-$user_id = get_current_user_id();
-// Get the custom number field value
-$custom_number = get_post_meta($post_id, '_studyvocabulary_custom_number', true);
-$commentcount = get_comments_number( $post->ID );
+ $post_id = get_the_ID();
+ $user_id = get_current_user_id();// Get the custom number field value
+$custom_number =intval(get_query_var('id_test'));
+$site_url = get_site_url();
+// Database credentials (update with your own database details)
+$servername = "localhost";
+$username = "root";
+$password = ""; // No password by default
+$dbname = "wordpress";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+// Truy vấn `question_choose` từ bảng `ielts_writing_test_list` theo `id_test`
+//$sql_test = "SELECT  testname, test_type, question_choose FROM shadowing_question WHERE id_test = ?";
+
+//$sql_test = "SELECT type_test, testname, transcript FROM shadowing_question WHERE id_test = ?";
+$sql_test = "SELECT id_test, test_type, testname FROM list_test_vocabulary_book WHERE id_test = ?";
+
+$stmt_test = $conn->prepare($sql_test);
+
+if ($stmt_test === false) {
+    die('Lỗi MySQL prepare: ' . $conn->error);
+}
 
 
-/*
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['doing_text'])) {
-    $textarea_content = sanitize_textarea_field($_POST['doing_text']);
-    update_user_meta($user_id, "ieltswritingtests_{$post_id}_textarea", $textarea_content);
+$stmt_test->bind_param("i", $custom_number);
+$stmt_test->execute();
+$result_test = $stmt_test->get_result();
+// Fetch the result
 
-    wp_safe_redirect(get_permalink($post_id) . 'result/');
+if ($result_test->num_rows === 0) {
+    // Nếu không tìm thấy id_test, chuyển hướng đến trang 404
+    wp_redirect(home_url('/404'));
     exit;
-}*/
+}
+
+
+if ($result_test->num_rows > 0) {
+    $row = $result_test->fetch_assoc();
+    $test_type = $row['test_type'];
+    $testname = $row['testname'];
+}
 
 
 
 
-if (is_user_logged_in()) {
+add_filter('document_title_parts', function ($title) use ($testname) {
+    $title['title'] = $testname; // Use the $testname variable from the outer scope
+    return $title;
+});
+
+
+get_header(); // Gọi phần đầu trang (header.php)
+
+
+
+// Close the database connection
+$conn->close();
+
+// Split the comma-separated string into an array
+
+
+
+
     global $wpdb;
 
     // Get current user's username
@@ -30,48 +76,16 @@ if (is_user_logged_in()) {
 
     // Get results for the current user and specific idtest (custom_number)
     $results_query = $wpdb->prepare("
-        SELECT * FROM list_test_vocabulary_book 
-        WHERE idtest = %d
-        ",
+        SELECT * FROM save_user_result_ielts_writing
+        WHERE username = %s 
+        AND idtest = %d
+        ORDER BY dateform DESC",
         $current_username,
         $custom_number
-            );
-        // Database credentials (update with your own database details)
-        $servername = "localhost";
-        $username = "root";
-        $password = ""; // No password by default
-        $dbname = "wordpress";
-
-        // Create connection
-        $conn = new mysqli($servername, $username, $password, $dbname);
-
-        // Check connection
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        }
-
-        $sql = "SELECT id_test, test_type, testname FROM list_test_vocabulary_book WHERE id_test = ?";
-
-
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $custom_number); // 'i' is used for integer
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-
-        // Fetch result and store in variables
-        if ($row = $result->fetch_assoc()) {
-            $test_type = $row['test_type'];
-            $testname = $row['testname'];
-        } 
-        // Đóng kết nối
-        $conn->close();
-
-
+    );
     $results = $wpdb->get_results($results_query); ?>
-
     
-     <style>
+        <style>
             * {
             box-sizing: border-box;
             }
@@ -128,17 +142,7 @@ if (is_user_logged_in()) {
             scroll-behavior: smooth;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-
-        table th, table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
+      
 
         .options-header {
             display: flex;
@@ -197,27 +201,49 @@ if (is_user_logged_in()) {
             background-color: #d8f0e2;
             border-color: #c8ead6;
         }
+
+                
+        .popup-position {
+            display:none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            width: 100%;
+            height: 100%;
+        }
+
+        #wrapper{
+            width: 960px;
+            margin: 40px auto;
+            text-align: left;
+        }
+
+        #popup-wrapper{
+            width: 800px;
+            margin: 70px auto;
+            text-align: left;
+        }
+        #popup-container{
+            width:800px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 4px;
+        }
     </style>
 
-<?php
-    if ( have_posts() ) :
-        while ( have_posts() ) : the_post(); ?>
-           
-
-
-           <div class="container-info-test">
-           <h1><?php echo htmlspecialchars($testname); ?> <span class="check-icon"></span></h1>
+        <div class="container-info-test">
+           <h1><?php echo htmlspecialchars($testname); ?>  <span class="check-icon">✔️</span></h1>
            
         <div class="test-info">
-            <p>Loại đề: <?php echo htmlspecialchars($test_type); ?></p>
+            <p><strong>Thời gian làm bài:</strong> 40 phút | 4 phần thi | 40 câu hỏi |  bình luận</p>
             <p>203832 người đã luyện tập đề thi này</p>
             <p class="note">Chú ý: để được duy trì điểm scaled score (ví dụ trên điểm 990 TOEIC hoặc 9.0 cho IELTS), vui lòng chọn chế độ làm FULL TEST.</p>
         </div>
 
 
         <?php
-       endwhile;
-    endif;
+       
         if ($results) {
             // Start the results table before the loop
             ?>
@@ -227,9 +253,11 @@ if (is_user_logged_in()) {
                     <thead>
                         <tr>
                             <th>Ngày làm</th>
-                            <th>Đề thi</th>
                             <th>Kết quả</th>
+                            <th>Điểm thành phần</th>
                             <th>Thời gian làm bài</th>
+                            <th>Chi tiết bài làm</th>
+
                         </tr>
                     </thead>
                     <tbody>
@@ -239,9 +267,15 @@ if (is_user_logged_in()) {
                         ?>
                         <tr>
                             <td><?php echo esc_html($result->dateform); ?></td>
-                            <td><?php echo esc_html($result->testname); ?></td>
-                            <td><?php echo esc_html($result->resulttest); ?></td>
-                            <td><?php echo esc_html($result->timedotest); ?></td>
+                            <td><?php echo esc_html($result->band_score); ?></td>
+                            <td><?php echo esc_html($result->band_score_expand) ;?></td>
+                            <td><?php echo esc_html($result->timeSpent) ;?></td>
+
+                            <td>
+                                <a href="<?php echo  '../result/' . esc_html($result->testsavenumber); ?>">
+                                    Xem bài làm
+                                </a>
+                            </td>
                         </tr>
                         <?php
                     }
@@ -259,66 +293,119 @@ if (is_user_logged_in()) {
 
 
 
+        
         <div class="practice-options">
-            <p class="options-header">
-                <span class="option active" id="practice">Luyện tập</span> 
-                <span class="option" id="full-test">Làm full test</span>  
-                <span class="option" id="discussion">Thảo luận</span>
-    </p>
-            
-            <div id="tips-container">
-                <div id="practice-content">
-                <a   class="btn-submit" href="flashcard">Luyện tập Flashcard</a>
+        <p class="options-header">
+            <span class="option active" id="full-test">Làm full test</span>  
+            <span class="option" id="practice">Luyện tập</span> 
+            <span class="option" id="discussion">Thảo luận</span>
+            <span class="option" id="preview_test" >Tải bản PDF</span>
 
-                    <div class="alert alert-success" role="alert">
-                        <h4 class="alert-heading">Pro tips:</h4> <hr>
-                        <p>Hình thức luyện tập từng phần và chọn mức thời gian phù hợp sẽ giúp bạn tập trung vào giải đúng các câu hỏi thay vì phải chịu áp lực hoàn thành bài thi.</p>    
-                    </div><br>
-                    
-                    <p class ="h2-test" >Giới hạn thời gian (Để trống để làm bài không giới hạn):</p>
-                    <form action="test" method="get">
-                        <label style="font-size: 18px;"  for="timer"></label>
+        </p>
 
-                        <select id="timer" name="option">
-                            <option value="1000000">Unlimited time</option>
-                            <option value="60">1 minutes</option>
-                            <option value="1800">30 minutes</option>
-                            <option value="2700">45 minutes</option>
-                            <option value="3600">60 minutes</option>
-                            <option value="4500">75 minutes</option>
-                            <option value="5400">90 minutes</option>
-                            <option value="6300">105 minutes</option>
-                            <option value="7200">120 minutes</option>
-                            <option value="9000">150 minutes</option>
-                            <option value="10800">180 minutes</option>
-                        </select><br><br>      
-                        <button  class ="btn-submit" type="submit" value="Start test">Luyện tập</button>
-                    </form>
-                </div>
+    <div id="tips-container">
+        <div id="full-test-content">
+            <div class="alert alert-success" role="alert">
+                <h4 class="alert-heading">Pro tips:</h4> <hr>
+                <p>Sẵn sàng để bắt đầu làm full test? Để đạt được kết quả tốt nhất, bạn cần dành ra 40 phút cho bài test này.</p>
+            </div><br>
+            <a class="btn-submit" href="<?php echo $site_url?>/studyvocabulary/<?php echo $custom_number?>/flashcard/" >Luyện tập Flashcard</a>
+            <a class="btn-submit" href="<?php echo $site_url?>/studyvocabulary/<?php echo $custom_number?>/test/" >Bắt đầu bài thi</a>
 
-                <div id="full-test-content" style="display: none;">
-                <div class="alert alert-success" role="alert">
-                        <h4 class="alert-heading">Pro tips:</h4> <hr>
-                        <p>Sẵn sàng để bắt đầu làm full test? Để đạt được kết quả tốt nhất, bạn cần dành ra 40 phút cho bài test này.</p>
-                        </div><br>
-                    <a   class="btn-submit" href="test">Bắt đầu bài thi</a>
-                </div>
+        </div>
+
+        <div id="practice-content" style="display: none;">
+            <div class="alert alert-success" role="alert">
+                <h4 class="alert-heading">Pro tips:</h4> <hr>
+                <p>Hình thức luyện tập từng phần và chọn mức thời gian phù hợp sẽ giúp bạn tập trung vào giải đúng các câu hỏi thay vì phải chịu áp lực hoàn thành bài thi.</p>    
+            </div><br>
+
+            <p class="h2-test">Giới hạn thời gian (Để trống để làm bài không giới hạn):</p>
+            <form action="start" method="get">
+                <label style="font-size: 18px;" for="timer"></label>
+
+                <select id="timer" name="option">
+                    <option value="1000000">Unlimited time</option>
+                    <option value="60">1 minutes</option>
+                    <option value="1800">30 minutes</option>
+                    <option value="2700">45 minutes</option>
+                    <option value="3600">60 minutes</option>
+                    <option value="4500">75 minutes</option>
+                    <option value="5400">90 minutes</option>
+                    <option value="6300">105 minutes</option>
+                    <option value="7200">120 minutes</option>
+                    <option value="9000">150 minutes</option>
+                    <option value="10800">180 minutes</option>
+                </select><br><br>      
+                <button class="btn-submit" type="submit" value="Start test">Luyện tập</button>
+            </form>
+
+   <!-- HTML Form to display checkboxes -->
+   <?php
+echo '<form id="myForm">';
+foreach ($parts as $part) {
+    echo '<label>';
+    echo '<input type="checkbox" name="part[]" value="' . esc_attr($part) . '"> ' . esc_html($part);
+    echo '</label><br>';
+}
+?>
+<button type="button" id="submitButton">Submit</button>
+</form>
 
 
-            </div>
+
         </div>
     </div>
+</div>
+    <div id="popup-box3" class="popup-position" style="display:none;">
+    <div id="popup-wrapper">
+        <div id="popup-container" style="height: 500px; overflow-y: auto; position: relative;">
+            <!-- Fixed Close box -->
+            <div style="position: sticky; top: 0; background: white; padding: 10px; z-index: 1;">
+                <p><a href="javascript:void(0)" onclick="toggle_visibility('popup-box3');" style ="float:right;">Đóng Popup</a></p>
+            </div>
+
+           
+        </div>
+    </div>
+</div>
 
 
 
-            
-<?php if ( comments_open() || get_comments_number() ) :
-    comments_template();
-endif; ?>
-            
+    <script>
+        
+        document.getElementById('submitButton').addEventListener('click', setPracticeLink);
 
-<script>
- document.getElementById('practice').addEventListener('click', function() {
+        function setPracticeLink(event) {
+    event.preventDefault();  // Ngừng việc gửi form
+    
+    var selectedParts = [];
+    var checkboxes = document.querySelectorAll('input[name="part[]"]:checked');
+    
+    checkboxes.forEach(function(checkbox) {
+        selectedParts.push(checkbox.value);
+    });
+
+    if (selectedParts.length > 0) {
+        var currentUrl = window.location.href;  // Lấy URL hiện tại
+        var newUrl = currentUrl +/start/+ (currentUrl.includes('?') ? '&' : '?') + 'part=' + selectedParts.join(',');
+        window.location.href = newUrl;  // Chuyển hướng đến URL mới
+    } else {
+        alert('No part selected');
+    }
+}
+
+
+        function toggle_visibility(id) {
+  var e = document.getElementById(id);
+  if (e.style.display == 'block') {
+    e.style.display = 'none';
+  } else {
+    e.style.display = 'block';
+  }
+}
+
+document.getElementById('practice').addEventListener('click', function() {
     // Show practice content
     document.getElementById('practice-content').style.display = 'block';
     document.getElementById('full-test-content').style.display = 'none';
@@ -336,10 +423,26 @@ document.getElementById('full-test').addEventListener('click', function() {
     setActiveOption('full-test');
 });
 
-document.getElementById('full-test').addEventListener('click', function() {
-    // Show full test content
-    
+// Event listener for the discussion tab to redirect to #comment
+document.getElementById('discussion').addEventListener('click', function() {
+    window.location.href = '#comment';  // Redirect to #comment
 });
+
+function setActiveOption(optionId) {
+    const options = document.querySelectorAll('.option');
+    options.forEach(option => {
+        if (option.id === optionId) {
+            option.classList.add('active');
+        } else {
+            option.classList.remove('active');
+        }
+    });
+}
+
+// Initial state: Show full test content and highlight the full test button
+document.getElementById('full-test-content').style.display = 'block';
+document.getElementById('practice-content').style.display = 'none';
+setActiveOption('full-test');
 
 
 // Get the elements
@@ -370,22 +473,24 @@ function resetActiveOptions() {
 }
 
 // Initial state: Show practice content and highlight the practice button
-setActiveOption('practice');
+setActiveOption('full-test');
+
 
 
 </script>
 
 
 
-    <?php
-        
+            
+<?php if ( comments_open() || get_comments_number() ) :
+    comments_template();
+endif; ?>
+
 
     
-} else {
-    echo '<p>Vui lòng đăng nhập để làm test.</p>';
-}
-
-
-
+    
+    <?php
+    
 get_footer(); // Gọi phần cuối trang (footer.php)
 ?>
+s

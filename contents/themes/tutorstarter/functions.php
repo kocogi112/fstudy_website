@@ -31,3 +31,10 @@ if ( class_exists( 'Tutor_Starter\\Init' ) ) :
 	Tutor_Starter\Init::register_services();
 endif;
 
+add_action('comment_post', function($comment_id) {
+    if (isset($_POST['id_test'])) {
+        add_comment_meta($comment_id, 'id_test', intval($_POST['id_test']), true);
+    }
+});
+
+

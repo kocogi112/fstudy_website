@@ -18,15 +18,20 @@ if ($conn->connect_error) {
 
 // Get filter value from the form input
 $id_filter = isset($_GET['id_filter']) ? $_GET['id_filter'] : '';
+$vocabulary_filter = isset($_GET['vocabulary_filter']) ? $_GET['vocabulary_filter'] : '';
 
 // Pagination logic
-$limit = 10; // Number of records per page
+$limit = 20; // Number of records per page
 $page = isset($_GET['page']) ? $_GET['page'] : 1; // Current page number
 $offset = ($page - 1) * $limit; // Calculate offset
 
 $total_sql = "SELECT COUNT(*) FROM list_vocabulary";
 if ($id_filter) {
     $total_sql .= " WHERE id LIKE '%$id_filter%'"; // Apply filter to total count
+}
+
+if ($vocabulary_filter) {
+    $total_sql .= " WHERE new_word LIKE '%$vocabulary_filter%'"; // Apply filter to total count
 }
 $total_result = $conn->query($total_sql);
 $total_rows = $total_result->fetch_row()[0];
@@ -35,6 +40,9 @@ $total_pages = ceil($total_rows / $limit); // Calculate total pages
 $sql = "SELECT * FROM list_vocabulary";
 if ($id_filter) {
     $sql .= " WHERE id LIKE '%$id_filter%'"; // Apply filter to the SQL query
+}
+if ($vocabulary_filter) {
+    $sql .= " WHERE new_word LIKE '%$vocabulary_filter%'"; // Apply filter to the SQL query
 }
 $sql .= " LIMIT $limit OFFSET $offset"; // Add pagination limits
 $result = $conn->query($sql);
@@ -78,6 +86,14 @@ $result = $conn->query($sql);
             <input type="text" name="id_filter" id="id_filter" class="form-control" value="<?php echo isset($_GET['id_filter']) ? $_GET['id_filter'] : ''; ?>">
         </div>
         <button type="submit" class="btn btn-primary">Filter</button>
+
+
+        <div class="mb-3">
+            <label for="vocabulary_filter" class="form-label">Filter by Vocab :</label>
+            <input type="text" name="vocabulary_filter" id="vocabulary_filter" class="form-control" value="<?php echo isset($_GET['vocabulary_filter']) ? $_GET['vocabulary_filter'] : ''; ?>">
+        </div>
+        <button type="submit" class="btn btn-primary">Filter</button>
+
         <a href="?" class="btn btn-secondary">Clear Filter</a>
     </form>
 
@@ -143,24 +159,40 @@ $result = $conn->query($sql);
 
 
 </table>
-  <!-- Pagination buttons -->
-  <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-            <?php if ($page > 1): ?>
-                <li class="page-item"><a class="page-link" href="?page=<?php echo $page - 1; ?>&id_filter=<?php echo $id_filter; ?>">Previous</a></li>
-            <?php endif; ?>
+    <!-- Pagination buttons -->
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        <?php if ($page > 1): ?>
+            <li class="page-item">
+                <a class="page-link" href="?page=1&id_filter=<?php echo $id_filter; ?>">First</a>
+            </li>
 
-            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                <li class="page-item <?php if ($i == $page) echo 'active'; ?>">
-                    <a class="page-link" href="?page=<?php echo $i; ?>&id_filter=<?php echo $id_filter; ?>"><?php echo $i; ?></a>
-                </li>
-            <?php endfor; ?>
+            <li class="page-item">
+                <a class="page-link" href="?page=<?php echo $page - 1; ?>&id_filter=<?php echo $id_filter; ?>">Previous</a>
+            </li>
+        <?php endif; ?>
 
-            <?php if ($page < $total_pages): ?>
-                <li class="page-item"><a class="page-link" href="?page=<?php echo $page + 1; ?>&id_filter=<?php echo $id_filter; ?>">Next</a></li>
-            <?php endif; ?>
-        </ul>
-    </nav>
+        <?php 
+        // Define the range of page buttons to display
+        $start_page = max(1, $page - 2);
+        $end_page = min($total_pages, $page + 2);
+
+        for ($i = $start_page; $i <= $end_page; $i++): ?>
+            <li class="page-item <?php if ($i == $page) echo 'active'; ?>">
+                <a class="page-link" href="?page=<?php echo $i; ?>&id_filter=<?php echo $id_filter; ?>"><?php echo $i; ?></a>
+            </li>
+        <?php endfor; ?>
+
+        <?php if ($page < $total_pages): ?>
+            <li class="page-item">
+                <a class="page-link" href="?page=<?php echo $page + 1; ?>&id_filter=<?php echo $id_filter; ?>">Next</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page=<?php echo $total_pages; ?>&id_filter=<?php echo $id_filter; ?>">Last</a>
+            </li>
+        <?php endif; ?>
+    </ul>
+</nav>
 <!-- Button to Add New Record -->
 <button class="btn btn-success" onclick="openAddModal()">Add New Question</button>
 <!-- View More Modal -->

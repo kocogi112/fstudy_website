@@ -13,14 +13,13 @@
 remove_filter('the_content', 'wptexturize');
 remove_filter('the_title', 'wptexturize');
 remove_filter('comment_text', 'wptexturize');
-get_header(); // Gọi phần đầu trang (header.php)
 
 //if (is_user_logged_in()) {
 $post_id = get_the_ID();
 $user_id = get_current_user_id();
 $additional_info = get_post_meta($post_id, '_studyvocabulary_additional_info', true); 
-$custom_number = get_post_meta($post_id, '_studyvocabulary_custom_number', true);
-
+//$custom_number = get_post_meta($post_id, '_studyvocabulary_custom_number', true);
+$custom_number =intval(get_query_var('id_test'));
 // Database credentials
 $servername = "localhost";
 $username = "root";
@@ -47,6 +46,15 @@ $result = $stmt->get_result();
 if ($result->num_rows > 0) {
 // Fetch test data if available
 $data = $result->fetch_assoc();
+$testname = $data['testname'];
+
+
+
+    add_filter('document_title_parts', function ($title) use ($testname) {
+        $title['title'] = $testname; // Use the $testname variable from the outer scope
+        return $title;
+    });
+    
 
 // Initialize quizData structure
 
@@ -91,6 +99,7 @@ echo "</script>";
 } else {
 echo "<script>console.log('No data found for the given id_test');</script>";
 }
+get_header(); // Gọi phần đầu trang (header.php)
 
 
 // Close statement and connection

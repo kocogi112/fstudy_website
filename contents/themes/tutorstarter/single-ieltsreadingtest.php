@@ -1,16 +1,16 @@
 <?php
-get_header(); // Gọi phần đầu trang (header.php)
-$post_id = get_the_ID();
-$user_id = get_current_user_id();
-// Get the custom number field value
-$custom_number = get_post_meta($post_id, '_ieltsreadingtest_custom_number', true);
+ $post_id = get_the_ID();
+ $user_id = get_current_user_id();// Get the custom number field value
+$custom_number =intval(get_query_var('id_test'));
+//$custom_number = get_post_meta($post_id, '_ieltsreadingtest_custom_number', true);
+$site_url = get_site_url();
 
 // Database credentials (update with your own database details)
 $servername = "localhost";
 $username = "root";
 $password = ""; // No password by default
 $dbname = "wordpress";
-$commentcount = get_comments_number( $post->ID );
+//$commentcount = get_comments_number( $post->ID );
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -20,7 +20,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 // Truy vấn `question_choose` từ bảng `ielts_reading_test_list` theo `id_test`
-$sql_test = "SELECT question_choose FROM ielts_reading_test_list WHERE id_test = ?";
+$sql_test = "SELECT  testname, test_type, question_choose FROM ielts_reading_test_list WHERE id_test = ?";
 $stmt_test = $conn->prepare($sql_test);
 
 if ($stmt_test === false) {
@@ -33,10 +33,33 @@ $stmt_test->execute();
 $result_test = $stmt_test->get_result();
 // Fetch the result
 $question_choose = '';
+
+if ($result_test->num_rows === 0) {
+    // Nếu không tìm thấy id_test, chuyển hướng đến trang 404
+    wp_redirect(home_url('/404'));
+    exit;
+}
+
+
 if ($result_test->num_rows > 0) {
     $row = $result_test->fetch_assoc();
+    $test_type = $row['test_type'];
+    $testname = $row['testname'];
     $question_choose = $row['question_choose']; // Comma-separated string
 }
+
+
+
+
+add_filter('document_title_parts', function ($title) use ($testname) {
+    $title['title'] = $testname; // Use the $testname variable from the outer scope
+    return $title;
+});
+
+
+get_header(); // Gọi phần đầu trang (header.php)
+
+
 
 // Close the database connection
 $conn->close();
@@ -212,10 +235,10 @@ $parts = explode(',', $question_choose);
     </style>
 
         <div class="container-info-test">
-           <h1><?php the_title(); ?> <span class="check-icon">✔️</span></h1>
+           <h1><?php echo htmlspecialchars($testname); ?>  <span class="check-icon">✔️</span></h1>
            
         <div class="test-info">
-            <p><strong>Thời gian làm bài:</strong> 40 phút | 4 phần thi | 40 câu hỏi | <?php echo wp_kses_post($commentcount);?> bình luận</p>
+            <p><strong>Thời gian làm bài:</strong> 40 phút | 4 phần thi | 40 câu hỏi |  bình luận</p>
             <p>203832 người đã luyện tập đề thi này</p>
             <p class="note">Chú ý: để được duy trì điểm scaled score (ví dụ trên điểm 990 TOEIC hoặc 9.0 cho IELTS), vui lòng chọn chế độ làm FULL TEST.</p>
         </div>
@@ -248,9 +271,10 @@ $parts = explode(',', $question_choose);
                             <td><?php echo esc_html($result->overallband); ?></td>
                             <td><?php echo esc_html($result->correct_number) ;?>/ <?php echo esc_html($result->total_question_number); ?></td>
                             <td>
-                                <a href="<?php echo esc_url(get_permalink()) . 'result/' . esc_html($result->testsavenumber); ?>">
+                                <a href="<?php echo $site_url?>/ieltsreadingtest/result/<?php echo esc_html($result->testsavenumber); ?>">
                                     Xem bài làm
                                 </a>
+
                             </td>
                         </tr>
                         <?php
@@ -285,7 +309,7 @@ $parts = explode(',', $question_choose);
                 <h4 class="alert-heading">Pro tips:</h4> <hr>
                 <p>Sẵn sàng để bắt đầu làm full test? Để đạt được kết quả tốt nhất, bạn cần dành ra 40 phút cho bài test này.</p>
             </div><br>
-            <a class="btn-submit" href="start">Bắt đầu bài thi</a>
+            <a class="btn-submit" href="<?php echo $site_url?>/ieltsreadingtest/<?php echo $custom_number?>/start/">Bắt đầu bài thi</a>
         </div>
 
         <div id="practice-content" style="display: none;">
@@ -295,7 +319,7 @@ $parts = explode(',', $question_choose);
             </div><br>
 
             <p class="h2-test">Giới hạn thời gian (Để trống để làm bài không giới hạn):</p>
-            <form action="start" method="get">
+            <form action="<?php echo $site_url?>/ieltsreadingtest/<?php echo $custom_number?>/start/" method="get">
                 <label style="font-size: 18px;" for="timer"></label>
 
                 <select id="timer" name="option">
@@ -314,17 +338,18 @@ $parts = explode(',', $question_choose);
                 <button class="btn-submit" type="submit" value="Start test">Luyện tập</button>
             </form>
 
-            <!-- HTML Form to display checkboxes -->
-<form method="get" action="">
-    <?php
-    foreach ($parts as $part) {
-        echo '<label>';
-        echo '<input type="checkbox" name="part[]" value="' . esc_attr($part) . '"> ' . esc_html($part);
-        echo '</label><br>';
-    }
-    ?>
-    <button type="submit">Submit</button>
+   <!-- HTML Form to display checkboxes -->
+   <?php
+echo '<form id="myForm">';
+foreach ($parts as $part) {
+    echo '<label>';
+    echo '<input type="checkbox" name="part[]" value="' . esc_attr($part) . '"> ' . esc_html($part);
+    echo '</label><br>';
+}
+?>
+<button type="button" id="submitButton">Submit</button>
 </form>
+
 
 
         </div>
@@ -338,77 +363,7 @@ $parts = explode(',', $question_choose);
                 <p><a href="javascript:void(0)" onclick="toggle_visibility('popup-box3');" style ="float:right;">Đóng Popup</a></p>
             </div>
 
-            <!-- Content starts here -->
-            <?php     
-            // Check if there are any results and display them
-            if ($result1->num_rows > 0) {
-                echo "<h3>Ielts Speaking Part 1 Questions:</h3>";
-                echo "<p>Speaking Part 1</p>";
-                echo "<table border='1'>
-                        <tr>
-                            <th>STT</th>
-                            <th>Question Content</th>
-                            <th>Topic</th>
-                            <th>Sample</th>
-                            <th>Speaking part</th>
-                        </tr>";
-                while ($row = $result1->fetch_assoc()) {
-                    echo "<tr>
-                            <td>" . htmlspecialchars($row['stt']) . "</td>
-                            <td>" . htmlspecialchars($row['question_content']) . "</td>
-                            <td>" . htmlspecialchars($row['topic']) . "</td>
-                            <td>" . htmlspecialchars($row['sample']) . "</td>
-                            <td>" . htmlspecialchars($row['speaking_part']) . "</td>
-                        </tr>";
-                }
-                echo "</table>";
-            }
-            else if ($result2->num_rows > 0) {
-                echo "<h3>Ielts Speaking Part 2 Questions:</h3>";
-                echo "<p>Speaking Part 2</p>";
-                echo "<table border='1'>
-                        <tr>
-                            
-                            <th>Question Content</th>
-                            <th>Topic</th>
-                            <th>Speaking part</th>
-                        </tr>";
-                while ($row = $result2->fetch_assoc()) {
-                    echo "<tr>
-                            
-                            <td>" . htmlspecialchars($row['question_content']) . "</td>
-                            <td>" . htmlspecialchars($row['topic']) . "</td>
-                            <td>" . htmlspecialchars($row['speaking_part']) . "</td>
-                        </tr>";
-                }
-                echo "</table>";
-            }
-            else if ($result3->num_rows > 0) {
-                echo "<h3>Ielts Speaking Part 3 Questions:</h3>";
-                echo "<p>Speaking Part 3</p>";
-                echo "<table border='1'>
-                        <tr>
-                            <th>STT</th>
-                            <th>Question Content</th>
-                            <th>Topic</th>
-                            <th>Sample</th>
-                            <th>Speaking part</th>
-                        </tr>";
-                while ($row = $result3->fetch_assoc()) {
-                    echo "<tr>
-                            <td>" . htmlspecialchars($row['stt']) . "</td>
-                            <td>" . htmlspecialchars($row['question_content']) . "</td>
-                            <td>" . htmlspecialchars($row['topic']) . "</td>
-                            <td>" . htmlspecialchars($row['sample']) . "</td>
-                            <td>" . htmlspecialchars($row['speaking_part']) . "</td>
-                        </tr>";
-                }
-                echo "</table>";
-            }
-            else {
-                echo "No questions found for this test.";
-            }
-            ?>
+           
         </div>
     </div>
 </div>
@@ -416,6 +371,29 @@ $parts = explode(',', $question_choose);
 
 
     <script>
+        
+        document.getElementById('submitButton').addEventListener('click', setPracticeLink);
+
+        function setPracticeLink(event) {
+    event.preventDefault();  // Ngừng việc gửi form
+    
+    var selectedParts = [];
+    var checkboxes = document.querySelectorAll('input[name="part[]"]:checked');
+    
+    checkboxes.forEach(function(checkbox) {
+        selectedParts.push(checkbox.value);
+    });
+
+    if (selectedParts.length > 0) {
+        var currentUrl = window.location.href;  // Lấy URL hiện tại
+        var newUrl = currentUrl +/start/+ (currentUrl.includes('?') ? '&' : '?') + 'part=' + selectedParts.join(',');
+        window.location.href = newUrl;  // Chuyển hướng đến URL mới
+    } else {
+        alert('No part selected');
+    }
+}
+
+
         function toggle_visibility(id) {
   var e = document.getElementById(id);
   if (e.style.display == 'block') {

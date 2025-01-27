@@ -5,23 +5,17 @@
  
  */
 
- get_header(); // Gọi phần đầu trang (header.php)
 
 if (is_user_logged_in()) {
     $post_id = get_the_ID();
     $user_id = get_current_user_id();
     $additional_info = get_post_meta($post_id, '_ieltsspeakingtests_additional_info', true);
 
-    /*if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['doing_text'])) {
-        $textarea_content = sanitize_textarea_field($_POST['doing_text']);
-        update_user_meta($user_id, "ieltsspeakingtests_{$post_id}_textarea", $textarea_content);
-
-        wp_safe_redirect(get_permalink($post_id) . 'get-mark-speaking/');
-        exit;
-    }*/
+   
 $post_id = get_the_ID();
 // Get the custom number field value
-$custom_number = get_post_meta($post_id, '_ieltsspeakingtests_custom_number', true);
+//$custom_number = get_post_meta($post_id, '_ieltsspeakingtests_custom_number', true);
+$custom_number =intval(get_query_var('id_test'));
 
 // Database credentials (update with your own database details)
 $servername = "localhost";
@@ -81,6 +75,13 @@ if ($row = $result->fetch_assoc()) {
     // Get the time directly from the query result
     $testname = $row['testname'];
     $test_type = $row['test_type'];
+    add_filter('document_title_parts', function ($title) use ($testname) {
+        $title['title'] = $testname; // Use the $testname variable from the outer scope
+        return $title;
+    });
+    
+    
+    get_header(); // Gọi phần đầu trang (header.php)
 }
 
 // Prepare an array to store the questions

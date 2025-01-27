@@ -8,6 +8,7 @@
  */
 
 defined( 'ABSPATH' ) || exit;
+$site_url = get_site_url();
 
 get_header();
 ?>
@@ -176,7 +177,9 @@ h1{
 			</div>
 		</div>
 		<h1 class="second-four">4</h1>
-		<p class="wrong-para">Uh Oh! Page not found!</p>
+		<p class="wrong-para">Uh Oh! Page not found!<br>    <a  href="<?php echo $site_url?>">Trở về Trang chủ</a>
+    </p>
+
 		</div>
 
 

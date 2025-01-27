@@ -10,33 +10,59 @@ add_filter('document_title_parts', function ($title) {
 
 get_header();
 // Define the post types with labels for the navigation
-$post_types = [
-    'all' => 'Tất cả',
-    'thptqg' => 'THPTQG',
-    'digitalsat' => 'Digital SAT',
-    'ieltsspeakingtests' => 'Ielts Speaking',
-    'ieltsreadingtest' => 'Ielts Reading',
-    'ieltswritingtests' => 'Ielts Writing',
-    'dictationexercise' => 'Dictation Exercise',
-    'studyvocabulary' => 'Study Vocabulary',
-    'conversation_ai' => 'Speak With AI',
+$test_tables = [
+    'all' => '', // Leave blank for all tables
+    'digitalsat' => 'digital_sat_test_list',
+    'ieltsreadingtests' => 'ielts_reading_test_list',
+    'thptqg' => 'thptqg_question',
+    'ieltsspeakingtests' => 'ielts_speaking_test_list',
+    'ieltslisteningtests' => 'ielts_listening_test_list',
+    'conversation_ai' => 'conversation_with_ai_list',
+    'vocabulary' => 'list_test_vocabulary_book',
+    'thptqg' => 'thptqg_question',
+    'ieltswritingtests' => 'ielts_writing_test_list',
+    'dictationexcercise' => 'dictation_question',
+    'shadowingexcercise' => 'shadowing_question',
+
 
 ];
 
-// Get the current post type and search term from the URL
-$current_post_type = get_query_var('post_type', 'all');
-$search_term = get_query_var('term', '');
+// Get the current post type and search term
+$current_post_type = get_query_var('search_url', 'all');
+$search_term = $_GET['term'] ?? '';
+global $wpdb;
+
+// Determine the table to query
+// Determine the table to query
+$table_name = $test_tables[$current_post_type] ?? '';
+$paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
+$limit = 8;
+$offset = ($paged - 1) * $limit;
+
+if (!empty($table_name)) {
+    $query = $wpdb->prepare(
+        "SELECT * FROM {$table_name} WHERE testname LIKE %s LIMIT %d OFFSET %d",
+        '%' . $wpdb->esc_like($search_term) . '%',
+        $limit,
+        $offset
+    );
+    $results = $wpdb->get_results($query);
+} else {
+    $results = [];
+}
+
 
 // Display the navigation buttons
 ?>
 <div class="post-type-navigation">
-    <?php foreach ($post_types as $type => $label) : ?>
-        <a href="<?php echo esc_url(home_url("/tests/" . ($type === 'all' ? '' : $type) . ($search_term ? '?term=' . $search_term : ''))); ?>" 
-           class="nav-button <?php echo $current_post_type === $type || ($type === 'all' && $current_post_type === '') ? 'active' : ''; ?>">
-            <?php echo esc_html($label); ?>
+    <?php foreach ($test_tables as $type => $table) : ?>
+        <a href="<?php echo esc_url(home_url("/tests/" . ($type === 'all' ? '' : $type))); ?>" 
+           class="nav-button <?php echo $current_post_type === $type ? 'active' : ''; ?>">
+            <?php echo esc_html($type === 'all' ? 'Tất cả' : ucfirst($type)); ?>
         </a>
     <?php endforeach; ?>
 </div>
+
 
 <!-- Search Form -->
 <form method="get" action="<?php echo esc_url(home_url('/tests/' . ($current_post_type ? $current_post_type : ''))); ?>" class="search-form">
@@ -48,7 +74,7 @@ $search_term = get_query_var('term', '');
 // Set up the query arguments
 $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
 $args = [
-    'post_type' => $current_post_type !== 'all' ? $current_post_type : 'any',
+    'search_url' => $current_post_type !== 'all' ? $current_post_type : 'any',
     's' => $search_term,
     'posts_per_page' => 8,
     'paged' => $paged,
@@ -59,88 +85,67 @@ $query = new WP_Query($args);
 ?>
 
 <div class="test-library">
-    <!--<h1><?php echo ucfirst($current_post_type) ?: 'Tests'; ?> Results</h1> -->
-    <?php if ($query->have_posts()) : ?>
+    <?php if (!empty($results)) : ?>
         <div class="test-grid">
-        <?php 
-        global $wpdb;
-        $current_user = wp_get_current_user(); // Lấy thông tin user đang đăng nhập
-        $username = $current_user->user_login; // Lấy username để đối chiếu trong bảng lưu kết quả
-        
-        while ($query->have_posts()) : $query->the_post(); 
-    $post_id = get_the_ID();
-    $custom_number = get_post_meta($post_id, "_{$current_post_type}_custom_number", true);
+    <?php 
+    // Lấy thông tin username hiện tại (ví dụ sử dụng hàm của WordPress)
+    $current_user = wp_get_current_user();
+    $username = $current_user->user_login;
 
-    // Kiểm tra xem người dùng đã làm bài kiểm tra này hay chưa
-    $is_completed = false;
+    foreach ($results as $test) : 
+        // Xác định bảng lưu kết quả và cột cần kiểm tra dựa trên loại bài kiểm tra
+        $table_res_name = '';
+        $check_column = '';
+        if ($current_post_type === 'digitalsat') {
+            $table_res_name = 'save_user_result_digital_sat';
+            $check_column = 'resulttest'; // Cột cần kiểm tra
+        } elseif ($current_post_type === 'ieltsreadingtests') {
+            $table_res_name = 'save_user_result_ielts_reading';
+            $check_column = 'overallband'; // Cột cần kiểm tra
+        }
 
-    if ($current_post_type === 'digitalsat') {
-        $table_name = 'save_user_result_digital_sat';
-        $query_result = $wpdb->get_var(
-            $wpdb->prepare(
-                "SELECT COUNT(*) 
-                FROM {$table_name} 
-                WHERE username = %s 
-                AND idtest = %s 
-                AND resulttest != ''", // Kiểm tra resulttest không trống
-                $username, $custom_number
-            )
-        );
-        $is_completed = $query_result > 0; // Nếu tìm thấy kết quả, đánh dấu là đã làm bài
-    }
-
-    else if ($current_post_type === 'ieltsreadingtest') {
-        $table_name = 'save_user_result_ielts_reading';
-        $query_result = $wpdb->get_var(
-            $wpdb->prepare(
-                "SELECT COUNT(*) 
-                FROM {$table_name} 
-                WHERE username = %s 
-                AND idtest = %s 
-                AND overallband != ''", // Kiểm tra resulttest không trống
-                $username, $custom_number
-            )
-        );
-        $is_completed = $query_result > 0; // Nếu tìm thấy kết quả, đánh dấu là đã làm bài
-    }
-    
-    // Sử dụng $is_completed để đánh dấu hoặc hiển thị trạng thái bài kiểm tra
-
-
-        ?>
-    <div class="test-item">
-        <!-- Hiển thị Custom Number -->
-        <?php if ($is_completed): ?>
-            <div class="completed-icon">
-               
-                <i class="fa-solid fa-check" style="color: #63E6BE;"></i>
+        // Kiểm tra kết quả trong bảng (dựa trên idtest và username)
+        $completed = false;
+        if (!empty($table_res_name) && !empty($username)) {
+            $completed_query = $wpdb->prepare(
+                "SELECT {$check_column} FROM {$table_res_name} 
+                 WHERE {$check_column} IS NOT NULL AND idtest = %d AND username = %s",
+                $test->id_test,
+                $username
+            );
+            $completed = $wpdb->get_var($completed_query); // Kết quả trả về
+        }
+    ?>
+        <div class="test-item">
+            <h2><?php echo esc_html($test->testname); ?></h2>
+            <div class="test-meta">
+                <p>⏱️ <?php echo esc_html($test->duration ?? '60 phút'); ?></p>
+                <p>📄 <?php echo esc_html($test->total_questions ?? 'Không rõ số câu'); ?></p>
             </div>
-
-            
-        <?php endif; ?>
-        <div class="custom-number"><?php echo esc_html($custom_number); ?></div>
-
-        <h2><?php the_title(); ?></h2>
-        <div class="test-meta">
-            <p>⏱️ <?php echo get_post_meta(get_the_ID(), '_duration', true) ?: '60 phút'; ?></p>
-            <p>📄 <?php echo get_post_meta(get_the_ID(), '_total_questions', true) ?: '22 phần thi | 22 câu hỏi'; ?></p>
-            <p>💬 <?php echo get_post_meta(get_the_ID(), '_comments_count', true) ?: '4'; ?></p>
+            <?php if ($completed) : ?>
+                <div class="completed-icon">
+                    <i class="fa-solid fa-check" style="color: #63E6BE;"></i>
+                </div>
+            <?php endif; ?>
+            <a href="<?php echo esc_url(home_url("/{$current_post_type}/{$test->id_test}")); ?>" class="detail-button">Take Test</a>
         </div>
-        <div class="test-tags">
-            <?php the_tags('<span>#', '</span> <span>#', '</span>'); ?>
-        </div>
-        <a href="<?php the_permalink(); ?>" class="detail-button">Take Test</a>
-    </div>
-<?php endwhile; ?>
+    <?php endforeach; ?>
+</div>
 
-
-        </div>
 
         <!-- Pagination -->
         <div class="pagination">
             <?php
+            $total_tests_query = $wpdb->prepare(
+                "SELECT COUNT(*) FROM {$table_name} WHERE testname LIKE %s",
+                '%' . $wpdb->esc_like($search_term) . '%'
+            );
+            $total_tests = $wpdb->get_var($total_tests_query);
+            
+            $total_pages = ceil($total_tests / $limit);
+
             echo paginate_links([
-                'total' => $query->max_num_pages,
+                'total' => $total_pages, // Số trang tính toán chính xác
                 'current' => $paged,
                 'format' => '?paged=%#%',
                 'prev_text' => '&laquo; Prev',

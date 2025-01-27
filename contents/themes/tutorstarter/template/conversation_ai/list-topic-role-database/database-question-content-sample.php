@@ -86,12 +86,14 @@ $result = $conn->query($sql);
     <tr>
         <th>Number</th>
         <th>ID Test</th>
-        <th>context_name</th>
+        <th>testname</th>
         <th>instruction</th>
         <th>target_1</th>
         <th>target_2</th>
         <th>target_3</th> 
         <th>topic</th>
+        <th>User Role</th>
+        <th>AI Role</th>
         <th>difficulty</th>
         <th>time_limit</th>
         <th>sentence_limit</th>
@@ -106,12 +108,14 @@ if ($result->num_rows > 0) {
         echo "<tr id='row_{$row['number']}'>
                 <td>{$row['number']}</td>
                 <td>{$row['id_test']}</td>
-                <td>{$row['context_name']}</td>
+                <td>{$row['testname']}</td>
                 <td>{$row['instruction']}</td>
                 <td>{$row['target_1']}</td>
                 <td>{$row['target_2']}</td>
                 <td>{$row['target_3']}</td>
                 <td>{$row['topic']}</td>
+                <td>{$row['user_role']}</td>
+                <td>{$row['ai_role']}</td>
                 <td>{$row['difficulty']}</td>
                 <td>{$row['time_limit']}</td>
                 <td>{$row['sentence_limit']}</td>
@@ -183,12 +187,14 @@ if ($result->num_rows > 0) {
                     <input type="hidden" id="edit_number" name="number">
                     
                     ID Test: <input type="text" id="edit_id_test" name="id_test" class="form-control" required><br>
-                    context_name: <textarea type="text" id="edit_context_name" name="context_name" class="form-control" required></textarea><br>
+                    testname: <textarea type="text" id="edit_testname" name="conttestnameext_name" class="form-control" required></textarea><br>
                     instruction: <textarea type="number" id="edit_instruction" name="instruction" class="form-control" required></textarea><br>
                     target_1: <textarea id="edit_target_1" name="target_1" class="form-control" required></textarea><br>
                     target_2: <textarea id="edit_target_2" name="target_2" class="form-control"></textarea><br>
                     target_3: <textarea id="edit_target_3" name="target_3" class="form-control"></textarea><br>
                     topic: <input  id="edit_topic" name="topic" class="form-control" required><br>
+                    ai_role: <input  id="edit_ai_role" name="ai_role" class="form-control" required><br>
+                    user_role: <input  id="edit_user_role" name="user_role" class="form-control" required><br>
                     difficulty: <input  id="edit_difficulty" name="difficulty" class="form-control" required><br>
                     time_limit: <input  id="edit_time_limit" name="time_limit" class="form-control" required><br>
                     sentence_limit: <input  id="edit_sentence_limit" name="sentence_limit" class="form-control" required><br>
@@ -215,12 +221,14 @@ if ($result->num_rows > 0) {
             <div class="modal-body">
                 <form id="addForm">
                     ID Test: <input type="text" id="add_id_test" name="id_test" class="form-control" required><br>
-                    context_name: <textarea type="text" id="add_context_name" name="context_name" class="form-control" required></textarea><br>
+                    testname: <textarea type="text" id="add_testname" name="testname" class="form-control" required></textarea><br>
                     instruction: <textarea type="number" id="add_instruction" name="instruction" class="form-control" required></textarea><br>
                     target_1: <textarea id="add_target_1" name="target_1" class="form-control" required></textarea><br>
                     target_2: <textarea id="add_target_2" name="target_2" class="form-control"></textarea><br>
                     target_3: <textarea id="add_target_3" name="target_3" class="form-control"></textarea><br>
                     topic: <input  id="add_topic" name="topic" class="form-control" required><br>
+                    ai_role: <input  id="add_ai_role" name="ai_role" class="form-control" required><br>
+                    user_role: <input  id="add_user_role" name="user_role" class="form-control" required><br>
                     difficulty: <input  id="add_difficulty" name="difficulty" class="form-control" required><br>
                     time_limit: <input  id="add_time_limit" name="time_limit" class="form-control" required><br>
                     sentence_limit: <input  id="add_sentence_limit" name="sentence_limit" class="form-control" required><br>
@@ -250,12 +258,14 @@ function openEditModal(number) {
             var data = JSON.parse(response);
             $('#edit_number').val(data.number);
             $('#edit_id_test').val(data.id_test);
-            $('#edit_context_name').val(data.context_name);
+            $('#edit_testname').val(data.testname);
             $('#edit_instruction').val(data.instruction);
             $('#edit_target_1').val(data.target_1);
             $('#edit_target_2').val(data.target_2);
             $('#edit_target_3').val(data.target_3);
             $('#edit_topic').val(data.topic);
+            $('#edit_ai_role').val(data.ai_role);
+            $('#edit_user_role').val(data.user_role);
             $('#edit_difficulty').val(data.difficulty);
             $('#edit_time_limit').val(data.time_limit);
             $('#edit_sentence_limit').val(data.sentence_limit);

@@ -4,14 +4,36 @@
  * Template Post Type: digitalsat
  */
 
-get_header();
 $post_id = get_the_ID();
 
 $post_id = get_the_ID();
 $user_id = get_current_user_id();
-$additional_info = get_post_meta($post_id, '_digitalsat_additional_info', true); 
-$custom_number = get_post_meta($post_id, '_digitalsat_custom_number', true);
-echo "<script>console.log('Custom Number doing template: " . esc_js($custom_number) . "');</script>";
+//$custom_number = get_post_meta($post_id, '_digitalsat_custom_number', true);
+
+global $wpdb; // Use global wpdb object to query the DB
+
+$testsavenumber = get_query_var('testsavedigitalsatnumber');
+
+
+$results = $wpdb->get_results(
+    $wpdb->prepare(
+        "SELECT * FROM save_user_result_digital_sat WHERE testsavenumber = %d",
+        $testsavenumber
+    )
+);
+
+
+// Assign $custom_number using the id_test field from the query result if available
+$custom_number = 0; // Default value
+if (!empty($results)) {
+    // Assuming you want the first result's id_test
+    $custom_number = intval($results[0]->idtest);
+
+}
+
+
+
+
 
 // Database credentials
 $servername = "localhost";
@@ -31,12 +53,43 @@ if ($conn->connect_error) {
 $id_test = $custom_number;
 
 // Prepare the SQL statement
-$sql = "SELECT testname, time, test_type, question_choose, tag, number_question, book FROM digital_sat_test_list WHERE id_test = ?";
+$sql = "SELECT testname, time, test_type, question_choose, tag, number_question, book, id_test FROM digital_sat_test_list WHERE id_test = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id_test);
 $stmt->execute();
 $result = $stmt->get_result();
+$site_url = get_site_url();
 
+
+
+
+if ($result->num_rows > 0) {
+    $data = $result->fetch_assoc();  
+
+      $testname = $data['testname'];
+      $id_test = $data['id_test'];
+      $question_choose = $data['question_choose'];
+      $number_question = $data['number_question'];
+
+      add_filter('document_title_parts', function ($title) use ($testname) {
+          $title['title'] = $testname; // Use the $testname variable from the outer scope
+          return $title;
+      });
+}
+else {
+    echo '<script type="text/javascript">console.error("Không tìm thấy test với custom number: ' . $custom_number . '");</script>';
+}
+echo '
+    <script>
+       
+        
+        var linkTest = "'.$site_url .'/digitalsat/' . $id_test . '";
+       
+    </script>
+';
+
+
+get_header(); // Gọi phần đầu trang (header.php)
 
 ?>
 <style>
@@ -284,30 +337,11 @@ body {
 </head>
 
 <?php
-if ($result->num_rows > 0) {
-    // Fetch test data if available
-    $data = $result->fetch_assoc();
-
-    
-} else {
-    echo "<script>console.log('No data found for the given id_test');</script>";
-}
-    global $wpdb;
 
     // Get current user's username
     $current_user = wp_get_current_user();
     $current_username = $current_user->user_login;
-    $testsavenumber = get_query_var('testsavedigitalsatnumber');
-
-
-
-    $results = $wpdb->get_results(
-        $wpdb->prepare(
-            "SELECT * FROM save_user_result_digital_sat WHERE testsavenumber = %d",
-            $testsavenumber
-        )
-    );
-    
+ 
     $review = $wpdb->get_row(
         $wpdb->prepare(
             "SELECT * FROM digital_sat_test_list WHERE id_test = %d",
@@ -420,8 +454,12 @@ $new_skip_ans = 0;
                 </div>
         ';
 
-        echo'<button class="button-10" id ="share-button">Chia sẻ bài làm</button>';
+        echo'<button class="button-10" onclick ="redirectToTest()"> Làm lại bài thi </button>';
+        echo'<button class="button-10" onclick = "opensharePermission()">Chia sẻ bài làm</button>';
         echo'<button class="button-10" onclick = "openRemarkTest()" >Chấm lại </button>';
+        echo'<button class="button-10"> Làm lại các câu sai</button><br><br>';
+
+      
 
 
         echo '<div>
@@ -631,10 +669,23 @@ $new_skip_ans = 0;
 
 
 
+<div id="share_popup" class="popup">
+    <div class="popup-content">
+        <span class="close" onclick="closesharePermission()">&times;</span>
+        <i>Chia sẻ bài làm</i>
+        <div id="permissionShareContent"></div>
+        <button onclick="coppyShareContentBtn()">Copy Link</button>
+        <div id="coppyShareContent"></div>
+        <div id="warningRemark"></div>
+    </div>
+</div>
+
+
 </body>
 
 
 <script>
+    /*
     // Lấy phần tử canvas
     const ctx = document.getElementById('myLineChart').getContext('2d');
 
@@ -688,7 +739,7 @@ $new_skip_ans = 0;
 
 
 
-
+*/
 
 //document.getElementById('quick-view').addEventListener('click', openChangeDisplayPopup);
 
@@ -798,6 +849,49 @@ document.getElementById("saveNewBtn").addEventListener("click", function() {
 
 
 
+function closesharePermission() {
+    document.getElementById('share_popup').style.display = 'none';
+}
+
+
+function coppyShareContentBtn() {
+    // Lấy nội dung cần sao chép
+    const copyText = document.getElementById("coppyShareContent").innerText;
+
+    // Sao chép nội dung vào clipboard
+    navigator.clipboard.writeText(copyText).then(() => {
+        // Thông báo khi sao chép thành công
+        alert("Copied the text: " + copyText);
+    }).catch((err) => {
+        console.error("Failed to copy text: ", err);
+        alert("Failed to copy the text.");
+    });
+}
+
+function redirectToTest(){
+    
+    window.location.href = `${linkTest}`;
+
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const updatePermission = document.getElementById("updatePermission");
+
+    if (updatePermission) {
+        updatePermission.addEventListener("change", function (event) {
+            togglePermission(event.target);
+        });
+    }
+});
+
+function opensharePermission() {
+    document.getElementById('share_popup').style.display = 'block';
+
+    document.getElementById("coppyShareContent").innerHTML =  window.location.href;
+
+    // Attach the event listener to the toggle switch with ID 'updatePermission'
+    
+}
 </script>
 
 <?php

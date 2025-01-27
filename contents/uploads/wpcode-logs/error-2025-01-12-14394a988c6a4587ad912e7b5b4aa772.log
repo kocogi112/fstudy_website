@@ -1,0 +1,17 @@
+2025-01-12T13:39:56+00:00 strtolower(): Passing null to parameter #1 ($string) of type string is deprecated
+2025-01-12T14:30:59+00:00 Uncaught Error: mysqli object is already closed in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\ieltswritingtest\template-testing.php:232
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\ieltswritingtest\template-testing.php(232): mysqli->close()
+#1 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(1923): include('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): ieltswritingtests_template_redirect('')
+#3 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#5 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#6 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#7 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#8 {main}
+  thrown
+2025-01-12T15:04:23+00:00 Snippet "endpoint_of_web_for_each_api_route" (#1250) was automatically deactivated due to a fatal error.
+2025-01-12T15:04:23+00:00 syntax error, unexpected single-quoted string "headers", expecting "]"
+2025-01-12T16:19:51+00:00 Snippet "endpoint_of_web_for_each_api_route" (#1250) was automatically deactivated due to a fatal error.
+2025-01-12T16:19:51+00:00 syntax error, unexpected token ";"

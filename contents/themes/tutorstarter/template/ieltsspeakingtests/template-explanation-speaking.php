@@ -8,7 +8,8 @@ get_header();
 $post_id = get_the_ID();
 
 // Get the custom number field value
-$custom_number = get_post_meta($post_id, '_ieltsspeakingtests_custom_number', true);
+//$custom_number = get_post_meta($post_id, '_ieltsspeakingtests_custom_number', true);
+$custom_number =intval(get_query_var('id_test'));
 
 
 // Database credentials (update with your own database details)

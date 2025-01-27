@@ -5,21 +5,25 @@
  
  */
 
-    if (!defined('ABSPATH')) {
-        exit; // Exit if accessed directly.
-    }
+if (!defined("ABSPATH")) {
+    exit(); // Exit if accessed directly.
+}
 
-    remove_filter('the_content', 'wptexturize');
-    remove_filter('the_title', 'wptexturize');
-    remove_filter('comment_text', 'wptexturize');
-    get_header(); // Gọi phần đầu trang (header.php)
+remove_filter("the_content", "wptexturize");
+remove_filter("the_title", "wptexturize");
+remove_filter("comment_text", "wptexturize");
 
 if (is_user_logged_in()) {
+
     $post_id = get_the_ID();
     $user_id = get_current_user_id();
-    $additional_info = get_post_meta($post_id, '_digitalsat_additional_info', true); 
-    $custom_number = get_post_meta($post_id, '_digitalsat_custom_number', true);
-
+    $additional_info = get_post_meta(
+        $post_id,
+        "_digitalsat_additional_info",
+        true
+    );
+    //$custom_number = get_post_meta($post_id, "_digitalsat_custom_number", true);
+    $custom_number =intval(get_query_var('id_test'));
     // Database credentials
     $servername = "localhost";
     $username = "root";
@@ -33,125 +37,181 @@ if (is_user_logged_in()) {
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
-// Set custom_number as id_test
-$id_test = $custom_number;
+    // Set custom_number as id_test
+    $id_test = $custom_number;
 
- // Get current time (hour, minute, second)
- $hour = date('H'); // Giờ
- $minute = date('i'); // Phút
- $second = date('s'); // Giây
+    // Get current time (hour, minute, second)
+    $hour = date("H"); // Giờ
+    $minute = date("i"); // Phút
+    $second = date("s"); // Giây
 
- // Generate random two-digit number
- $random_number = rand(10, 99);
- // Handle user_id and id_test error, set to "00" if invalid
- if (!$user_id) {
-    $user_id = '00'; // Set user_id to "00" if invalid
-}
+    // Generate random two-digit number
+    $random_number = rand(10, 99);
+    // Handle user_id and id_test error, set to "00" if invalid
+    if (!$user_id) {
+        $user_id = "00"; // Set user_id to "00" if invalid
+    }
 
-if (!$id_test) {
-    $id_test = '00'; // Set id_test to "00" if invalid
-}
+    if (!$id_test) {
+        $id_test = "00"; // Set id_test to "00" if invalid
+    }
 
-
- // Create result_id
- $result_id = $hour . $minute . $second . $id_test . $user_id . $random_number;
-
- echo "<script> 
-        var resultId = '" . $result_id . "';
+    // Create result_id
+    $result_id =
+        $hour . $minute . $second . $id_test . $user_id . $random_number;
+        $site_url = get_site_url();
+    echo "<script> 
+        var resultId = '" .
+        $result_id .
+        "';
+        var siteUrl = '" .
+        $site_url .
+        "';
         console.log('Result ID: ' + resultId);
     </script>";
 
-// Prepare the SQL statement
-$sql = "SELECT testname, time, test_type, question_choose, tag, number_question FROM digital_sat_test_list WHERE id_test = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $id_test);
-$stmt->execute();
-$result = $stmt->get_result();
+    // Prepare the SQL statement
+    $sql =
+        "SELECT testname, time, test_type, question_choose, tag, number_question FROM digital_sat_test_list WHERE id_test = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id_test);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-if ($result->num_rows > 0) {
-    // Fetch test data if available
-    $data = $result->fetch_assoc();
+    if ($result->num_rows > 0) {
+        // Fetch test data if available
+        $data = $result->fetch_assoc();
+        $testname = $data['testname'];
 
-    // Initialize quizData structure
-    echo "<script>";
-    echo "const quizData = {";
-    echo "    'title': " . json_encode($data['testname']) . ",";
-    echo "    'description': '',";
-    echo "    'duration': " . intval($data['time']) * 60 . ",";
-    echo "    'test_type': " . json_encode($data['test_type']) . ",";
-    echo "    'number_questions': " . intval($data['number_question']) . ",";
-    echo "    'category_test': " . json_encode($data['tag']) . ",";
-    echo "    'id_test': " . json_encode($data['tag'] . "_003") . ",";
-    echo "    'restart_question_number_for_each_question_category': 'Yes',";
-    echo "    'data_added_1': '',";
-    echo "    'data_added_2': '',";
-    echo "    'data_added_3': '',";
-    echo "    'data_added_4': '',";
-    echo "    'data_added_5': '',";
-    echo "    'questions': [";
+        add_filter('document_title_parts', function ($title) use ($testname) {
+            $title['title'] = $testname; // Use the $testname variable from the outer scope
+            return $title;
+        });
+        
 
-    // Normalize and split question_choose
-    $question_choose_cleaned = preg_replace('/\s*,\s*/', ',', trim($data['question_choose']));
-    $questions = explode(",", $question_choose_cleaned);
-    $first = true;
 
-    foreach ($questions as $question_id) {
-        if (strpos($question_id, "verbal") === 0) {
-            // Query only from digital_sat_question_bank_verbal table
-            $sql_question = "SELECT id_question, type_question, question_content, answer_1, answer_2, answer_3, answer_4, correct_answer, explanation, image_link, category FROM digital_sat_question_bank_verbal WHERE id_question = ?";
-            $stmt_question = $conn->prepare($sql_question);
-            $stmt_question->bind_param("s", $question_id);
-            $stmt_question->execute();
-            $result_question = $stmt_question->get_result();
 
-            if ($result_question->num_rows > 0) {
-                $question_data = $result_question->fetch_assoc();
+        // Initialize quizData structure
+        echo "<script>";
+        echo "const quizData = {";
+        echo "    'title': " . json_encode($data["testname"]) . ",";
+        echo "    'description': '',";
+        echo "    'duration': " . intval($data["time"]) * 60 . ",";
+        echo "    'test_type': " . json_encode($data["test_type"]) . ",";
+        echo "    'number_questions': " .
+            intval($data["number_question"]) .
+            ",";
+        echo "    'category_test': " . json_encode($data["tag"]) . ",";
+        echo "    'id_test': " . json_encode($data["tag"] . "_003") . ",";
+        echo "    'restart_question_number_for_each_question_category': 'Yes',";
+        echo "    'data_added_1': '',";
+        echo "    'data_added_2': '',";
+        echo "    'data_added_3': '',";
+        echo "    'data_added_4': '',";
+        echo "    'data_added_5': '',";
+        echo "    'questions': [";
 
-                if (!$first) echo ",";
-                $first = false;
+        // Normalize and split question_choose
+        $question_choose_cleaned = preg_replace(
+            "/\s*,\s*/",
+            ",",
+            trim($data["question_choose"])
+        );
+        $questions = explode(",", $question_choose_cleaned);
+        $first = true;
 
-                echo "{";
-                echo "'type': " . json_encode($question_data['type_question']) . ",";
-                echo "'question': " . json_encode($question_data['question_content']) . ",";
-                echo "'image': " . json_encode($question_data['image_link']) . ",";
-                echo "'question_category': '',";
-                echo "'id_question': " . json_encode($question_data['id_question']) . ",";
-                echo "'category': " . json_encode($question_data['category']) . ",";
+        foreach ($questions as $question_id) {
+            if (strpos($question_id, "verbal") === 0) {
+                // Query only from digital_sat_question_bank_verbal table
+                $sql_question =
+                    "SELECT id_question, type_question, question_content, answer_1, answer_2, answer_3, answer_4, correct_answer, explanation, image_link, category FROM digital_sat_question_bank_verbal WHERE id_question = ?";
+                $stmt_question = $conn->prepare($sql_question);
+                $stmt_question->bind_param("s", $question_id);
+                $stmt_question->execute();
+                $result_question = $stmt_question->get_result();
 
-                echo "'answer': [";
-                echo "['" . $question_data['answer_1'] . "', '" . ($question_data['correct_answer'] == 'answer_1' ? "true" : "false") . "'],";
-                echo "['" . $question_data['answer_2'] . "', '" . ($question_data['correct_answer'] == 'answer_2' ? "true" : "false") . "'],";
-                echo "['" . $question_data['answer_3'] . "', '" . ($question_data['correct_answer'] == 'answer_3' ? "true" : "false") . "'],";
-                echo "['" . $question_data['answer_4'] . "', '" . ($question_data['correct_answer'] == 'answer_4' ? "true" : "false") . "']";
-                echo "],";
-                echo "'explanation': " . json_encode($question_data['explanation']) . ",";
-                echo "'section': '',";
-                echo "'related_lectures': ''";
-                echo "}";
+                if ($result_question->num_rows > 0) {
+                    $question_data = $result_question->fetch_assoc();
+
+                    if (!$first) {
+                        echo ",";
+                    }
+                    $first = false;
+
+                    echo "{";
+                    echo "'type': " .
+                        json_encode($question_data["type_question"]) .
+                        ",";
+                    echo "'question': " .
+                        json_encode($question_data["question_content"]) .
+                        ",";
+                    echo "'image': " .
+                        json_encode($question_data["image_link"]) .
+                        ",";
+                    echo "'question_category': '',";
+                    echo "'id_question': " .
+                        json_encode($question_data["id_question"]) .
+                        ",";
+                    echo "'category': " .
+                        json_encode($question_data["category"]) .
+                        ",";
+
+                    echo "'answer': [";
+                    echo "['" .
+                        $question_data["answer_1"] .
+                        "', '" .
+                        ($question_data["correct_answer"] == "answer_1"
+                            ? "true"
+                            : "false") .
+                        "'],";
+                    echo "['" .
+                        $question_data["answer_2"] .
+                        "', '" .
+                        ($question_data["correct_answer"] == "answer_2"
+                            ? "true"
+                            : "false") .
+                        "'],";
+                    echo "['" .
+                        $question_data["answer_3"] .
+                        "', '" .
+                        ($question_data["correct_answer"] == "answer_3"
+                            ? "true"
+                            : "false") .
+                        "'],";
+                    echo "['" .
+                        $question_data["answer_4"] .
+                        "', '" .
+                        ($question_data["correct_answer"] == "answer_4"
+                            ? "true"
+                            : "false") .
+                        "']";
+                    echo "],";
+                    echo "'explanation': " .
+                        json_encode($question_data["explanation"]) .
+                        ",";
+                    echo "'section': '',";
+                    echo "'related_lectures': ''";
+                    echo "}";
+                }
             }
         }
+
+        // Close the questions array and the main object
+        echo "]};";
+
+        echo "</script>";
+    } else {
+        echo "<script>console.log('No data found for the given id_test');</script>";
     }
-
-    // Close the questions array and the main object
-    echo "]};";
-
-    echo "</script>";
-} else {
-    echo "<script>console.log('No data found for the given id_test');</script>";
-}
-
+    get_header(); // Gọi phần đầu trang (header.php)
 
     // Close statement and connection
     $stmt->close();
     $conn->close();
-        
-        
-
-?>
+    ?>
 
 
 
-<!DOCTYPE html>
 <html lang="en">
 <head>
 <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML">
@@ -170,7 +230,7 @@ if (window.MathJax) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title></title>
-    <link rel="stylesheet" href="/wordpress/contents/themes/tutorstarter/system-test-toolkit/style/style_1.css">
+    <link rel="stylesheet" href="/wordpress/contents/themes/tutorstarter/system-test-toolkit/style/style_2.css">
     <style type="text/css">
 
 #time-remaining-container {
@@ -228,6 +288,9 @@ if (window.MathJax) {
                }
            }
            #quiz-container {
+                overflow: auto;
+                height: calc(100% - 140px);
+
                 visibility: visible;
                 position: absolute;
                 left: 0;
@@ -272,7 +335,10 @@ if (window.MathJax) {
   transform: translateY(-50%); /* Center the line vertically */
   display: none; /* Hide by default */
 }
-
+img {
+              max-width: 90%;
+              display: block;
+          }
 .answer-options.active:after {
   display: block; /* Show the line when active */
 }
@@ -502,7 +568,129 @@ if (window.MathJax) {
   50%   {transform:scaleY(-1) rotate(0deg)}
   100%  {transform:scaleY(-1) rotate(-135deg)}
 }
-/* Fixed bottom navigation for questions */
+/* Flex container for left and right navigation */
+.navigation-group {
+    display: flex;           /* Use flexbox for layout */
+    justify-content: space-between; /* Distribute space between left and right */
+    align-items: center;     /* Vertically center items */
+    margin: 10px 0;          /* Add some margin above and below */
+    width: 100%;             /* Ensure full width */
+    height: 20px;
+}
+@media (max-width: 768px) {
+    
+    .navigation-group {
+        height: auto;
+        overflow-x: auto;
+        display: flex;           /* Use flexbox for layout */
+        justify-content: space-between; /* Distribute space between left and right */
+        align-items: center;     /* Vertically center items */
+        margin: 10px 0;          /* Add some margin above and below */
+        width: 100%;             /* Ensure full width */
+    }
+
+    #checkbox-button{
+        font-size: 12px;
+            width: 100px;
+        display: none;
+        position: absolute;
+        left: 20%;
+        transform: translate(-50%);
+        padding: 4px 14px;
+        border-radius: 8px;
+        border: solid 2px #000;
+        font-weight: 700;
+        user-select: none;
+        cursor: initial;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        opacity: 1;
+        pointer-events: all;
+        cursor: pointer;
+        transition: all .2s 0s ease;
+        font-family: Roboto;
+        font-size: 1.1rem;
+        background-color: #000;
+        color: #fff;
+    }
+    .quick-view-checkbox-button {
+        display: flex;
+        align-items: center;
+        justify-content: center; /* Center content horizontally */
+        padding: 6px 14px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+        border-radius: 6px;
+        font-size: 15px;
+        border: none;
+        color: #fff;
+        background: linear-gradient(180deg, #4B91F7 0%, #367AF6 100%);
+        background-origin: border-box;
+        box-shadow: 0px 0.5px 1.5px rgba(54, 122, 246, 0.25), inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2);
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+        text-align: center; /* Center text horizontally in case of inline elements */
+    }
+    .btn-person {
+        display:none;
+        visibility: hidden;
+    }
+
+}
+
+
+  /* The Modal (background) */
+  .modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.4); 
+}
+
+/* Modal Content */
+.modal-content {
+    margin: 15% auto; 
+    padding: 20px;
+    width: 60%; 
+   /* 
+    background-color: #fefefe;
+   border: 1px solid #888; */
+
+}
+#modalImage{
+    margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+
+  height: 60%;
+}
+
+/* The Close Button */
+.close-modal {
+    color: #050505;
+   /* float: right; */
+   
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-modal:hover,
+.close-modal:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
 
 .button-navigate-test{
     
@@ -532,11 +720,9 @@ if (window.MathJax) {
     <body onload="main()">
         
     
+    <div class ="content-container">
 
         <div  class="container">
-        
-
-
             <div class="blank-block"></div>
 
             <div class="main-block" >
@@ -545,7 +731,9 @@ if (window.MathJax) {
                     <h3>Your test will begin shortly</h3>
                     <div style="display: none;" id="date" style="visibility:hidden;"></div>
                     <div style="display: none;" id="title" style="visibility:hidden;"><?php the_title(); ?></div>
-                    <div  style="display: none;"  id="id_test"  style="visibility:hidden;"><?php echo esc_html($custom_number);?></div>
+                    <div  style="display: none;"  id="id_test"  style="visibility:hidden;"><?php echo esc_html(
+                        $custom_number
+                    ); ?></div>
 
                 </div>
             
@@ -559,7 +747,7 @@ if (window.MathJax) {
 
                     <div style="display: flex;">
                         <b style="margin-right: 5px;">Phân loại đề thi: </b>
-                        <div id="test_type"></div>
+                        <div id="testtype"></div>
                     </div>
 
                 
@@ -666,10 +854,10 @@ if (window.MathJax) {
                             
         <!-- The Modal -->
         <div id="myModal" class="modal">
-            <div class="modal-content">
-                <span class="close-modal">&times;</span>
+         <span class="close-modal" style = "display:none">&times;</span> 
 
-            <img id="modalImage" src="" style="width: 150%; height: 150%;">
+            <div class="modal-content">
+            <img id="modalImage" src="" >
             </div>
         </div>
   
@@ -682,78 +870,19 @@ if (window.MathJax) {
           
             <div class="blank-block"></div>
 
-            <!-- <button id="toggle-time-button" onclick="toggleTimeRemaining()">Hide</button> Button to toggle visibility -->
-             <div id="time-remaining-container"  >
-           
+
 
             
          
          
-         
-         
-        <div class = "fixedrightsmallbuttoncontainer" style="display: none;">
-         <button  class ="buttonsidebar"  id="report-error"><img width="22px" height="22px" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/report.png" ></button><br>  
-            <button class ="buttonsidebar"  id="full-screen-button">⛶</button><br>
-                <button class ="buttonsidebar" id="zoom-in">+</button><br>
-                <button  class ="buttonsidebar"  id="zoom-out">-</button><br>
-                <button  class ="buttonsidebar"  id="notesidebar"><img width="20px" height="20px" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/notesidebar.png" ></button><br>
-         
-                  
-         
-         
-         
-         </div>
-         
-         
-         <div class = "fixedleftsmallbuttoncontainer" style="display: none;">
-         
-                    <button  class ="buttonsidebar" onClick="reloadTest()"><img width="25px"  src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/reload.png" ></button><br>
-         
-                       <button  class ="buttonsidebar" id="print-exam-button" ><img width="28px" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/print.png" ></button><br>
-         
-                       <button id="change_appearance"  class ="buttonsidebar" ><img width="28px" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/setting.png" ></button><br>
-
-                       <button id="quick-view"  class ="buttonsidebar" ><img width="28px" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/quick-view.png" ></button>
-
-         
-                  
-         
-         
-         </div>
-         
-         
-         
-                   <div id="center-block" style="display:none"> 
-                        <h3 id="countdowns"style="display:none"></h3>
-                    </div>
-                    <div class="name-zone btn-group dropup">
-                <button type="button" class="btn-person" id="user-button" data-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-user"></i> Tester</button>
-                <div class="dropdown-menu usermap" style="">
-                    
-                </div>
-            </div>
-                                <button class="quick-view-checkbox-button" id="checkbox-button">Quick View All Questions</button>
-
-                  <div id ="navi-button" style="display: none;">
-                    <button class="button-navigate-test" id="prev-button" onclick="showPrevQuestion()">Quay lại</button>
-                    <button class="button-navigate-test" id="next-button" onclick="showNextQuestion()">Tiếp theo</button>
-                </div>
-         
-         
-         
-                </div>
-         
-         
-               <div id="loading-popup" style="display: none;">
+                <div id="loading-popup" style="display: none;">
                 <div id="loading-spinner"></div>
          
             </div>
          
          
          
-            <div id="loading-popup-remember" style="display: none;">
-                
-            </div>
+            <div id="loading-popup-remember" style="display: none;"></div>
          
          
          
@@ -923,6 +1052,15 @@ if (window.MathJax) {
                    
                 </div>
             </div>
+
+             <!-- Resume -->
+             <div id="resume-popup" class="popup">
+         
+                <div class="popup-content">
+                    <h3 style="text-align: center;" > Resume Test</h3>
+                    <button onclick="closeResumePopup()"> Continue The Test</button>
+                    
+            </div>
          
          
          <!-- note sidebar -->
@@ -951,8 +1089,39 @@ if (window.MathJax) {
          
          <!-- end note sidebar -->
          
+         </div>      
+         <div id="time-remaining-container"  >
+                    <div class = "fixedrightsmallbuttoncontainer" style="display: none;">
+                        <button  class ="buttonsidebar"  id="report-error"><img width="22px" height="22px" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/report.png" ></button><br>  
+                        <button class ="buttonsidebar"  id="full-screen-button">⛶</button><br>
+                        <button class ="buttonsidebar" id="zoom-in">+</button><br>
+                        <button  class ="buttonsidebar"  id="zoom-out">-</button><br>
+                        <button  class ="buttonsidebar"  id="notesidebar"><img width="20px" height="20px" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/notesidebar.png" ></button><br>
+                    </div>
+                    
          
+                    <div class = "fixedleftsmallbuttoncontainer" style="display: none;">
+                                <button  class ="buttonsidebar" onClick="reloadTest()"><img width="25px"  src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/reload.png" ></button><br>
+                                <button  class ="buttonsidebar" id="print-exam-button" ><img width="28px" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/print.png" ></button><br>
+                                <button id="change_appearance"  class ="buttonsidebar" ><img width="28px" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/setting.png" ></button><br>
+                                <button id="quick-view"  class ="buttonsidebar" ><img width="28px" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/quick-view.png" ></button>
+                    </div>
 
+                   <div id="center-block" style="display:none"> 
+                        <h3 id="countdowns"style="display:none"></h3>
+                    </div>
+                    <div class="name-zone btn-group dropup">
+                        <button type="button" class="btn-person" id="user-button" data-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-user"></i> Tester</button>
+                        <div class="dropdown-menu usermap" style=""></div>
+                    </div>
+                                
+                    <button class="quick-view-checkbox-button" id="checkbox-button">Quick View All Questions</button>
+
+                    <div id ="navi-button" style="display: none;">
+                        <button class="button-navigate-test" id="prev-button" onclick="showPrevQuestion()">Quay lại</button>
+                        <button class="button-navigate-test" id="next-button" onclick="showNextQuestion()">Tiếp theo</button>
+                    </div>
+                </div>
 
      <!-- giấu form send kết quả bài thi -->
 
@@ -960,7 +1129,7 @@ if (window.MathJax) {
     
   
  <span id="message"  style = "display:none" ></span>
- <form id="frmContactUs"  style = "display:none">
+ <form id="frmContactUs"  style = "display:none" >
          <div class="card">
              <div class="card-header">Form lưu kết quả</div>
              <div class="card-body" >
@@ -990,8 +1159,9 @@ if (window.MathJax) {
     </div>
 
     <div class = "form-group" >
-         <input type="text" id="idcategory" name="idcategory" placeholder="Id category"  class="form-control form_data" />
-         <span id="idcategory_error" class="text-danger"></span>
+         <input   type="text" id="test_type" name="test_type" placeholder="Test type"  class="form-control form_data" />
+         <span id="test_type_error" class="text-danger" ></span>
+
     </div>
 
      <div class = "form-group"   >
@@ -999,11 +1169,6 @@ if (window.MathJax) {
          <span id="testname_error" class="text-danger"></span>
     </div>
 
-
-    <div class = "form-group"   >
-        <input type="text"  id="correctanswer" name="correctanswer" placeholder="Correct Answer"  class="form-control form_data" />
-        <span id="correctanswer_error" class="text-danger"></span>  
-    </div>
 
 
     <div class = "form-group"   >
@@ -1046,7 +1211,10 @@ if (window.MathJax) {
     </div>
            
 
-
+    <div class = "form-group"   >
+        <input type="text"  id="correct_percentage" name="correct_percentage" placeholder="Correct Percentage"  class="form-control form_data" />
+        <span id="correct_percentager_error" class="text-danger"></span>  
+    </div>
 
     </div>
 
@@ -1067,7 +1235,7 @@ if (window.MathJax) {
            
 
 let submitTest = false;
-let pre_id_test_ = `<?php echo esc_html($custom_number);?>`;
+let pre_id_test_ = `<?php echo esc_html($custom_number); ?>`;
 //console.log(`preid: ${pre_id_test_}`);
 
 
@@ -1075,7 +1243,7 @@ let pre_id_test_ = `<?php echo esc_html($custom_number);?>`;
 jQuery('#frmContactUs').submit(function(event) {
 event.preventDefault(); // Prevent the default form submission
 
- var link = "<?php echo admin_url('admin-ajax.php'); ?>";
+ var link = "<?php echo admin_url("admin-ajax.php"); ?>";
 
  var form = jQuery('#frmContactUs').serialize();
  var formData = new FormData();
@@ -1458,12 +1626,18 @@ function ChangeQuestion(questionNumber)
 
 // Button functions for testing
 function blue_highlight(spanId) {
-            document.getElementById(spanId).style.backgroundColor = 'blue';
-        }
-        
-        function green_highlight(spanId) {
-            document.getElementById(spanId).style.backgroundColor = 'green';
-        }
+    document.getElementById(spanId).style.backgroundColor = '#00CED1';
+}
+
+function green_highlight(spanId) {
+    document.getElementById(spanId).style.backgroundColor = '#90EE90';
+}
+function yellow_highlight(spanId) {
+    document.getElementById(spanId).style.backgroundColor = 'yellow';
+}
+function purple_highlight(spanId) {
+    document.getElementById(spanId).style.backgroundColor = '#FFB6C1';
+}
     /*
 function startTest() {
             document.getElementById("test-prepare").style.display = "none";
@@ -1492,7 +1666,7 @@ function startTest() {
         </script>
 
 <!--<script type="text/javascript" src="function/alert_leave_page.js"></script> -->
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/main_.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/main_sat_2.js"></script>
 
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/translate.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/zoom-text.js"></script>
@@ -1501,12 +1675,12 @@ function startTest() {
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/report-error.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/note-sidebar.js"></script>
 
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/submit-answer.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/submit_answer_2.js"></script>
 <!--<script type="module" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/check_dev_tool.js"></script>
     -->
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/highlight-text-2.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/highlight_text_2.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/fullscreen.js"></script>
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/format-time.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/format-time-1.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/draft-popup.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/color-background.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/start-Test.js"></script>
@@ -1531,8 +1705,10 @@ function startTest() {
 
 <?php
     //get_footer();
+
+
 } else {
     get_header();
-    echo '<p>Please log in to submit your answer.</p>';
+    echo "<p>Please log in to submit your answer.</p>";
     //get_footer();
 }

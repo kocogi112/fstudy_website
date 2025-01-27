@@ -9,7 +9,14 @@ add_filter('document_title_parts', function ($title) {
     }
     return $title;
 });
+/*
+ 
 
+sửa tại C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\tutor\dashboard\analysis_test.php 
+ 
+
+
+*/
 $post_types = [
     'all' => 'Tất cả',
     'thptqg' => 'THPTQG',
@@ -60,6 +67,14 @@ foreach ($post_types as $key => $label) {
 
 get_header();
 ?>
+<!-- 
+ 
+
+sửa tại C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\tutor\dashboard\analysis_test.php 
+ 
+
+
+-->
 <div class="result-template">
     <div class="tabs">
         <?php foreach ($post_types as $key => $label): ?>
@@ -83,7 +98,14 @@ get_header();
             <button type="submit">Search</button>
         </form>
     </div>
+<!-- 
+ 
 
+sửa tại C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\tutor\dashboard\analysis_test.php 
+ 
+
+
+-->
     <div class="stats">
         <?php foreach ($test_counts as $key => $count): ?>
             <div class="stat-item">
@@ -92,7 +114,14 @@ get_header();
             </div>
         <?php endforeach; ?>
     </div>
+<!-- 
+ 
 
+sửa tại C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\tutor\dashboard\analysis_test.php 
+ 
+
+
+-->
     <?php if ($current_post_type !== 'all'): ?>
         <div class="results">
             <h2>Results for <?php echo esc_html($post_types[$current_post_type]); ?></h2>
@@ -116,6 +145,14 @@ get_header();
                         </tr>
                         </thead>
                         <tbody>
+                            <!-- 
+ 
+
+sửa tại C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\tutor\dashboard\analysis_test.php 
+ 
+
+
+-->
                         <?php foreach ($results as $result): ?>
                             <tr>
                                 <td><?php echo esc_html($result->testname); ?></td>

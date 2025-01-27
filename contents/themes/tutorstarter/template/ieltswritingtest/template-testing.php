@@ -5,7 +5,6 @@
  
  */
 
- get_header(); // Gọi phần đầu trang (header.php)
 
 if (is_user_logged_in()) {
     $post_id = get_the_ID();
@@ -14,7 +13,8 @@ if (is_user_logged_in()) {
 $post_id = get_the_ID();
 
 // Get the custom number field value
-$custom_number = get_post_meta($post_id, '_ieltswritingtests_custom_number', true);
+//$custom_number = get_post_meta($post_id, '_ieltswritingtests_custom_number', true);
+$custom_number = intval(get_query_var('id_test'));
 
 // Database credentials (update with your own database details)
 $servername = "localhost";
@@ -76,7 +76,13 @@ if ($row = $result->fetch_assoc()) {
     $testname = $row['testname'];
     $test_type = $row['test_type'];
 }
+add_filter('document_title_parts', function ($title) use ($testname) {
+    $title['title'] = $testname; // Use the $testname variable from the outer scope
+    return $title;
+});
 
+
+get_header(); // Gọi phần đầu trang (header.php)
 // Prepare an array to store the questions
 $questions = [];
 $topic = ''; // Variable to store the topic
@@ -141,7 +147,126 @@ console.log("Bài thi: ", quizData);
 
 
 
+// Truy vấn dữ liệu từ bảng order_and_prompt_api_list
+$sql3 = "SELECT list_name_endpoint_order, last_use_end_point 
+          FROM order_and_prompt_api_list 
+          WHERE number = 1";
+$result3 = $conn->query($sql3);
 
+$now_end_point = '';
+if ($result3->num_rows > 0) {
+    while ($row = $result3->fetch_assoc()) {
+        $list_name_endpoint_order = json_decode($row['list_name_endpoint_order'], true);
+        $last_use_end_point = $row['last_use_end_point'];
+
+        if (is_array($list_name_endpoint_order)) {
+            // Tìm id của last_use_end_point
+            $current_id = null;
+            foreach ($list_name_endpoint_order as $item) {
+                if ($item['name'] === $last_use_end_point) {
+                    $current_id = $item['id'];
+                    break;
+                }
+            }
+
+            // Tìm name kế tiếp
+            $now_end_point = '';
+            if ($current_id !== null) {
+                // Nếu tìm thấy last_use_end_point, lấy id kế tiếp
+                $next_id = $current_id + 1;
+                $now_end_point = array_reduce($list_name_endpoint_order, function ($carry, $item) use ($next_id) {
+                    return ($item['id'] === $next_id) ? $item['name'] : $carry;
+                }, '');
+            }
+
+            // Nếu không tìm thấy name kế tiếp (id cuối cùng), lấy id 1
+            if (!$now_end_point) {
+                foreach ($list_name_endpoint_order as $item) {
+                    if ($item['id'] === 1) {
+                        $now_end_point = $item['name'];
+                        break;
+                    }
+                }
+            }
+
+            // Tính next_end_point
+            $next_end_point = '';
+            if ($now_end_point) {
+                foreach ($list_name_endpoint_order as $item) {
+                    if ($item['name'] === $now_end_point) {
+                        $current_id = $item['id'];
+                        break;
+                    }
+                }
+
+                if ($current_id !== null) {
+                    $next_id = $current_id + 1;
+                    $next_end_point = array_reduce($list_name_endpoint_order, function ($carry, $item) use ($next_id) {
+                        return ($item['id'] === $next_id) ? $item['name'] : $carry;
+                    }, '');
+                }
+
+                if (!$next_end_point) {
+                    foreach ($list_name_endpoint_order as $item) {
+                        if ($item['id'] === 1) {
+                            $next_end_point = $item['name'];
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+// Xuất biến JavaScript
+echo '<script type="text/javascript">
+var now_end_point = "' . htmlspecialchars($now_end_point) . '";
+var next_end_point_for_update = "' . htmlspecialchars($next_end_point) . '";
+
+
+
+</script>';
+
+
+
+
+// Nếu tìm thấy now_end_point, kiểm tra bảng api_key_route
+if ($now_end_point) {
+    $sql4 = "SELECT name_end_point, api_endpoint_url, api_key, updated_time, type, all_time_use_number, today_time_use_number 
+             FROM api_key_route 
+             WHERE name_end_point = ?";
+    $stmt = $conn->prepare($sql4);
+    $stmt->bind_param("s", $now_end_point);
+    $stmt->execute();
+    $result4 = $stmt->get_result();
+
+    if ($result4->num_rows > 0) {
+        // Xuất dữ liệu ra console
+        while ($row = $result4->fetch_assoc()) {
+            echo '<script type="text/javascript">
+            var url_end_point = "' . htmlspecialchars($row['api_endpoint_url']) . '";
+            var all_time_use = "'. (int)$row['all_time_use_number'] .  '";
+            var today_use = "'  . (int)$row['today_time_use_number'] . '";
+            var type_gate = "' . htmlspecialchars($row['type']) . '";
+
+            //console.log("API Endpoint URL: ", "' . htmlspecialchars($row['api_endpoint_url']) . '");
+            //console.log("Updated Time: ", "' . htmlspecialchars($row['updated_time']) . '");
+            //console.log("Type: ", "' . htmlspecialchars($row['type']) . '");
+            //console.log("All Time Use Number: ", ' . (int)$row['all_time_use_number'] . ');
+            //console.log("Today Time Use Number: ", ' . (int)$row['today_time_use_number'] . ');
+            </script>';
+        }
+    } else {
+        echo '<script type="text/javascript">console.log("No matching endpoint found in api_key_route.");</script>';
+    }
+    $stmt->close();
+} else {
+    echo '<script type="text/javascript">console.log("No now_end_point found.");</script>';
+}
+
+// Close the database connection
 
 // Close the database connection
 $conn->close();
@@ -1515,7 +1640,7 @@ The given table compares different means of transportation in terms of the annua
 
 
     <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/full_overall_chart/full_band_chart.js"></script>
-    <script  src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/processnew.js"></script>
+    <script  src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/process.js"></script>
     
 
 

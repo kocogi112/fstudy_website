@@ -4,11 +4,32 @@
  * Template Post Type: ieltsreadingtest
  */
 
-get_header();
-$post_id = get_the_ID();
 
+
+
+$post_id = get_the_ID();
+$user_id = get_current_user_id();// Get the custom number field value
+//$custom_number =intval(get_query_var('id_test'));
+//$custom_number = get_post_meta($post_id, '_ieltsreadingtest_custom_number', true);
 // Get the custom number field value
-$custom_number = get_post_meta($post_id, '_ieltsreadingtest_custom_number', true);
+global $wpdb; // Use global wpdb object to query the DB
+
+// Get testsavenumber from URL
+$testsavenumber = get_query_var('testsavereadingnumber');
+
+$results = $wpdb->get_results(
+    $wpdb->prepare(
+        "SELECT * FROM save_user_result_ielts_reading WHERE testsavenumber = %d",
+        $testsavenumber
+    )
+);
+// Assign $custom_number using the id_test field from the query result if available
+$custom_number = 0; // Default value
+if (!empty($results)) {
+    // Assuming you want the first result's id_test
+    $custom_number = intval($results[0]->idtest);
+
+}
 
 echo "<script>console.log('Custom Number doing template: " . esc_js($custom_number) . "');</script>";
 
@@ -27,7 +48,7 @@ if ($conn->connect_error) {
 }
 
 // Truy vấn `question_choose` từ bảng `ielts_reading_test_list` theo `id_test`
-$sql_test = "SELECT question_choose FROM ielts_reading_test_list WHERE id_test = ?";
+$sql_test = "SELECT testname, question_choose FROM ielts_reading_test_list WHERE id_test = ?";
 $stmt_test = $conn->prepare($sql_test);
 
 if ($stmt_test === false) {
@@ -38,11 +59,20 @@ $stmt_test->bind_param("i", $custom_number);
 $stmt_test->execute();
 $result_test = $stmt_test->get_result();
 
+
+
 if ($result_test->num_rows > 0) {
+
     // Lấy các ID từ question_choose (ví dụ: "1001,2001,3001")
     $row_test = $result_test->fetch_assoc();
+    $testname = $row_test['testname'];
+    add_filter('document_title_parts', function ($title) use ($testname) {
+        $title['title'] = $testname; // Use the $testname variable from the outer scope
+        return $title;
+    });
     $question_choose = $row_test['question_choose'];
     $id_parts = explode(",", $question_choose); // Chuyển thành mảng ID
+   
 
     $part = []; // Mảng chứa dữ liệu của các phần
     $previous_part_questions = 0; // Biến lưu trữ số câu hỏi của phần trước
@@ -142,16 +172,18 @@ if ($result_test->num_rows > 0) {
     echo '<script type="text/javascript">console.error("Không tìm thấy test với custom number: ' . $custom_number . '");</script>';
 }
 
+
+
+get_header(); // Gọi phần đầu trang (header.php)
+
+
 // Đóng kết nối
 $conn->close();
 
 
 
 
-global $wpdb; // Use global wpdb object to query the DB
 
-// Get testsavenumber from URL
-$testsavenumber = get_query_var('testsavereadingnumber');
 echo '
 <script>
     // Truyền giá trị PHP sang JavaScript
@@ -161,12 +193,7 @@ echo '
 ';
 
 // Query database to find results by testsavenumber
-$results = $wpdb->get_results(
-    $wpdb->prepare(
-        "SELECT * FROM save_user_result_ielts_reading WHERE testsavenumber = %d",
-        $testsavenumber
-    )
-);
+
 
 
 if (!empty($results)) {
@@ -362,7 +389,7 @@ if (!empty($results)) {
 
 
 
-<!DOCTYPE html>
+
 <html lang="en">
 <head>
    

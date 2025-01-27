@@ -102,3 +102,4 @@ define('WP_CONTENT_URL', 'http://localhost/wordpress/' . WP_CONTENT_FOLDERNAME);
 
 /** Sets up WordPress vars and included files. */
 require_once ABSPATH . 'wp-settings.php';
+

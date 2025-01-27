@@ -1,0 +1,23 @@
+2025-01-15T10:13:24+00:00 Uncaught Error: Call to a member function bind_param() on bool in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\ieltslisteningtest\template-testing-listening-ielts.php:40
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(3555): include()
+#1 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): ieltslisteningtest_template_redirect('')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#3 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#5 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#7 {main}
+  thrown
+2025-01-15T10:13:52+00:00 Cannot redeclare fetch_from_groq() (previously declared in C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code:34)
+2025-01-15T15:11:57+00:00 Uncaught Error: Call to a member function bind_param() on bool in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\ieltslisteningtest\template-testing-listening-ielts.php:40
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(3557): include()
+#1 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): ieltslisteningtest_template_redirect('')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#3 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#5 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#7 {main}
+  thrown

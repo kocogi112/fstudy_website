@@ -5,17 +5,15 @@
  
  */
 
- get_header(); // Gọi phần đầu trang (header.php)
 
 if (is_user_logged_in()) {
     $post_id = get_the_ID();
     $user_id = get_current_user_id();
-    $additional_info = get_post_meta($post_id, '_ieltsreadingtest_additional_info', true);
 
-    $post_id = get_the_ID();
     // Lấy giá trị custom number từ custom field
-    $custom_number = get_post_meta($post_id, '_ieltsreadingtest_custom_number', true);
-    
+    $custom_number = intval(get_query_var('id_test'));
+   
+    //$custom_number = get_post_meta($post_id, '_ieltsreadingtest_custom_number', true);
     // Thông tin kết nối database
     $servername = "localhost";
     $username = "root";
@@ -30,8 +28,7 @@ if (is_user_logged_in()) {
         die("Connection failed: " . $conn->connect_error);
     }
     
-// Truy vấn `question_choose` từ bảng `ielts_reading_test_list` theo `id_test`
-$sql_test = "SELECT question_choose FROM ielts_reading_test_list WHERE id_test = ?";
+$sql_test = "SELECT testname, question_choose FROM ielts_reading_test_list WHERE id_test = ?";
 $stmt_test = $conn->prepare($sql_test);
 
 if ($stmt_test === false) {
@@ -70,11 +67,69 @@ $stmt_test->bind_param("i", $custom_number);
 $stmt_test->execute();
 $result_test = $stmt_test->get_result();
 
+
+
+$current_url = $_SERVER['REQUEST_URI'];
+
+
+
+
 if ($result_test->num_rows > 0) {
     // Lấy các ID từ question_choose (ví dụ: "1001,2001,3001")
     $row_test = $result_test->fetch_assoc();
     $question_choose = $row_test['question_choose'];
-    $id_parts = explode(",", $question_choose); // Chuyển thành mảng ID
+    $testname = $row_test['testname'];
+
+    add_filter('document_title_parts', function ($title) use ($testname) {
+        $title['title'] = $testname; // Use the $testname variable from the outer scope
+        return $title;
+    });
+    
+
+get_header(); // Gọi phần đầu trang (header.php)
+
+// Kiểm tra nếu URL chứa tham số part
+
+
+if (strpos($current_url, '?part=') !== false) {
+    $query_string = $_SERVER['QUERY_STRING']; // Lấy chuỗi truy vấn từ URL
+    parse_str($query_string, $query_params); // Chuyển thành mảng
+
+    if (isset($query_params['part'])) {
+        // Tách các giá trị từ 'part' (chuỗi, không phải mảng)
+        $id_parts_raw = explode(',', $query_params['part']);
+        
+        // Tạo mảng mặc định với 3 phần tử
+        $id_parts = ["0", "0", "0"];
+
+        // Lặp qua các giá trị và đặt vào mảng kết quả
+        foreach ($id_parts_raw as $part) {
+            $position = intval(substr($part, 0, 1)) - 1; // Xác định vị trí (1003 -> vị trí 1)
+            if ($position >= 0 && $position < 3) {
+                $id_parts[$position] = $part; // Đặt giá trị vào đúng vị trí
+            }
+        }
+
+        // Xuất ra JavaScript để kiểm tra
+        echo '<script type="text/javascript">
+            const idParts = ' . json_encode($id_parts, JSON_UNESCAPED_SLASHES) . ';
+            console.log("idParts:", idParts);
+        </script>';
+    } else {
+        $id_parts = [];
+    }
+}
+ else {
+    // Nếu không có tham số ?part, dùng giá trị mặc định từ cơ sở dữ liệu
+    $id_parts = explode(",", $row_test['question_choose']);
+
+    echo '<script type="text/javascript">
+    const idParts = ' . json_encode($id_parts, JSON_UNESCAPED_SLASHES) . ';
+    console.log("idParts cho full test:", idParts);
+</script>';
+
+}
+
 
     $part = []; // Mảng chứa dữ liệu của các phần
     $previous_part_questions = 0; // Biến lưu trữ số câu hỏi của phần trước
@@ -134,6 +189,8 @@ if ($result_test->num_rows > 0) {
                 $entry['group_question'] = null;
             }
             
+
+
             if (!empty($row['category'])) {
                 $categoryData = json_decode($row['category'], true);
                 if (json_last_error() === JSON_ERROR_NONE) {
@@ -185,7 +242,6 @@ $conn->close();
 
 
 
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -779,7 +835,7 @@ html {
     
   
      <span id="message" style="display:none" ></span>
-     <form id="saveReadingResult" style="display:none" >
+     <form id="saveReadingResult">
                 <div class="card">
                     <div class="card-header">Form lưu kết quả</div>
                     <div class="card-body" >
@@ -806,6 +862,11 @@ html {
                 <div class = "form-group" >
                     <input type="text" id="idtest" name="idtest" placeholder="Id test"  class="form-control form_data" />
                     <span id="idtest_error" class="text-danger" ></span>
+                </div>
+
+                <div class = "form-group" >
+                    <input type="text" id="test_type" name="test_type" placeholder="Type Test"  class="form-control form_data" />
+                    <span id="test_type_error" class="text-danger" ></span>
                 </div>
             
                 <div class = "form-group" >
@@ -889,7 +950,7 @@ html {
             let highlights = {}; // Object để lưu trữ các highlight
 
     </script>
-    <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/script_1.js"></script>
+    <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/script_new_1.js"></script>
     <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/highlight_text.js"></script>
 
 </body>

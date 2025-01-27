@@ -4,11 +4,11 @@
  * Template Post Type: ieltswritingtests
  */
 
-get_header();
 $post_id = get_the_ID();
 
 // Get the custom number field value
-$custom_number = get_post_meta($post_id, '_ieltswritingtests_custom_number', true);
+//$custom_number = get_post_meta($post_id, '_ieltswritingtests_custom_number', true);
+global $wpdb; // Use global wpdb object to query the DB
 
 // Database credentials
 $servername = "localhost";
@@ -23,6 +23,28 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
+
+
+
+$testsavenumber = get_query_var('testsaveieltswriting');
+
+
+    $results = $wpdb->get_results(
+        $wpdb->prepare(
+            "SELECT * FROM save_user_result_ielts_writing WHERE testsavenumber = %d",
+            $testsavenumber
+        )
+    );
+
+
+
+$custom_number = 0; // Default value
+if (!empty($results)) {
+    // Assuming you want the first result's id_test
+    $custom_number = intval($results[0]->idtest);
+
+}
+
 
 // Set custom_number as id_test
 $id_test = $custom_number;
@@ -42,29 +64,25 @@ echo "<script>console.log('Custom Number doing template: " . esc_js($custom_numb
 if ($result->num_rows > 0) {
     // Fetch test data if available
     $data = $result->fetch_assoc();
-
+    $testname = $data['testname'];
+    add_filter('document_title_parts', function ($title) use ($testname) {
+        $title['title'] = $testname; // Use the $testname variable from the outer scope
+        return $title;
+    });
     
 } else {
     echo "<script>console.log('No data found for the given id_test');</script>";
 }
 
 
+get_header();
 
 
-    global $wpdb;
 
     // Get current user's username
     $current_user = wp_get_current_user();
     $current_username = $current_user->user_login;
-    $testsavenumber = get_query_var('testsaveieltswriting');
-
-
-    $results = $wpdb->get_results(
-        $wpdb->prepare(
-            "SELECT * FROM save_user_result_ielts_writing WHERE testsavenumber = %d",
-            $testsavenumber
-        )
-    );
+    
     
     $review = $wpdb->get_row(
         $wpdb->prepare(

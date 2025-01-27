@@ -5,135 +5,239 @@
  
  */
 
- //get_header(); // Gọi phần đầu trang (header.php)
 
-if (is_user_logged_in()) {
+ if (is_user_logged_in()) {
     $post_id = get_the_ID();
     $user_id = get_current_user_id();
-    $additional_info = get_post_meta($post_id, '_ieltslisteningtest_additional_info', true);
 
-   
-$post_id = get_the_ID();
-// Get the custom number field value
-$custom_number = get_post_meta($post_id, '_ieltslisteningtest_custom_number', true);
+    // Lấy giá trị custom number từ custom field
 
-// Database credentials (update with your own database details)
-$servername = "localhost";
-$username = "root";
-$password = ""; // No password by default
-$dbname = "wordpress";
+   //$custom_number =intval(get_query_var('id_test'));
+   $custom_number = get_post_meta($post_id, '_ieltslisteningtest_custom_number', true);
 
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-$sql = "SELECT part, duration, number_question_of_this_part, paragraph, group_question, category FROM ielts_reading_part_1_question WHERE id_test = ?";
-$sql2 = "SELECT part, duration, number_question_of_this_part, paragraph, group_question, category FROM ielts_reading_part_2_question WHERE id_test = ?";
-$sql3 = "SELECT part, duration, number_question_of_this_part, paragraph, group_question, category FROM ielts_reading_part_3_question WHERE id_test = ?";
-
-
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $custom_number); // 'i' is used for integer
-$stmt->execute();
-$result = $stmt->get_result();
-
-$stmt2 = $conn->prepare($sql2);
-$stmt2->bind_param("i", $custom_number); // 'i' is used for integer
-$stmt2->execute();
-$result2 = $stmt2->get_result();
-
-$stmt3 = $conn->prepare($sql3);
-$stmt3->bind_param("i", $custom_number); // 'i' is used for integer
-$stmt3->execute();
-$result3 = $stmt3->get_result();
-
-
-$part = []; // Initialize the array for storing questions
-
-while ($row = $result->fetch_assoc()) {
-    // Create an associative array for each row
-    $entry = [
-        'part_number' => $row['part'],
-        'paragraph' => $row['paragraph'],
-        'number_question_of_this_part' => $row['number_question_of_this_part'],
-        'duration' => $row['duration'],
-    ];
-
-    // Kiểm tra nếu group_question là chuỗi JSON hợp lệ, chuyển thành mảng hoặc đối tượng PHP
-    if (!empty($row['group_question'])) {
-        $entry['group_question'] = json_decode($row['group_question'], true); // Chuyển từ JSON string thành array
-    } else {
-        $entry['group_question'] = null; // Đặt là null nếu không có dữ liệu
+    // Thông tin kết nối database
+    $servername = "localhost";
+    $username = "root";
+    $password = ""; // No password by default
+    $dbname = "wordpress";
+    
+    // Tạo kết nối
+    $conn = new mysqli($servername, $username, $password, $dbname);
+    
+    // Kiểm tra kết nối
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
     }
+    
+// Truy vấn `question_choose` từ bảng `ielts_reading_test_list` theo `id_test`
+$sql_test = "SELECT testname, question_choose FROM ielts_listening_test_list WHERE id_test = ?";
+$stmt_test = $conn->prepare($sql_test);
 
-    // Add the entry to the $part array
-    $part[] = $entry;
+if ($stmt_test === false) {
+    die('Lỗi MySQL prepare: ' . $conn->error);
 }
 
 
+ // Get current time (hour, minute, second)
+ $hour = date('H'); // Giờ
+ $minute = date('i'); // Phút
+ $second = date('s'); // Giây
+
+ // Generate random two-digit number
+ $random_number = rand(10, 99);
+ // Handle user_id and id_test error, set to "00" if invalid
+ if (!$user_id) {
+    $user_id = '00'; // Set user_id to "00" if invalid
+}
+
+if (!$custom_number) {
+    $custom_number = '00'; // Set id_test to "00" if invalid
+}
 
 
-while ($row = $result2->fetch_assoc()) {
-    // Create an associative array for each row
-    $entry = [
-        'part_number' => $row['part'],
-        'paragraph' => $row['paragraph'],
-        'number_question_of_this_part' => $row['number_question_of_this_part'],
-        'duration' => $row['duration'],
-    ];
+ // Create result_id
+ $result_id = $hour . $minute . $second . $custom_number . $user_id . $random_number;
 
-    // Kiểm tra nếu group_question là chuỗi JSON hợp lệ, chuyển thành mảng hoặc đối tượng PHP
-    if (!empty($row['group_question'])) {
-        $entry['group_question'] = json_decode($row['group_question'], true); // Chuyển từ JSON string thành array
+ echo "<script> 
+        var resultId = '" . $result_id . "';
+        console.log('Result ID: ' + resultId);
+    </script>";
+
+
+
+$stmt_test->bind_param("i", $custom_number);
+$stmt_test->execute();
+$result_test = $stmt_test->get_result();
+
+
+
+$current_url = $_SERVER['REQUEST_URI'];
+
+
+
+
+if ($result_test->num_rows > 0) {
+    // Lấy các ID từ question_choose (ví dụ: "1001,2001,3001")
+    $row_test = $result_test->fetch_assoc();
+    $question_choose = $row_test['question_choose'];
+    $testname = $row_test['testname'];
+
+    add_filter('document_title_parts', function ($title) use ($testname) {
+        $title['title'] = $testname; // Use the $testname variable from the outer scope
+        return $title;
+    });
+    
+
+get_header(); // Gọi phần đầu trang (header.php)
+
+// Kiểm tra nếu URL chứa tham số part
+
+
+if (strpos($current_url, '?part=') !== false) {
+    $query_string = $_SERVER['QUERY_STRING']; // Lấy chuỗi truy vấn từ URL
+    parse_str($query_string, $query_params); // Chuyển thành mảng
+
+    if (isset($query_params['part'])) {
+        // Tách các giá trị từ 'part' (chuỗi, không phải mảng)
+        $id_parts_raw = explode(',', $query_params['part']);
+        
+        // Tạo mảng mặc định với 3 phần tử
+        $id_parts = ["0", "0", "0", "0"];
+
+        // Lặp qua các giá trị và đặt vào mảng kết quả
+        foreach ($id_parts_raw as $part) {
+            $position = intval(substr($part, 0, 1)) - 1; // Xác định vị trí (1003 -> vị trí 1)
+            if ($position >= 0 && $position < 3) {
+                $id_parts[$position] = $part; // Đặt giá trị vào đúng vị trí
+            }
+        }
+
+        // Xuất ra JavaScript để kiểm tra
+        echo '<script type="text/javascript">
+            const idParts = ' . json_encode($id_parts, JSON_UNESCAPED_SLASHES) . ';
+            console.log("idParts:", idParts);
+        </script>';
     } else {
-        $entry['group_question'] = null; // Đặt là null nếu không có dữ liệu
+        $id_parts = [];
     }
-
-    // Add the entry to the $part array
-    $part[] = $entry;
 }
+ else {
+    // Nếu không có tham số ?part, dùng giá trị mặc định từ cơ sở dữ liệu
+    $id_parts = explode(",", $row_test['question_choose']);
 
-
-
-
-while ($row = $result3->fetch_assoc()) {
-    // Create an associative array for each row
-    $entry = [
-        'part_number' => $row['part'],
-        'paragraph' => $row['paragraph'],
-        'number_question_of_this_part' => $row['number_question_of_this_part'],
-        'duration' => $row['duration'],
-    ];
-
-    // Kiểm tra nếu group_question là chuỗi JSON hợp lệ, chuyển thành mảng hoặc đối tượng PHP
-    if (!empty($row['group_question'])) {
-        $entry['group_question'] = json_decode($row['group_question'], true); // Chuyển từ JSON string thành array
-    } else {
-        $entry['group_question'] = null; // Đặt là null nếu không có dữ liệu
-    }
-
-    // Add the entry to the $part array
-    $part[] = $entry;
-}
-
-
-
-
-/*
-// Output the quizData as JavaScript
-echo '<script type="text/javascript">
-const quizData = {
-    part: ' . json_encode($part, JSON_UNESCAPED_SLASHES) . '
-};
-
-console.log(quizData);
+    echo '<script type="text/javascript">
+    const idParts = ' . json_encode($id_parts, JSON_UNESCAPED_SLASHES) . ';
+    console.log("idParts cho full test:", idParts);
 </script>';
-*/
 
+}
+
+
+    $part = []; // Mảng chứa dữ liệu của các phần
+    $previous_part_questions = 0; // Biến lưu trữ số câu hỏi của phần trước
+    $filterTypeQuestion = [];
+
+    // Lặp qua từng id_part và truy vấn bảng tương ứng
+    foreach ($id_parts as $index => $id_part) {
+        // Xác định bảng và câu lệnh SQL tương ứng dựa trên index của part
+        switch ($index) {
+            case 0:
+                $sql_part = "SELECT part, duration, audio_link, group_question, category 
+                             FROM ielts_listening_part_1_question WHERE id_part = ?";
+                break;
+            case 1:
+                $sql_part = "SELECT part, duration, audio_link, group_question, category 
+                             FROM ielts_listening_part_2_question WHERE id_part = ?";
+                break;
+            case 2:
+                $sql_part = "SELECT part, duration, audio_link, group_question, category 
+                             FROM ielts_listening_part_3_question WHERE id_part = ?";
+                break;
+            case 3:
+                $sql_part = "SELECT part, duration, audio_link, group_question, category 
+                             FROM ielts_listening_part_4_question WHERE id_part = ?";
+                break;
+            default:
+                continue 2; // Nếu có nhiều hơn 3 phần, bỏ qua
+        }
+
+        // Chuẩn bị và thực thi câu lệnh SQL cho từng phần
+        $stmt_part = $conn->prepare($sql_part);
+        if ($stmt_part === false) {
+            die('Lỗi MySQL prepare: ' . $conn->error);
+        }
+
+        $stmt_part->bind_param("i", $id_part);
+        $stmt_part->execute();
+        $result_part = $stmt_part->get_result();
+
+        // Nếu có kết quả, thêm vào mảng part
+        while ($row = $result_part->fetch_assoc()) {
+            $entry = [
+                'part_number' => $row['part'],
+                'audio_link' => $row['audio_link'],
+                'duration' => $row['duration'],
+                'category' => $row['category'],
+                'group_question' => $row['group_question']
+            ];
+
+            if (!empty($row['group_question'])) {
+                $decoded = json_decode($row['group_question'], true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $entry['group_question'] = $decoded;
+                } else {
+                    // Log the error and set group_question to null
+                    error_log('JSON decode error: ' . json_last_error_msg());
+                    $entry['group_question'] = null;
+                }
+            } else {
+                $entry['group_question'] = null;
+            }
+            
+
+
+            if (!empty($row['category'])) {
+                $categoryData = json_decode($row['category'], true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $entry['question_types'] = [];
+                    foreach ($categoryData as $category) {
+                        // Cộng thêm số câu hỏi của phần trước đó vào start và end
+                        $start = $category['start'] + $previous_part_questions;
+                        $end = $category['end'] + $previous_part_questions;
+
+                        for ($i = $start; $i <= $end; $i++) {
+                            $entry['question_types'][$i] = $category['type'];
+                            $filterTypeQuestion[] = [$i => $category['type']]; // Sử dụng dạng key-value
+
+                        }
+                    }
+                } else {
+                    error_log('JSON decode error in category: ' . json_last_error_msg());
+                }
+            }
+
+            // Cập nhật số câu hỏi của phần hiện tại để cộng vào phần tiếp theo
+            $previous_part_questions += 10;
+
+
+            // Thêm phần vào mảng part
+            $part[] = $entry;
+        }
+    }
+
+    // Xuất mảng quizData dưới dạng JavaScript
+    echo '<script type="text/javascript">
+    const quizData = {
+        part: ' . json_encode($part, JSON_UNESCAPED_SLASHES) . ',
+        filterTypeQuestion: ' . json_encode($filterTypeQuestion, JSON_UNESCAPED_SLASHES) . '
+
+    };
+
+    console.log(quizData);
+    </script>';
+} else {
+    echo '<script type="text/javascript">console.error("Không tìm thấy test với custom number: ' . $custom_number . '");</script>';
+}
 
 // Đóng kết nối
 $conn->close();
@@ -236,6 +340,25 @@ tr:nth-child(even) {
 .test-taker-id {
     font-weight: bold;
 }
+.group-control-part-btn{
+    position: fixed;
+    bottom: 70px;
+    right: 10px;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+}
+.control-part-btn{
+    background-color:black;
+    color: #ffffff;
+    height:60px;
+    width: 60px;
+}
+
+.bookmark-btn{
+    height: 30px;
+}
 
 
 .question-range {
@@ -247,9 +370,8 @@ tr:nth-child(even) {
 }
 
 
-#content {
+#content1 {
     display: none;
-    padding-top: 70px; /* Thêm padding trên cùng để tránh che khuất bởi header */
     width: 100%;
 }
 #header{
@@ -336,6 +458,121 @@ tr:nth-child(even) {
 }
 
 
+.question-checkbox {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #282828;
+    flex-shrink: 0;
+    background-color: #fff;
+    cursor: pointer;
+    opacity: 1;
+    font-family: "Montserrat", Helvetica, Arial, sans-serif;
+    -moz-transition: all ease 0.2s;
+    -o-transition: all ease 0.2s;
+    -webkit-transition: all ease 0.2s;
+    transition: all ease 0.2s;
+    font-size: 12px;
+    border: 1px solid #EAECEF;
+}
+
+.number-question {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #282828;
+    flex-shrink: 0;
+    background-color: #fff;
+    cursor: pointer;
+    opacity: 1;
+    font-family: "Montserrat", Helvetica, Arial, sans-serif;
+    -moz-transition: all ease 0.2s;
+    -o-transition: all ease 0.2s;
+    -webkit-transition: all ease 0.2s;
+    transition: all ease 0.2s;
+    font-size: 12px;
+    border: 1px solid #EAECEF;
+}
+.highlight-marked {
+    background-color: yellow !important;
+}
+
+.checkbox-marked {
+    background-color: yellow !important;
+}
+
+.form-group{
+ 
+ position: relative;
+ font-size: 15px;
+ color: #666;
+ &+&{
+   margin-top: 30px;
+ }
+ 
+ 
+}
+
+
+.form-label{
+   position: absolute;
+   z-index: 1;
+   left: 0;
+   top: 5px;
+   @include transition(.3s);
+   
+ }
+ 
+ .form-control{
+   width: 100%;
+   position: relative;
+   z-index: 3;
+   height: 35px;
+   background: none;
+   border:none;
+   padding: 5px 0;
+   @include transition(.3s);
+   border-bottom: 1px solid #777;
+   color: #555;
+   &:invalid{outline: none;}
+   
+   &:focus , &:valid{
+     outline: none;
+
+     @include box-shadow(0 1px $primary);
+     border-color:$primary;
+     + .form-label{
+       font-size: 12px;
+       color: $primary;
+       @include translateY(-15px);
+     }
+   }
+ }
+
+
+.highlight-current-question {
+    font-weight: bold; /* In đậm */
+    border: 2px solid #ffcc00; /* Viền ngoài sáng màu vàng */
+    border-radius: 5px; /* Bo tròn góc */
+    padding: 5px; /* Tạo khoảng cách giữa chữ và viền */
+    background-color: #f9f6e8; /* Thêm nền nhạt */
+    transition: all 0.3s ease; /* Hiệu ứng mượt */
+}
+.checkbox-answered {
+    background-color: #e6f7ff; /* Màu nền xanh nhạt */
+    border-color: #1890ff;    /* Viền xanh đậm */
+    color: #1890ff;           /* Chữ màu xanh */
+}
 @keyframes l20-1{
    0%    {clip-path: polygon(50% 50%,0       0,  50%   0%,  50%    0%, 50%    0%, 50%    0%, 50%    0% )}
    12.5% {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100%   0%, 100%   0%, 100%   0% )}
@@ -399,6 +636,76 @@ img{
     max-width: 100%;
 }
 
+.tooltip {
+    position: relative;
+    cursor: pointer;
+    background-color: yellow;
+
+  }
+  
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 150px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 10px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* Position above the span */
+    left: 50%;
+    margin-left: -75px; /* Center the tooltip */
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  .tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%; /* Arrow at the bottom */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+  }
+  
+  .tooltip.active .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+  
+  .tooltiptext button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin: 2px 0;
+    font-size: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .tooltiptext button:hover {
+    background-color: #3e8e41;
+  }
+
+#highlight-icon-modify{
+    width : 20px;
+    height: 20px;
+}
+.tooltiptext img {
+    display: inline-block;
+    width: 20px;  /* Set the desired width */
+    height: 20px; /* Set the desired height */
+    margin-right: 5px; /* Add some space between images */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    vertical-align: middle; /* Align images vertically in the middle */
+}
 .audio-player {
       margin: 20px auto;
       background: #fff;
@@ -447,33 +754,117 @@ img{
       color: #333;
     }
 
+    .start_test {
+  appearance: none;
+  background-color: #2ea44f;
+  border: 1px solid rgba(27, 31, 35, .15);
+  border-radius: 6px;
+  box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: -apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 20px;
+  padding: 6px 16px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.start_test:focus:not(:focus-visible):not(.focus-visible) {
+  box-shadow: none;
+  outline: none;
+}
+
+.start_test:hover {
+  background-color: #2c974b;
+}
+
+.start_test:focus {
+  box-shadow: rgba(46, 164, 79, .4) 0 0 0 3px;
+  outline: none;
+}
+
+.start_test:disabled {
+  background-color: #94d3a2;
+  border-color: rgba(27, 31, 35, .1);
+  color: rgba(255, 255, 255, .8);
+  cursor: default;
+}
+
+.start_test:active {
+  background-color: #298e46;
+  box-shadow: rgba(20, 70, 32, .2) 0 1px 0 inset;
+}
+
+
+.above-test {
+    background-color: #e9ecef; /* Màu xám cho phần câu hỏi */
+    padding: 14px; /* Khoảng cách bên trong */
+    margin-top: 30px; /* Tăng giá trị để tránh che khuất bởi header */
+    margin: 0 auto; /* Căn giữa */
+    display: flex; /* Sử dụng flexbox để căn chỉnh các phần tử con */
+    justify-content: space-between; /* Đưa icon và thời gian ra hai bên */
+    align-items: center; /* Căn chỉnh theo chiều dọc */
+}
+
+.above-test .fa-regular.fa-clock {
+    margin-right: 10px; /* Tạo khoảng cách giữa fa-clock và timer */
+}
+
+.above-test .timer {
+    margin-right: 20px; /* Tạo khoảng cách giữa timer và fa-bug */
+}
+
+.above-test .fa-solid.fa-bug {
+    margin-right: 20px; /* Tạo khoảng cách giữa fa-bug và fa-circle-info */
+}
+
+
     </style>
 </head>
 <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 
 <body onload="main()">
-    <div id = "test-prepare">
+<div id = "test-prepare">
         <div class="loader"></div>
         <h3>Your test will begin shortly</h3>
+        <div id = "quick-instruction">
+            <i>Quick Instruction:<br>
+            - If you find any errors from test (image,display,text,...), please let us know by clicking icon <i class="fa-solid fa-bug"></i><br> 
+            - Incon <i class="fa-solid fa-circle-info"></i> will give you a guide tour, in which you can understand the structure of test, include test's type, formation and how to answer questions<br>
+            - All these two icons are at the right-above side of test.
+        </i>
+
+        </div>
         <div style="display: none;" id="date" style="visibility:hidden;"></div>
         <div style="display: none;" id="title" style="visibility:hidden;"><?php the_title(); ?></div>
         <div  style="display: none;"  id="id_test"  style="visibility:hidden;"><?php echo esc_html($custom_number);?></div>
+        <button  style="display: none;" class ="start_test" id="start_test"  onclick = "startTest()">Start test</button>
+        <i id = "welcome" style = "display:none">Click Start Test button to start the test now. Good luck</i>
+
 
     </div>
 
 
-    <div id="header" class="fixed-above">
-        <div class="header-content">
-            
-            <div class="test-taker-id">Test taker ID</div>
-            <span id="timer" class="timer" style="font-weight: bold"></span>
-        </div>
-    </div>
+
     
-    
-    <div id="content" style="display: none;">
-            <div id="question-range-of-part" class="question-range">Part 1<br>Read the text and answer questions 1–13.</div>
-            <div class="audio-player">
+    <div id="content1" style="display: none;">
+            <div class = "above-test">
+                <div id="question-range-of-part" class="question-range"></div>
+                <i class="fa-regular fa-clock"></i><span id="timer" class="timer" style="font-weight: bold"></span>
+                <i class="fa-solid fa-bug"></i>
+                <i class="fa-solid fa-circle-info"></i>
+            </div>
+                        <div class="audio-player">
                 <audio id="audio" controls>
                     <source id="audio-source" src="" type="audio/mpeg">
                     Your browser does not support the audio element.
@@ -506,80 +897,106 @@ img{
                     <h5  id="time-result"></h5>
 
                     <h5 id ="useranswerdiv">Here: </h5>
-                     <!-- giấu form send kết quả bài thi -->
+        <!-- giấu form send kết quả bài thi -->
 
 
     
   
-     <span id="message" style="display:none" ></span>
-     <form id="saveReadingResult" >
-             <div class="card">
-                 <div class="card-header">Form lưu kết quả</div>
-                 <div class="card-body" >
+        <span id="message" style="display:none" ></span>
+     <form id="saveListeningResult">
+                <div class="card">
+                    <div class="card-header">Form lưu kết quả</div>
+                    <div class="card-body" >
+        
+                <div class = "form-group" >
+                    <input   type="text" id="overallband" name="overallband" placeholder="Kết quả"  class="form-control form_data" />
+                    <span id="result_error" class="text-danger" ></span>
+            
+                </div>
+            
+            
+                <div class = "form-group">
+                    <input type="text" id="dateform" name="dateform" placeholder="Ngày"  class="form-control form_data"  />
+                    <span id="date_error" class="text-danger" ></span>
+                </div>
+            
+                
+            
+                <div class = "form-group"  >
+                    <input type="text" id="timedotest" name="timedotest" placeholder="Thời gian làm bài"  class="form-control form_data" />
+                    <span id="time_error" class="text-danger"></span>
+                </div>
+            
+                <div class = "form-group" >
+                    <input type="text" id="idtest" name="idtest" placeholder="Id test"  class="form-control form_data" />
+                    <span id="idtest_error" class="text-danger" ></span>
+                </div>
+
+                <div class = "form-group" >
+                    <input type="text" id="test_type" name="test_type" placeholder="Type Test"  class="form-control form_data" />
+                    <span id="test_type_error" class="text-danger" ></span>
+                </div>
+            
+                <div class = "form-group" >
+                    <input type="text" id="idcategory" name="idcategory" placeholder="Id category"  class="form-control form_data" />
+                    <span id="idcategory_error" class="text-danger"></span>
+                </div>
+            
+                <div class = "form-group"   >
+                    <input type="text"  id="testname" name="testname" placeholder="Test Name"  class="form-control form_data" />
+                    <span id="testname_error" class="text-danger"></span>
+                </div>
+                <div class = "form-group"   >
+                    <input type="text"  id="useranswer" name="useranswer" placeholder="User Answer"  class="form-control form_data" />
+                    <span id="useranswer_error" class="text-danger"></span>
+            </div>
+            
+            <div class = "form-group"   >
+                    <input type="text"  id="correct_percentage" name="correct_percentage" placeholder="Correct percentage"  class="form-control form_data" />
+                    <span id="correctanswer_error" class="text-danger"></span>  
+                </div>
+          
+
+            <div class = "form-group"   >
+                    <input type="text"  id="total_question_number" name="total_question_number" placeholder="Total Number"  class="form-control form_data" />
+                    <span id="total_question_number_error" class="text-danger"></span>  
+                </div>
+           
+
+            <div class = "form-group"   >
+                    <input type="text"  id="correct_number" name="correct_number" placeholder="Correct Number"  class="form-control form_data" />
+                    <span id="correctanswer_error" class="text-danger"></span>  
+                </div>
+            
+            <div class = "form-group"   >
+                    <input type="text"  id="incorrect_number" name="incorrect_number" placeholder="Incorrect Number"  class="form-control form_data" />
+                    <span id="incorrect_number_error" class="text-danger"></span>  
+                </div>
+        
+
+            <div class = "form-group"   >
+                    <input type="text"  id="skip_number" name="skip_number" placeholder="Skip Number"  class="form-control form_data" />
+                    <span id="skip_number_error" class="text-danger"></span>  
+                </div>
+
+                <div class = "form-group"   >
+                    <input type="text"  id="testsavenumber" name="testsavenumber" placeholder="Result Number"  class="form-control form_data" />
+                    <span id="testsavenumber_error" class="text-danger"></span>  
+                </div>
+           
+           
+        
+        <div class="card-footer">
+            <!--  <button type="button" name="submit" id="submit" class="btn btn-primary" onclick="save_data(); return false;">Save</button>-->
+                            <td><input type="submit" id="submit" name="submit"/></td> 
     
-        <div class = "form-group" >
-             <input   type="text" id="resulttest" name="resulttest" placeholder="Kết quả"  class="form-control form_data" />
-             <span id="result_error" class="text-danger" ></span>
-    
+            </div>
+                
         </div>
-    
-    
-        <div class = "form-group">
-             <input type="text" id="dateform" name="dateform" placeholder="Ngày"  class="form-control form_data"  />
-             <span id="date_error" class="text-danger" ></span>
-        </div>
-    
-         
-    
-        <div class = "form-group"  >
-             <input type="text" id="timedotest" name="timedotest" placeholder="Thời gian làm bài"  class="form-control form_data" />
-             <span id="time_error" class="text-danger"></span>
-        </div>
-    
-        <div class = "form-group" >
-             <input type="text" id="idtest" name="idtest" placeholder="Id test"  class="form-control form_data" />
-             <span id="idtest_error" class="text-danger" ></span>
-        </div>
-    
-        <div class = "form-group" >
-             <input type="text" id="idcategory" name="idcategory" placeholder="Id category"  class="form-control form_data" />
-             <span id="idcategory_error" class="text-danger"></span>
-        </div>
-    
-         <div class = "form-group"   >
-             <input type="text"  id="testname" name="testname" placeholder="Test Name"  class="form-control form_data" />
-             <span id="testname_error" class="text-danger"></span>
-        </div>
-        <div class = "form-group"   >
-            <input type="text"  id="useranswer" name="useranswer" placeholder="User Answer"  class="form-control form_data" />
-            <span id="useranswer_error" class="text-danger"></span>
-       </div>
-    
-        <div class = "form-group"   >
-            <input type="text"  id="correctpercentage" name="correctpercentage" placeholder="Correct percentage"  class="form-control form_data" />
-            <span id="correctanswer_error" class="text-danger"></span>  
-        </div>
-    
-    
-      
-    
-      
-    
-    
-    
-    
-        </div>
-    
-       <div class="card-footer">
-           <!--  <button type="button" name="submit" id="submit" class="btn btn-primary" onclick="save_data(); return false;">Save</button>-->
-                          <td><input type="submit" id="submit" name="submit"/></td> 
-    
-         </div>
-             
-     </div>
-     <div id="result_msg" ></div>
+        <div id="result_msg" ></div>
     </form>
     <!-- kết thúc send form -->
+
 
                 </div> 
 
@@ -604,16 +1021,67 @@ img{
     
     <!-- kết thúc send form -->
         
-     <script src="\wordpress\contents\themes\tutorstarter\ielts-listening-toolkit\script1.js"></script>  
+    <script>
+            let highlights = {}; // Object để lưu trữ các highlight
 
+    </script>
+     <script src="\wordpress\contents\themes\tutorstarter\ielts-listening-toolkit\script_2.js"></script>  
+     <script src="\wordpress\contents\themes\tutorstarter\ielts-listening-toolkit\highlight_text.js"></script>
 
 </body>
+
+<script>
+    // function save data qua ajax
+jQuery('#saveListeningResult').submit(function(event) {
+    event.preventDefault(); // Prevent the default form submission
+    
+     var link = "<?php echo admin_url('admin-ajax.php'); ?>";
+    
+     var form = jQuery('#saveListeningResult').serialize();
+     var formData = new FormData();
+     formData.append('action', 'save_user_result_ielts_listening');
+     formData.append('save_user_result_ielts_listening', form);
+    
+     jQuery.ajax({
+         url: link,
+         data: formData,
+         processData: false,
+         contentType: false,
+         type: 'post',
+         success: function(result) {
+             jQuery('#submit').attr('disabled', false);
+             if (result.success == true) {
+                 jQuery('#saveListeningResult')[0].reset();
+             }
+             jQuery('#result_msg').html('<span class="' + result.success + '">' + result.data + '</span>');
+         }
+     });
+    });
+    
+             //end
+    
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("submitForm", function () {
+        setTimeout(function () {
+            let form = document.getElementById("saveReadingResult");
+            form.submit(); // This should work now that there's no conflict
+        }, 2000); 
+    });
+});
+
+
+//end new adding
+
+</script>
+
+
 </html>
 
 
 <?php
 } else {
     get_header();
-    echo '<p>Please log in start reading test.</p>';
+    echo '<p>Please log in start listening test.</p>';
     get_footer();
 }

@@ -179,24 +179,40 @@ if (window.MathJax) {
 
 
 </table>
-  <!-- Pagination buttons -->
-  <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-            <?php if ($page > 1): ?>
-                <li class="page-item"><a class="page-link" href="?page=<?php echo $page - 1; ?>&id_question_filter=<?php echo $id_question_filter; ?>">Previous</a></li>
-            <?php endif; ?>
+    <!-- Pagination buttons -->
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        <?php if ($page > 1): ?>
+            <li class="page-item">
+                <a class="page-link" href="?page=1&id_question_filter=<?php echo $id_question_filter; ?>">First</a>
+            </li>
 
-            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                <li class="page-item <?php if ($i == $page) echo 'active'; ?>">
-                    <a class="page-link" href="?page=<?php echo $i; ?>&id_question_filter=<?php echo $id_question_filter; ?>"><?php echo $i; ?></a>
-                </li>
-            <?php endfor; ?>
+            <li class="page-item">
+                <a class="page-link" href="?page=<?php echo $page - 1; ?>&id_question_filter=<?php echo $id_question_filter; ?>">Previous</a>
+            </li>
+        <?php endif; ?>
 
-            <?php if ($page < $total_pages): ?>
-                <li class="page-item"><a class="page-link" href="?page=<?php echo $page + 1; ?>&id_question_filter=<?php echo $id_question_filter; ?>">Next</a></li>
-            <?php endif; ?>
-        </ul>
-    </nav>
+        <?php 
+        // Define the range of page buttons to display
+        $start_page = max(1, $page - 2);
+        $end_page = min($total_pages, $page + 2);
+
+        for ($i = $start_page; $i <= $end_page; $i++): ?>
+            <li class="page-item <?php if ($i == $page) echo 'active'; ?>">
+                <a class="page-link" href="?page=<?php echo $i; ?>&id_question_filter=<?php echo $id_question_filter; ?>"><?php echo $i; ?></a>
+            </li>
+        <?php endfor; ?>
+
+        <?php if ($page < $total_pages): ?>
+            <li class="page-item">
+                <a class="page-link" href="?page=<?php echo $page + 1; ?>&id_question_filter=<?php echo $id_question_filter; ?>">Next</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page=<?php echo $total_pages; ?>&id_question_filter=<?php echo $id_question_filter; ?>">Last</a>
+            </li>
+        <?php endif; ?>
+    </ul>
+</nav>
 <!-- Button to Add New Record -->
 <button class="btn btn-success" onclick="openAddModal()">Add New Question</button>
 <!-- View More Modal -->

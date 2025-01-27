@@ -5,19 +5,12 @@
  
  */
 
- get_header(); // Gọi phần đầu trang (header.php)
 
 if (is_user_logged_in()) {
     $post_id = get_the_ID();
     $user_id = get_current_user_id();
-    $additional_info = get_post_meta($post_id, '_thptqg_additional_info', true);
 
-   
-$post_id = get_the_ID();
-// Get the custom number field value
-$custom_number = get_post_meta($post_id, '_thptqg_custom_number', true);
-$user_id = get_current_user_id();
-
+    $custom_number =intval(get_query_var('id_test'));
 
 
 // Database credentials (update with your own database details)
@@ -51,6 +44,15 @@ if ($row = $result->fetch_assoc()) {
     $subject = $row['subject']; // Fetch the testname field
     $year = $row['year']; // Fetch the testname field
     $time = $row['time']; // Fetch the testname field
+    add_filter('document_title_parts', function ($title) use ($testname) {
+      $title['title'] = $testname; // Use the $testname variable from the outer scope
+      return $title;
+  });
+  
+
+get_header(); // Gọi phần đầu trang (header.php)
+
+
 
 }
 

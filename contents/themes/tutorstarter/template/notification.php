@@ -15,8 +15,14 @@ return $title;
 
 
 
+/*
+ 
+
+sửa tại C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\tutor\dashboard\notification.php 
+ 
 
 
+*/
 
 
 
@@ -77,6 +83,14 @@ $notifications = $wpdb->get_results("
 ");
 
 ?>
+<!-- 
+ 
+
+sửa tại C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\tutor\dashboard\notification.php 
+ 
+
+
+-->
 <div class="notifications">
     <b>Thông báo của bạn</b>
     <?php if (!empty($notifications)) : ?>
@@ -99,6 +113,13 @@ $notifications = $wpdb->get_results("
         <p>Bạn không có thông báo nào.</p>
     <?php endif; ?>
 </div>
+<!-- 
+ 
 
+sửa tại C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\tutor\dashboard\notification.php 
+ 
+
+
+-->
 <?php
 get_footer();

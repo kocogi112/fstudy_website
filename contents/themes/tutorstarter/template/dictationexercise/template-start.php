@@ -5,18 +5,17 @@
  
  */
 
- //get_header(); // Gọi phần đầu trang (header.php)
 
 if (is_user_logged_in()) {
-    $post_id = get_the_ID();
-    $user_id = get_current_user_id();
-    $additional_info = get_post_meta($post_id, '_dictationexercise_additional_info', true);
+    
 
-   
 $post_id = get_the_ID();
 // Get the custom number field value
-$custom_number = get_post_meta($post_id, '_dictationexercise_custom_number', true);
+//$custom_number = get_post_meta($post_id, '_dictationexercise_custom_number', true);
+$user_id = get_current_user_id();
 
+//$commentcount = get_comments_number( $post->ID );
+$custom_number =intval(get_query_var('id_test'));
 // Database credentials (update with your own database details)
 $servername = "localhost";
 $username = "root";
@@ -45,9 +44,22 @@ if ($row = $result->fetch_assoc()) {
     $transcript = $row['transcript'];
     $type_test = $row['type_test'];
     $testname = $row['testname'];
+
+
+
+    add_filter('document_title_parts', function ($title) use ($testname) {
+        $title['title'] = $testname; // Use the $testname variable from the outer scope
+        return $title;
+    });
+    
+
+
+
+
 } else {
     $transcript = "No content available.";
 }
+get_header(); // Gọi phần đầu trang (header.php)
 
 echo '
 <script>
@@ -103,8 +115,8 @@ body {
 }
 
 
-.container{
-  width: 70%;
+.container1{
+    width: 70%;
     height: 600px;
     display: contents;
     align-items: center;
@@ -264,7 +276,8 @@ body {
   display: none;
 }
 
-#content{
+#content1
+{
   height: 550px;
   border-radius: 4%;
   border: 1px solid #ddd;
@@ -303,12 +316,6 @@ body {
 
 }
 
-
-.bf-content-setting-class{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
 
 .left-group, .right-group {
   display: flex;
@@ -512,7 +519,7 @@ button {
     border-radius: 0px;
     border-left: 1px solid #ccc;
   }
-  .text-input textarea{
+  .text-input {
     height: 100px;
     width: 100%;
     border: none;
@@ -523,11 +530,27 @@ button {
     padding: 10px 15px;
     border-radius: 5px;
   }
-
+.textarea{
+  
+  display: block;
+    width: 100%;
+    font-weight: 400;
+    appearance: none;
+    border-radius: var(--bs-border-radius);
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    padding: 10px !important;
+    margin-bottom: 4px !important;
+    resize: none;
+    z-index: 1;
+    position: relative;
+    font-family: sans-serif;
+    font-size: 100%;
+    line-height: 1.15;
+    margin: 0;
+}
   .controls, li, .icons, .icons i{
     display: flex;
     align-items: center;
-    justify-content: space-between;
   }
   .controls{
     list-style: none;
@@ -707,31 +730,166 @@ border: 3px solid transparent;
  background-clip: content-box;
   background-color: #685757;
 }
-    </style>
+
+.bf-content-setting-class{
+  display: flex;
+  align-items: center;
+}
+.opt-player{
+  display: flex;
+  align-items: center;
+}
+
+
+
+/* CSS */
+.button-4 {
+  appearance: none;
+  background-color: #FAFBFC;
+  border: 1px solid rgba(27, 31, 35, 0.15);
+  border-radius: 6px;
+  box-shadow: rgba(27, 31, 35, 0.04) 0 1px 0, rgba(255, 255, 255, 0.25) 0 1px 0 inset;
+  box-sizing: border-box;
+  color: #24292E;
+  cursor: pointer;
+  display: inline-block;
+  font-family: -apple-system, system-ui, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  list-style: none;
+  padding: 6px 16px;
+  position: relative;
+  transition: background-color 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: middle;
+  white-space: nowrap;
+  word-wrap: break-word;
+}
+
+.button-4:hover {
+  background-color: #F3F4F6;
+  text-decoration: none;
+  transition-duration: 0.1s;
+}
+
+.button-4:disabled {
+  background-color: #FAFBFC;
+  border-color: rgba(27, 31, 35, 0.15);
+  color: #959DA5;
+  cursor: default;
+}
+
+.button-4:active {
+  background-color: #EDEFF2;
+  box-shadow: rgba(225, 228, 232, 0.2) 0 1px 0 inset;
+  transition: none 0s;
+}
+
+.button-4:focus {
+  outline: 1px transparent;
+}
+
+.button-4:before {
+  display: none;
+}
+
+.button-4:-webkit-details-marker {
+  display: none;
+}
+
+<!-- HTML !-->
+
+/* CSS */
+.button-11 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 14px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+  border-radius: 6px;
+  border: none;
+
+  color: #fff;
+  background: linear-gradient(180deg,rgb(143, 150, 160) 0%, #367AF6 100%);
+   background-origin: border-box;
+  box-shadow: 0px 0.5px 1.5px rgba(54, 122, 246, 0.25), inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.button-11:focus {
+  box-shadow: inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2), 0px 0.5px 1.5px rgba(54, 122, 246, 0.25), 0px 0px 0px 3.5px rgba(58, 108, 217, 0.5);
+  outline: 0;
+}
+
+
+
+.button-11 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 14px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+  border-radius: 6px;
+  border: none;
+
+  color: #fff;
+  background: gray;
+   background-origin: border-box;
+  box-shadow: 0px 0.5px 1.5px rgba(54, 122, 246, 0.25), inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.button-11:focus {
+  box-shadow: inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2), 0px 0.5px 1.5px rgba(54, 122, 246, 0.25), 0px 0px 0px 3.5px rgba(58, 108, 217, 0.5);
+  outline: 0;
+}
+
+
+#player {
+  position: relative;
+
+  height: 400px;
+  width: 100%;
+}
+#hide-player{
+  height: 400px;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Hoặc đặt hình ảnh */
+  z-index: 10;
+}
+#video-container {
+  position: relative;
+}
+</style>
 </head>
 <body>
 
 
-    <div class="header">
-        <a class="logo">Onluyen247.net</a>
-        <div class="header-right">
-          <a  href="#home">Home</a>
-          
-        </div>
-      </div>
+   
 
-      <div class="container">
+<div class="container1">
     <div id = "before-content">
         <div class = "bf-content-setting-class" id = "bf-content-setting">
             
 
         </div>
     </div>
-    <div id="content">
+    <div id="content1">
         <div id = 'left-side' class="left-side">
         <div id ="intro" style="text-align: center;">
-            <h3>Dictation 1: 10 things you didn't know about orgasm</h3>
-            <p>This speech/ conversation has been collected from TED TALK</p>
+          <h3> <?php echo $testname; ?></h3>
+          <p>This speech/ conversation has been collected from <?php echo $type_test; ?></p>
             <p id = 'number-sentences'>Number of sentence: </p>
             <p>Guidelines: </p>
             <button onclick ="getStart()" class="button-1">Start Now</button>
@@ -740,45 +898,89 @@ border: 3px solid transparent;
 
     <div id ="start-dictation" style="display: none;">
         <div id="video-container">
-            <div id="player"></div>
+            <image id="hide-player" class = "hide-player" src = "http://localhost/wordpress/contents/uploads/2025/01/StudyAI.com_-1.png"></image>
+            <div id="player" class = "player"></div>
         </div>
-        <div id="transcript"></div>
+
+      <div class ="opt-player">
+        <select name="video-width" id="video-width">
+          <option value="small">Video Size: Small</option>
+          <option value="normal" selected>Video Size: Normal</option>
+          <option value="large">Video Size: Large</option>
+          <option value="extra-large">Video Size: Extra Large</option>
+        </select>
+        <br>
+        <button id="toggle-video-btn" class = "button-11">Hide Video</button>
+    </div>
+      <div id="transcript"></div>
 
 
-        
+      
     </div>
 </div>
 <div id = "right-side" class = "right-side" >
-    <div id="question-number">2/20</div>
 
 
-    <div class="controls">
-      <button id="previous">Previous</button>
-      <input type="text" id="userInput" placeholder="Enter transcript text here">
-      <button id="checkAnswer">Check Answer</button>
-      <button id="next">Next</button>
-      <button id="listenAgain">Listen Again</button>
-  </div>
-  
-    <button id="hintButton">Show Hint</button>
+<div class = "bf-content-setting-class" >
+        <svg id="previous"  xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+        </svg>
+        <div class="question-number" id="question-number"></div>
+        <svg id="next" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
+        </svg>
+</div>
+
+
+      <button id="listenAgain" class="button-4" role="button"><i class="fa-solid fa-play"></i> Listen Again</button><br>
+      <textarea class = "textarea" type="text" id="userInput" placeholder="Enter transcript text here"></textarea>
+
+      <div class = "controls">
+        <button id="checkAnswer"  class="button-10" role="button">Check Answer</button>
+        <button id="skipAnswer" class="button-11" role="button">Skip Answer</button>
+        <button id="hintButton" class = "button-11">  Show Hint</button>
+    </div>
     <div id="hint"></div>
 
 </div>
 
 </div>
 
-<div id ="ads" style="display:  flex;justify-content: center; align-items: center;">
+<!--<div id ="ads" style="display:  flex;justify-content: center; align-items: center;">
     DEV TAG: Powered by Nguyen Minh Long
+</div> -->
 </div>
-</div>
-
+<?php if ( comments_open() || get_comments_number() ) :
+    comments_template();
+endif; ?>  
 
    
     
 
     <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const toggleButton = document.getElementById("toggle-video-btn");
+    const player = document.getElementById("player");
+    const hidePlayer = document.getElementById("hide-player");
+
+    // Ban đầu, ẩn hide-player
+    hidePlayer.style.display = "none";
+
+    toggleButton.addEventListener("click", function () {
+      if (hidePlayer.style.display === "none") {
+        // Hiện hide-player (che player), đổi nội dung nút
+        hidePlayer.style.display = "block";
+        toggleButton.textContent = "Show Video";
+      } else {
+        // Ẩn hide-player (bỏ che), đổi nội dung nút
+        hidePlayer.style.display = "none";
+        toggleButton.textContent = "Hide Video";
+      }
+    });
+  });
 
 function getStart() {     
+  updateTranscript();
     document.getElementById("intro").style.display = "none";
     document.getElementById("start-dictation").style.display = "block";
     navigateTranscript(0);
@@ -847,14 +1049,16 @@ document.getElementById('listenAgain').addEventListener('click', () => {
                 width: '560',
                 videoId: '<?php echo esc_html($id_video);?>', // Replace with the desired video ID
                 playerVars: { enablejsapi: 1 },
-                events: {
-                    onReady: onPlayerReady
-                }
+                //events: {
+                  //  onReady: onPlayerReady
+               // }
             });
         }
 
 
 
+  
+  
         function updateTranscript() {
         const currentItem = transcript[currentTranscriptIndex];
         if (currentItem) {
@@ -869,6 +1073,9 @@ document.getElementById('listenAgain').addEventListener('click', () => {
     }
 
         function navigateTranscript(direction) {
+          let userInput = document.getElementById("userInput");
+        userInput.value = "";
+
         currentQuestion += direction;
         if (currentQuestion < 1) currentQuestion = 1;
         if (currentQuestion > totalQuestions) currentQuestion = totalQuestions;

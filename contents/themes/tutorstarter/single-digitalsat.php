@@ -1,14 +1,14 @@
 
 
 <?php
-get_header(); // Gọi phần đầu trang (header.php)
-$post_id = get_the_ID();
+//$post_id = get_the_ID();
 $user_id = get_current_user_id();
 // Get the custom number field value
-$custom_number = get_post_meta($post_id, '_digitalsat_custom_number', true);
-$commentcount = get_comments_number( $post->ID );
+$custom_number =intval(get_query_var('id_test'));
+//$commentcount = get_comments_number( $post->ID );
 global $wpdb;
 $id_test = $custom_number;
+$site_url = get_site_url();
 
 // Prepare the SQL statement
 $test_info = $wpdb->get_row($wpdb->prepare(
@@ -24,6 +24,18 @@ $time = $test_info ? $test_info->time : '';
 $number_question = $test_info ? $test_info->number_question : '';
 $book = $test_info ? $test_info->book : '';
 $test_type = $test_info ? $test_info->test_type : '';
+
+
+
+// Add filter for document title
+add_filter('document_title_parts', function ($title) use ($testname) {
+    $title['title'] = $testname; // Use the $testname variable from the outer scope
+    return $title;
+});
+
+get_header(); // Gọi phần đầu trang (header.php)
+
+
 
 
 if (is_user_logged_in()) {
@@ -170,17 +182,15 @@ if (is_user_logged_in()) {
         }
     </style>
 
-<?php
-    if ( have_posts() ) :
-        while ( have_posts() ) : the_post(); ?>
-           
+
+   
 
 
            <div class="container-info-test">
            <h1><?php echo esc_html($testname); ?> <span class="check-icon">✔️</span></h1>
            
         <div class="test-info">
-            <p><strong>Thời gian làm bài:</strong> <?php echo esc_html($time); ?> phút |  <?php echo esc_html($number_question); ?> câu | <?php echo wp_kses_post($commentcount);?> bình luận</p>
+            <p><strong>Thời gian làm bài:</strong> <?php echo esc_html($time); ?> phút |  <?php echo esc_html($number_question); ?> câu </p>
             <p><strong>Resource:</strong> <?php echo esc_html($book); ?>  </p>
             <p><strong>Loại đề:</strong> <?php echo esc_html($test_type); ?>  </p>
 
@@ -190,8 +200,7 @@ if (is_user_logged_in()) {
 
 
         <?php
-       endwhile;
-    endif;
+       
         if ($results) {
             // Start the results table before the loop
             ?>
@@ -218,11 +227,12 @@ if (is_user_logged_in()) {
                             <td><?php echo esc_html($result->resulttest); ?></td>
                             <td><?php echo esc_html($result->timedotest); ?></td>
                             <td>
-                                <a href="<?php echo esc_url(get_permalink()) . 'result/' . esc_html($result->testsavenumber); ?>">
+                             
+
+                                <a href="<?php echo $site_url?>/digitalsat/result/<?php echo esc_html($result->testsavenumber); ?>">
                                     Xem bài làm
                                 </a>
                             </td>
-
 
                         </tr>
                         <?php
@@ -253,9 +263,8 @@ if (is_user_logged_in()) {
                 <h4 class="alert-heading">Pro tips:</h4> <hr>
                 <p>Sẵn sàng để bắt đầu làm full test? Để đạt được kết quả tốt nhất, bạn cần dành ra 40 phút cho bài test này.</p>
             </div><br>
-            <a class="btn-submit" href="start/">Bắt đầu bài thi</a>
+            <a class="btn-submit" href="<?php echo $site_url?>/digitalsat/<?php echo $custom_number?>/start/">Bắt đầu bài thi</a>
         </div>
-
         <div id="practice-content" style="display: none;">
             <div class="alert alert-success" role="alert">
                 <h4 class="alert-heading">Pro tips:</h4> <hr>
@@ -263,7 +272,7 @@ if (is_user_logged_in()) {
             </div><br>
 
             <p class="h2-test">Giới hạn thời gian (Để trống để làm bài không giới hạn):</p>
-            <form action="start/" method="get">
+            <form action="<?php echo $site_url?>/digitalsat/<?php echo $custom_number?>/start/" method="get">
                 <label style="font-size: 18px;" for="timer"></label>
 
                 <select id="timer" name="option">
