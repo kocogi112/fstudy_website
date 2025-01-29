@@ -36,6 +36,7 @@ if ($conn->connect_error) {
 // Set custom_number as id_test
 $id_test = $custom_number;
 
+
 // Prepare the SQL statement
 $sql = "SELECT testname, test_type, question_choose, id_test FROM list_test_vocabulary_book WHERE id_test = ?";
 $stmt = $conn->prepare($sql);
@@ -54,8 +55,16 @@ $testname = $data['testname'];
         $title['title'] = $testname; // Use the $testname variable from the outer scope
         return $title;
     });
-    
+    $site_url = get_site_url();
 
+    echo "<script> 
+   
+   
+    var siteUrl = '" .
+    $site_url .
+    "';
+    console.log('Result ID: ' + resultId);
+</script>";
 // Initialize quizData structure
 
 echo "<script>";
@@ -116,6 +125,8 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flashcard App</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>
 <style>
     body {
@@ -284,7 +295,7 @@ $conn->close();
 }
 
 /* Style cho nút "Gợi ý" */
-#hintButton {
+#hintButton, #addNotationBtn, #next {
     display: inline-flex; /* Nội dung nằm ngang */
     align-items: center; /* Căn giữa dọc */
     gap: 8px; /* Khoảng cách giữa icon và chữ */
@@ -297,34 +308,14 @@ $conn->close();
     transition: background-color 0.3s ease;
 }
 
-#hintButton:hover {
+#hintButton:hover , #addNotationBtn:hover , #next:hover {
     background-color: #e0e0e0; /* Hiệu ứng khi rê chuột */
 }
 
-#hintButton i {
+#hintButton, #addNotationBtn, #next i {
     font-size: 18px; /* Kích thước biểu tượng */
 }
 
-#next {
-    display: inline-flex; /* Nội dung nằm ngang */
-    align-items: center; /* Căn giữa dọc */
-    gap: 8px; /* Khoảng cách giữa icon và chữ */
-    padding: 10px 16px;
-    font-size: 16px;
-    cursor: pointer;
-    border: 1px solid #ccc;
-    background-color: #f9f9f9;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
-
-#next:hover {
-    background-color: #e0e0e0; /* Hiệu ứng khi rê chuột */
-}
-
-#next i {
-    font-size: 18px; /* Kích thước biểu tượng */
-}
 .tabs {
     display: flex;
     border-bottom: 1px solid #ccc;
@@ -388,6 +379,7 @@ table th {
 }
 
 </style>
+
 <body>
     <h4 style = "color: black">Vocabulary Quiz: <?php echo htmlspecialchars($testname); ?></h4>
 
@@ -406,17 +398,21 @@ table th {
             <!-- Nút kiểm tra -->
            
             <button id="check">
-                <i class="fa-solid fa-check"></i> Kiểm tra
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="arcs"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Kiểm tra
             </button>
 
             <!-- Nút gợi ý -->
             <button id="hintButton">
-                <i class="fa-regular fa-lightbulb"></i> Gợi ý
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="arcs"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg> Gợi ý
+            </button>
+
+            <button id="addNotationBtn" onclick = "addNotation()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11.08V8l-6-6H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h6"/><path d="M14 3v5h5M18 21v-6M15 18h6"/></svg> Notation
             </button>
 
   
             <button id="next" >
-                Bỏ qua →
+                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="arcs"><path d="M10 3H6a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h4M16 17l5-5-5-5M19.8 12H9"/></svg>Bỏ qua
             </button>
       
 
@@ -437,7 +433,10 @@ table th {
         <p>Thời gian hoàn thành: <span id="completionTime"></span> giây</p>
         <p>Trạng thái: <span id="status"></span></p>
     </div>
-    <script src="http://localhost/wordpress/contents/themes/tutorstarter/study_vocabulary_toolkit/test-new-word/script_6.js"></script>
+    <script>
+           let pre_id_test_ = `<?php echo esc_html($custom_number); ?>`;
+    </script>
+    <script src="http://localhost/wordpress/contents/themes/tutorstarter/study_vocabulary_toolkit/test-new-word/script.js"></script>
 
 </body>
 </html>

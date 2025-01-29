@@ -17,11 +17,7 @@ if (is_user_logged_in()) {
 
     $post_id = get_the_ID();
     $user_id = get_current_user_id();
-    $additional_info = get_post_meta(
-        $post_id,
-        "_digitalsat_additional_info",
-        true
-    );
+    
     //$custom_number = get_post_meta($post_id, "_digitalsat_custom_number", true);
     $custom_number =intval(get_query_var('id_test'));
     // Database credentials
@@ -64,6 +60,7 @@ if (is_user_logged_in()) {
         var resultId = '" .
         $result_id .
         "';
+       
         var siteUrl = '" .
         $site_url .
         "';
@@ -230,7 +227,7 @@ if (window.MathJax) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title></title>
-    <link rel="stylesheet" href="/wordpress/contents/themes/tutorstarter/system-test-toolkit/style/style_2.css">
+    <link rel="stylesheet" href="/wordpress/contents/themes/tutorstarter/system-test-toolkit/style/style_6.css">
     <style type="text/css">
 
 #time-remaining-container {
@@ -262,7 +259,7 @@ if (window.MathJax) {
     align-items: center;
     z-index: 2300;
     height: 80px;
-    background-color: #fff;
+  /*  background-color: #fff;*/
     justify-content: flex-end;
 
     
@@ -1090,7 +1087,7 @@ img {
          <!-- end note sidebar -->
          
          </div>      
-         <div id="time-remaining-container"  >
+                  <div id="time-remaining-container"  >
                     <div class = "fixedrightsmallbuttoncontainer" style="display: none;">
                         <button  class ="buttonsidebar"  id="report-error"><img width="22px" height="22px" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/report.png" ></button><br>  
                         <button class ="buttonsidebar"  id="full-screen-button">⛶</button><br>
@@ -1638,29 +1635,9 @@ function yellow_highlight(spanId) {
 function purple_highlight(spanId) {
     document.getElementById(spanId).style.backgroundColor = '#FFB6C1';
 }
-    /*
-function startTest() {
-            document.getElementById("test-prepare").style.display = "none";
 
-            document.getElementById("change_appearance").style.display = "block";
-            document.getElementById("start-test").style.display = 'none';
-            document.getElementById("basic-info").style.display = 'none';
-            document.getElementById("quiz-container").style.display = 'block';
-            document.getElementById("submit-button").style.display = 'block';
-            var explain_zone = document.getElementsByClassName("explain-zone");
-            for (var i = 0; i < explain_zone.length; i++)
-                explain_zone[i].style.display = 'none';
-            document.getElementById("center-block").style.display = 'block';
-            const image = document.createElement("img").src = "note.";
 
-            document.getElementById('countdown').innerHTML =  secondsToHMS(countdownValue);
-            startCountdown();
-            
-
-            showQuestion(currentQuestionIndex);
-
-}*/
-
+    
        let removeChoice = false;
 
         </script>
@@ -1678,7 +1655,7 @@ function startTest() {
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/submit_answer_2.js"></script>
 <!--<script type="module" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/check_dev_tool.js"></script>
     -->
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/highlight_text_2.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/highlight_text_3.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/fullscreen.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/format-time-1.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/draft-popup.js"></script>

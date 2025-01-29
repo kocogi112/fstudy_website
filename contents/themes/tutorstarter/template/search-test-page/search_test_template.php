@@ -13,16 +13,16 @@ get_header();
 $test_tables = [
     'all' => '', // Leave blank for all tables
     'digitalsat' => 'digital_sat_test_list',
-    'ieltsreadingtests' => 'ielts_reading_test_list',
+    'ieltsreadingtest' => 'ielts_reading_test_list',
     'thptqg' => 'thptqg_question',
     'ieltsspeakingtests' => 'ielts_speaking_test_list',
-    'ieltslisteningtests' => 'ielts_listening_test_list',
+    'ieltslisteningtest' => 'ielts_listening_test_list',
     'conversation_ai' => 'conversation_with_ai_list',
-    'vocabulary' => 'list_test_vocabulary_book',
+    'studyvocabulary' => 'list_test_vocabulary_book',
     'thptqg' => 'thptqg_question',
     'ieltswritingtests' => 'ielts_writing_test_list',
-    'dictationexcercise' => 'dictation_question',
-    'shadowingexcercise' => 'shadowing_question',
+    'dictation' => 'dictation_question',
+    'shadowing' => 'shadowing_question',
 
 
 ];
@@ -36,7 +36,7 @@ global $wpdb;
 // Determine the table to query
 $table_name = $test_tables[$current_post_type] ?? '';
 $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
-$limit = 8;
+$limit = 12;
 $offset = ($paged - 1) * $limit;
 
 if (!empty($table_name)) {
@@ -76,7 +76,7 @@ $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
 $args = [
     'search_url' => $current_post_type !== 'all' ? $current_post_type : 'any',
     's' => $search_term,
-    'posts_per_page' => 8,
+    'posts_per_page' => 12,
     'paged' => $paged,
 ];
 

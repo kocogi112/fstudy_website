@@ -277,7 +277,7 @@ get_header(); // Gọi phần đầu trang (header.php)
                     </div><br>
                     
                     <p class ="h2-test" >Giới hạn thời gian (Để trống để làm bài không giới hạn):</p>
-                    <form action="<?php echo $site_url?>/dictationexercise/<?php echo $custom_number?>/start/" method="get">
+                    <form action="<?php echo $site_url?>/dictation/<?php echo $custom_number?>/start/" method="get">
                         <label style="font-size: 18px;"  for="timer"></label>
 
                         <select id="timer" name="option">
@@ -302,7 +302,7 @@ get_header(); // Gọi phần đầu trang (header.php)
                         <h4 class="alert-heading">Pro tips:</h4> <hr>
                         <p>Sẵn sàng để bắt đầu làm full test? Để đạt được kết quả tốt nhất, bạn cần dành ra 40 phút cho bài test này.</p>
                         </div><br>
-                    <a   class="btn-submit" href="<?php echo $site_url?>/dictationexercise/<?php echo $custom_number?>/start/" method="get">Bắt đầu bài thi</a>
+                    <a   class="btn-submit" href="<?php echo $site_url?>/dictation/<?php echo $custom_number?>/start/" method="get">Bắt đầu bài thi</a>
                 </div>
             </div>
         </div>

@@ -228,6 +228,30 @@ define('MAIN_PATH', '/wordpress/contents/themes/tutorstarter/template/admin_pane
         <i class="fas fa-fw fa-chart-area"></i>
         <span>Hệ thống xuất video</span></a>
 </li>
+
+
+<!-- Nav Item - Charts -->
+<li class="nav-item">
+    <a class="nav-link"  href="<?php echo MAIN_PATH; ?>other_function_page/gift_database/admin_gift.php">
+        <i class="fas fa-fw fa-chart-area"></i>
+        <span>Hệ thống gửi quà</span></a>
+</li>
+
+<li class="nav-item">
+    <a class="nav-link"  href="<?php echo MAIN_PATH; ?>other_function_page/create_token/admin_token.php">
+        <i class="fas fa-fw fa-chart-area"></i>
+        <span>Tạo token làm test</span></a>
+</li>
+
+
+
+<li class="nav-item">
+    <a class="nav-link"  href="<?php echo MAIN_PATH; ?>other_function_page/notation/admin_notation_page.php">
+        <i class="fas fa-fw fa-chart-area"></i>
+        <span>Quản lý Notation</span></a>
+</li>
+
+
 <li class="nav-item">
     <a class="nav-link" href="<?php echo MAIN_PATH; ?>other_function_page/notification/admin_notification_page.php">
         <i class="fas fa-fw fa-chart-area"></i>
@@ -240,9 +264,8 @@ define('MAIN_PATH', '/wordpress/contents/themes/tutorstarter/template/admin_pane
         <span>Report lỗi đề</span></a>
 </li>
 
-
 <li class="nav-item">
-    <a class="nav-link" href="charts.html">
+    <a class="nav-link" href="<?php echo MAIN_PATH; ?>other_function_page/user_control_and_blacklist/admin.php">
         <i class="fas fa-fw fa-chart-area"></i>
         <span>Quản lý user/Blacklist</span></a>
 </li>

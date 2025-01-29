@@ -288,7 +288,7 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ielts Writing Tests</title>
-    <link rel="stylesheet" href="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/style/style_2.css">
+    <link rel="stylesheet" href="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/style/style_9.css">
     
 </head>
 <style>
@@ -399,6 +399,9 @@ $conn->close();
 
 
 .quiz-container {
+    padding:10px;
+    overflow: auto;
+    height: calc(100% - 35px);
     visibility: visible;
     position: absolute;
     left: 0;
@@ -411,7 +414,7 @@ $conn->close();
 
   #time-remaining-container {
     width: 100%;
-    height: 30px;
+    height: 35px;
     display: flex;
     justify-content: center;
     align-items: center; 
@@ -586,7 +589,7 @@ $conn->close();
             
          <!-- New add sửa đổi 3/8/2024-->
 
-            <div class = "fixedrightsmallbuttoncontainer">
+            <div class = "fixedrightsmallbuttoncontainer" style ="display:none">
                 <button  class ="buttonsidebar"  id="report-error"><img  width="22px" height="22px" src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/assets/images/report.png" ></button><br>  
                    <button class ="buttonsidebar"  id="full-screen-button">⛶</button><br>
                     <button  onclick=" DarkMode()" class ="buttonsidebar"><img width="30px" height="30px" src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/assets/images/dark-mode.png"></img></button><br>
@@ -1041,7 +1044,6 @@ function openDraft(index) {
     x.style.display = "block";
   }
 }
-//countdownElement =quizData.duration;
 
 function changeTabResult(evt, tabResultName) {
                 var i, tabcontent, tablinks;
@@ -1413,7 +1415,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // Initialize countdownElement to the total duration initially
-    countdownElement = duration;
+    countdownElement =  duration;
 
     // Example: Start a countdown (You would have your own countdown logic)
     countdownInterval = setInterval(function() {
@@ -1610,7 +1612,7 @@ function startCountdown(duration) {
         if (timer > 0) {
             const minutes = Math.floor(timer / 60);
             const seconds = timer % 60;
-            countdownElement.textContent = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+            countdownElement.innerHTML = `<div style ="display: inline-block"> <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> ${minutes}:${seconds < 10 ? '0' + seconds : seconds} </div>`;
             timer--;
         } else {
             clearInterval(countdownInterval); // Stop the countdown at 0
@@ -1667,6 +1669,7 @@ The given table compares different means of transportation in terms of the annua
 
 
 <?php
+
 } else {
     get_header();
     echo '<p>Please log in to submit your answer.</p>';

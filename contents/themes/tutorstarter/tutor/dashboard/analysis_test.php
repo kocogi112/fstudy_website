@@ -68,14 +68,7 @@ if (!defined('ABSPATH')) {
 
                         foreach ($results as $row) {
                             // Fetch post_id from wp_postmeta
-                            $post_id = $wpdb->get_var($wpdb->prepare(
-                                "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value = %s",
-                                $meta_key,
-                                $row->idtest
-                            ));
-
-                            // Generate post link if post_id exists
-                            $post_link = $post_id ? get_permalink($post_id) : 'Không tìm thấy link';
+                          
 
                             echo '<tr>
                                     <td>' . esc_html($row->username) . '</td>
@@ -85,7 +78,7 @@ if (!defined('ABSPATH')) {
                                     <td>' . esc_html($row->$result_column) . '</td>
                                     <td>' . esc_html($row->testsavenumber) . '</td>
                                     
-                                    <td>' . ($post_id ? '<a href="' . esc_url($post_link . 'result/' . $row->testsavenumber) . '/' .'" target="_blank">Xem chi tiết</a>' : 'Không tìm thấy kết quả') . '</td>
+                                    <td>' . ( '<a href="' . esc_url($base_url . 'result/' . $row->testsavenumber) . '/' .'" target="_blank">Xem chi tiết</a>' ) . '</td>
                                 </tr>';
                         }
 
@@ -100,16 +93,16 @@ if (!defined('ABSPATH')) {
             render_table_data_with_links('save_user_result_digital_sat', 'http://localhost/wordpress/digitalsat/', '_digitalsat_custom_number', $current_username, 'dateform', 'resulttest', $wpdb);
 
             // Render table for IELTS Reading
-            render_table_data_with_links('save_user_result_ielts_reading', 'http://localhost/wordpress/ieltsreading/', '_ieltsreadingtest_custom_number', $current_username, 'dateform', 'overallband', $wpdb);
+            render_table_data_with_links('save_user_result_ielts_reading', 'http://localhost/wordpress/ieltsreadingtest/', '_ieltsreadingtest_custom_number', $current_username, 'dateform', 'overallband', $wpdb);
 
             // Render table for digital SAT
-            render_table_data_with_links('save_user_result_ielts_speaking', 'http://localhost/wordpress/digitalsat/', '_ieltsspeakingtests_custom_number', $current_username, 'dateform', 'resulttest', $wpdb);
+            render_table_data_with_links('save_user_result_ielts_speaking', 'http://localhost/wordpress/ieltsspeakingtests/', '_ieltsspeakingtests_custom_number', $current_username, 'dateform', 'resulttest', $wpdb);
 
             // Render table for IELTS Reading
-            render_table_data_with_links('save_user_result_ielts_writing', 'http://localhost/wordpress/ieltswriting/', '_ieltswritingtests_custom_number', $current_username, 'dateform', 'band_score', $wpdb);
+            render_table_data_with_links('save_user_result_ielts_writing', 'http://localhost/wordpress/ieltswritingtests/', '_ieltswritingtests_custom_number', $current_username, 'dateform', 'band_score', $wpdb);
             
 
-            render_table_data_with_links('save_user_result_ielts_listening', 'http://localhost/wordpress/ieltswriting/', '_ieltslisteningtest_custom_number', $current_username, 'dateform', 'overallband', $wpdb);
+            render_table_data_with_links('save_user_result_ielts_listening', 'http://localhost/wordpress/ieltslisteningtest/', '_ieltslisteningtest_custom_number', $current_username, 'dateform', 'overallband', $wpdb);
 
 
         } else {

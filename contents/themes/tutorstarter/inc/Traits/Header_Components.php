@@ -111,6 +111,7 @@ trait Header_Components {
 			),
 
 			
+			
 
 			'settings'       => array(
 				'title' => __( 'Account Settings', 'tutorstarter' ),

@@ -55,9 +55,14 @@ if (!$custom_number) {
 
  // Create result_id
  $result_id = $hour . $minute . $second . $custom_number . $user_id . $random_number;
+ $site_url = get_site_url();
 
  echo "<script> 
         var resultId = '" . $result_id . "';
+        var siteUrl = '" .
+        $site_url .
+        "';
+
         console.log('Result ID: ' + resultId);
     </script>";
 
@@ -785,7 +790,7 @@ html {
 
         </div>
         <div style="display: none;" id="date" style="visibility:hidden;"></div>
-        <div style="display: none;" id="title" style="visibility:hidden;"><?php the_title(); ?></div>
+        <div style="display: none;" id="title-test"><?php echo esc_html($testname);?></div>
         <div  style="display: none;"  id="id_test"  style="visibility:hidden;"><?php echo esc_html($custom_number);?></div>
         <button  style="display: none;" class ="start_test" id="start_test"  onclick = "startTest()">Start test</button>
         <i id = "welcome" style = "display:none">Click Start Test button to start the test now. Good luck</i>
@@ -947,10 +952,14 @@ html {
     </div>
 
     <script>
+        let DoingTest = false;
+
             let highlights = {}; // Object để lưu trữ các highlight
 
     </script>
-    <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/script_new_1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
+    <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/script_new_9.js"></script>
     <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/highlight_text.js"></script>
 
 </body>
