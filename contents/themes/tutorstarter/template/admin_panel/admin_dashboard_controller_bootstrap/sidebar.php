@@ -237,10 +237,19 @@ define('MAIN_PATH', '/wordpress/contents/themes/tutorstarter/template/admin_pane
         <span>Hệ thống gửi quà</span></a>
 </li>
 
+
 <li class="nav-item">
-    <a class="nav-link"  href="<?php echo MAIN_PATH; ?>other_function_page/create_token/admin_token.php">
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages2"
+        aria-expanded="true" aria-controls="collapsePages2">
         <i class="fas fa-fw fa-chart-area"></i>
-        <span>Tạo token làm test</span></a>
+        <span>Quản lý Token</span>
+    </a>
+    <div id="collapsePages2" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+        <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item"  href="<?php echo MAIN_PATH; ?>other_function_page/create_token/admin_token.php">Tạo Token</a>
+            <a class="collapse-item"  href="<?php echo MAIN_PATH; ?>other_function_page/create_token/transaction.php">Lịch sử mua Token</a>
+        </div>
+    </div>
 </li>
 
 

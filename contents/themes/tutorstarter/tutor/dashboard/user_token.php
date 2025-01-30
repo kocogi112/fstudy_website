@@ -32,7 +32,7 @@ global $wp_query;
  $user_id = $current_user->ID; // Lấy user ID
 
   // Thực hiện truy vấn để lấy id_video_orginal 
-  $sql = "SELECT username, updated_time, token FROM user_token WHERE username = %s";
+  $sql = "SELECT username, updated_time, token, token_use_history FROM user_token WHERE username = %s";
   $result = $wpdb->get_row($wpdb->prepare($sql, $current_username));
 
   if ($result) {

@@ -1,5 +1,3 @@
-2025-01-29T05:06:33+00:00 Undefined property: stdClass::$idcategory
-2025-01-29T15:26:34+00:00 Undefined property: stdClass::$idcategory
 2025-01-29T17:52:02+00:00 Uncaught TypeError: Unsupported operand types: string + string in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\admin_panel\gift_database\template-gift.php:379
 Stack trace:
 #0 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(1107): include()

@@ -1,0 +1,24 @@
+2025-01-30T02:52:25+00:00 Undefined property: stdClass::$idcategory
+2025-01-30T03:00:58+00:00 Uncaught Error: Call to a member function get_row() on null in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\inc\Traits\Header_Components.php:40
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\views\partials\header\header_default.php(119): Header_COMP::tutor_multi_column_dropdown()
+#1 C:\xampp\htdocs\wordpress\wp-includes\template.php(812): require('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\wordpress\wp-includes\template.php(745): load_template('C:\\xampp\\htdocs...', false, Array)
+#3 C:\xampp\htdocs\wordpress\wp-includes\general-template.php(206): locate_template(Array, true, false, Array)
+#4 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\header.php(43): get_template_part('views/partials/...')
+#5 C:\xampp\htdocs\wordpress\wp-includes\template.php(810): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\wordpress\wp-includes\template.php(745): load_template('C:\\xampp\\htdocs...', true, Array)
+#7 C:\xampp\htdocs\wordpress\wp-includes\general-template.php(48): locate_template(Array, true, true, Array)
+#8 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\admin_panel\gift_database\template-gift.php(7): get_header()
+#9 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(1107): include('C:\\xampp\\htdocs...')
+#10 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): gift_template_redirect('')
+#11 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#12 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#13 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#14 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#15 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#16 {main}
+  thrown
+2025-01-30T03:01:46+00:00 Undefined property: stdClass::$idcategory
+2025-01-30T03:07:53+00:00 Undefined property: stdClass::$idcategory
+2025-01-30T03:09:38+00:00 Undefined property: stdClass::$idcategory

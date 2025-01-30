@@ -33,7 +33,63 @@ trait Header_Components {
 		// $default_menus = apply_filters( 'tutor_dashboard/nav_items', self::default_menus() );
 		$default_menus = self::default_menus();
 		$current_user  = wp_get_current_user();
+		$current_username = $current_user->user_login;
+		global $wpdb;
+		$site_url = get_site_url();
+		echo "<script> 
+		var site_url = '" .$site_url . "';
+	  
+	</script>";
+	
+
+		// Fetch user token from the user_token table
+		$sql = "SELECT token, updated_time, token_use_history FROM user_token WHERE username = %s";
+		$user_token_result = $wpdb->get_row($wpdb->prepare($sql, $current_username));
+
+		if ($user_token_result) {
+			$user_token = $user_token_result->token;
+			$updated_time = $user_token_result->updated_time;
+
+		} else {
+			$user_token = '0';
+			$updated_time = 'Đang cập nhật';
+
+		}
+
+
 		?>
+		<style>
+.profile-name {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+}
+
+.token-wrapper {
+    font-weight: bold;
+}
+
+.group-btn {
+    display: flex;
+    gap: 10px;
+}
+
+.group-btn button {
+    cursor: pointer;
+    padding: 5px 10px;
+    background-color: #0073e6;
+    border: none;
+    color: white;
+    border-radius: 4px;
+}
+
+.group-btn button:hover {
+    background-color: #005bb5;
+}
+
+
+		</style>
 		<div class="tutor-header-profile-photo">
 			<?php 
 			$profile_pic = tutor_utils()->get_tutor_avatar( get_current_user_id() ); 
@@ -58,9 +114,18 @@ trait Header_Components {
 			<?php if ( is_user_logged_in() ) : ?>
 				<div class="tutor-submenu-links">
 					<ul>
-						<div class="profile-name">
-							<?php echo esc_html( ucfirst( $current_user->display_name ) ); ?>
+					<div class="profile-name">
+						<!--<?php echo esc_html( ucfirst( $current_user->display_name ) ); ?> -->
+						<div class="token-wrapper">
+							<span>Token làm bài: <?php echo esc_html( ucfirst( $user_token ) ); ?></span>
 						</div>
+						<div class="group-btn">
+							<button onclick="window.location.href=`<?php echo $site_url?>/dashboard/user_token/`;">Xem chi tiết</button>
+							<button onclick="window.location.href=`<?php echo $site_url?>/dashboard/buy_token/`;">Mua token</button>
+						</div>
+					</div>
+
+
 						<?php
 						foreach ( $default_menus as $menu_key => $menu_item ) {
 							$menu_title = $menu_item;
