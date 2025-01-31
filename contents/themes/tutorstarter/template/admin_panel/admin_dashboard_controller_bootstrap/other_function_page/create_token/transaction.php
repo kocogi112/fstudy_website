@@ -132,12 +132,13 @@ $result = $conn->query($sql);
         <th>Type Transaction</th>
         <th>Amount (VND)</th>
         <th>Order Time</th>
+        <th>Completed order time</th>
         <th>Order Item</th>
         <th>Order Content</th>
         <th>Order Status</th>
         <!--<th>Actions</th> -->
     </tr>
-
+    
     <?php
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
@@ -145,9 +146,17 @@ $result = $conn->query($sql);
                
                 echo "<tr id='row_{$row['number']}'>
                         <td>{$row['number']}</td>
-                        <td>{$row['token_name']}</td>
-                        <td>{$row['token_key']}</td>
-                        <td>{$row['token_image']}</td>
+                        <td>{$row['username']}</td>
+                        <td>{$row['user_id']}</td>
+                        <td>{$row['order_code']}</td>
+                        <td>{$row['type_transaction']}</td>
+                        <td>{$row['amount']}</td>
+                        <td>{$row['order_time']}</td>
+                        <td>{$row['completed_order_time']}</td>
+                        <td>{$row['order_item']}</td>
+                        <td>{$row['order_content']}</td>
+                        <td>{$row['order_status']}</td>
+
                         <!--<td>
                             <button class='btn btn-primary btn-sm' onclick='openEditModal({$row['number']})'>Edit</button>
                             <button class='btn btn-danger btn-sm' onclick='deleteRecord({$row['number']})'>Delete</button>

@@ -9,6 +9,7 @@ global $wpdb;
 
 // Fetch user token from the user_token table
 $sql = "SELECT token, updated_time, token_use_history FROM user_token WHERE username = %s";
+
 $user_token_result = $wpdb->get_row($wpdb->prepare($sql, $current_username));
 
 if ($user_token_result) {
@@ -21,6 +22,7 @@ if ($user_token_result) {
 
 }
 
+$order_info = urldecode($_GET['vnp_OrderInfo']);
 
 ?>
 <html lang="en">
@@ -61,6 +63,7 @@ if ($user_token_result) {
                 $i = 1;
             }
         }
+        $site_url = get_site_url();
 
         $secureHash = hash_hmac('sha512', $hashData, $vnp_HashSecret);
         ?>
@@ -74,13 +77,10 @@ if ($user_token_result) {
 
                     <label><?php echo $_GET['vnp_TxnRef'] ?></label>
                 </div>    
-                <div class="form-group">
-                    <label >Số token thêm:</label>
-
-                    <label><?php echo $_GET['item'] ?></label>
-                </div>  
+                
 
                 <div class="form-group">
+
 
                     <label >Số tiền:</label>
                     <label><?php echo $_GET['vnp_Amount'] ?></label>
@@ -90,13 +90,10 @@ if ($user_token_result) {
                     <label><?php echo $_GET['vnp_OrderInfo'] ?></label>
                 </div> 
                 <div class="form-group">
-                    <label >Mã phản hồi (vnp_ResponseCode):</label>
-                    <label><?php echo $_GET['vnp_ResponseCode'] ?></label>
-                </div> 
-                <div class="form-group">
                     <label >Mã GD Tại VNPAY:</label>
                     <label><?php echo $_GET['vnp_TransactionNo'] ?></label>
                 </div> 
+
                 <div class="form-group">
                     <label >Mã Ngân hàng:</label>
                     <label><?php echo $_GET['vnp_BankCode'] ?></label>
@@ -105,19 +102,98 @@ if ($user_token_result) {
                     <label >Thời gian thanh toán:</label>
                     <label><?php echo $_GET['vnp_PayDate'] ?></label>
                 </div> 
+
                 <div class="form-group">
-                    <label >Kết quả:</label>
+                    <label style = "display:none">Kết quả:</label>
                     <label>
                         <?php
-                        if ($secureHash == $vnp_SecureHash) {
-                            if ($_GET['vnp_ResponseCode'] == '00') {
-                                echo "<span style='color:blue'>GD Thanh cong</span>";
+                       
+                    if ($_GET['vnp_ResponseCode'] == '00') {
+                        
+                    
+                        // Lấy mã đơn hàng từ vnp_TxnRef
+                        $order_code = $_GET['vnp_TxnRef'];
+                    
+                        // Tìm giao dịch trong token_transaction
+                        $transaction = $wpdb->get_row($wpdb->prepare(
+                            "SELECT order_item, order_status FROM token_transaction WHERE order_code = %s",
+                            $order_code
+                        ));
+                    
+                        if ($transaction) {
+                            if ($transaction->order_status === 'success') {
+                                echo "<span style='color:green'>Giao dịch đã thành công trước đó. Không cập nhật thêm.</span>";
                             } else {
-                                echo "<span style='color:red'>GD Khong thanh cong</span>";
+                                $order_item = json_decode($transaction->order_item, true);
+                                $tokens_to_add = $order_item['tokens'];
+                                $amount = $order_item['amount'];
+                    
+                                // Cập nhật trạng thái order_status thành 'success'
+                                $wpdb->update(
+                                    'token_transaction',
+                                    ['order_status' => 'success'],
+                                    ['order_code' => $order_code]
+                                );
+                    
+                                // Lấy token hiện tại của user
+                                $user_token_result = $wpdb->get_row($wpdb->prepare(
+                                    "SELECT token, token_use_history FROM user_token WHERE username = %s",
+                                    $current_username
+                                ));
+                    
+                                if ($user_token_result) {
+                                    $current_token = (int) $user_token_result->token;
+                                    $new_token = $current_token + (int) $tokens_to_add;
+                    
+                                    // Cập nhật token mới cho user
+                                    $wpdb->update(
+                                        'user_token',
+                                        ['token' => $new_token],
+                                        ['username' => $current_username]
+                                    );
+                    
+                                    // Ghi lịch sử sử dụng token
+                                    $token_history = json_decode($user_token_result->token_use_history, true) ?? [];
+                                    $token_history[] = [
+                                        "change_token" => $tokens_to_add,
+                                        "payment_gate" => "VNPAY",
+                                        "title" => htmlspecialchars($order_info, ENT_QUOTES, 'UTF-8'),
+                                        "update_time" => date('Y-m-d H:i:s'),
+                                        "amount" => $amount
+                                    ];
+
+                                    // Update the token history
+                                    $wpdb->update(
+                                        'user_token',
+                                        ['token_use_history' => json_encode($token_history)],
+                                        ['username' => $current_username]
+                                    );
+                                    echo "
+                        <span style='color:blue,font-size:30px,'>GIAO DỊCH THÀNH CÔNG</span>
+                        <svg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 24 24' fill='none' stroke='#7ed321' stroke-width='2' stroke-linecap='round' stroke-linejoin='arcs'><path d='M22 11.08V12a10 10 0 1 1-5.93-9.14'></path><polyline points='22 4 12 14.01 9 11.01'></polyline></svg>
+                        <button class = 'return-token-history' id ='return-token-history'>Xem số dư token</button>
+
+                        
+                        ";
+                    
+                                    echo "<span style='color:green'>Token đã được cập nhật thành công.</span>";
+                                } else {
+                                    echo" <span style='color:blue,font-size:30px,'>GIAO DỊCH THẤT BẠI</span>
+                                    <svg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 24 24' fill='none' stroke='#d0021b' stroke-width='2' stroke-linecap='round' stroke-linejoin='arcs'><circle cx='12' cy='12' r='10'></circle><line x1='15' y1='9' x2='9' y2='15'></line><line x1='9' y1='9' x2='15' y2='15'></line></svg>                        <button class = 'return-token-history' id ='return-token-history'>Xem số dư token</button>
+                                   <span style='color:red'>Không tìm thấy thông tin token của người dùng.</span>
+                                    <p> Hãy liên hệ admin qua SĐT: 0867052811 để được trợ giúp</p>";
+                                }
                             }
                         } else {
-                            echo "<span style='color:red'>Chu ky khong hop le</span>";
+                           echo" <span style='color:blue,font-size:30px,'>GIAO DỊCH THẤT BẠI</span>
+                        <svg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 24 24' fill='none' stroke='#d0021b' stroke-width='2' stroke-linecap='round' stroke-linejoin='arcs'><circle cx='12' cy='12' r='10'></circle><line x1='15' y1='9' x2='9' y2='15'></line><line x1='9' y1='9' x2='15' y2='15'></line></svg>                        <button class = 'return-token-history' id ='return-token-history'>Xem số dư token</button>
+                        <span style='color:red'>Không tìm thấy giao dịch với mã đơn hàng: $order_code.</span>
+                        Hãy liên hệ admin qua SĐT: 0867052811 để được trợ giúp";
                         }
+                    }
+                    
+                    
+                    
                         ?>
 
                     </label>
@@ -126,9 +202,7 @@ if ($user_token_result) {
             <p>
                 &nbsp;
             </p>
-            <footer class="footer">
-                   <p>&copy; VNPAY <?php echo date('Y')?></p>
-            </footer>
+            
         </div>  
     </body>
 </html>

@@ -30,6 +30,34 @@ $siteurl = get_site_url();
  $current_user = wp_get_current_user();
  $current_username = $current_user->user_login;
  $user_id = $current_user->ID; // Lấy user ID
+ 
+ // Get current time (hour, minute, second)
+ $hour = date('H'); // Giờ
+ $minute = date('i'); // Phút
+ $second = date('s'); // Giây
+
+ // Generate random two-digit number
+ $random_number = rand(10, 99);
+
+ // Handle user_id and id_test error, set to "00" if invalid
+ if (!$user_id) {
+    $user_id = '00'; // Set user_id to "00" if invalid
+}
+
+
+
+
+ // Create result_id
+ $ss_id = $hour . $minute . $second . $user_id . $random_number;
+
+ echo "<script> 
+ const sessionID = '" . strval($ss_id) . "'; 
+ console.log('sessionID: ' + sessionID);
+</script>";
+
+
+
+
 
   // Thực hiện truy vấn để lấy id_video_orginal 
   $sql = "SELECT username, updated_time, token, token_use_history FROM user_token WHERE username = %s";
@@ -131,6 +159,8 @@ $siteurl = get_site_url();
   <form action="/wordpress/contents/checkout_gateway/vnpay_php/vnpay_create_payment.php" id="frmCreateOrder" method="post" style="display:none;">
     <input type="hidden" name="bankCode" id="bankCode">
     <input type="hidden" name="amount" id="amount">
+    <input type="hidden" name="orderCode" id="orderCode">
+
     <input type="hidden" name="item" id="item">
     <input type="hidden" name="language" id="language" value="vn">
   </form>
@@ -182,14 +212,14 @@ $siteurl = get_site_url();
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
     const packages = [
-      { title: "Token Package 1", content: "Best for small tasks.", tokens: 100, price: 20000 },
-      { title: "Token Package 2", content: "Ideal for daily users.", tokens: 200, price: 30000 },
-      { title: "Token Package 3", content: "Most popular package.", tokens: 500, price: 50000 },
-      { title: "Token Package 4", content: "Professional use.", tokens: 1000, price: 100000 },
-      { title: "Token Package 5", content: "Best value deal.", tokens: 2000, price: 200000 },
-      { title: "Token Package 6", content: "Corporate package.", tokens: 5000, price: 300000 },
-      { title: "Token Package 7", content: "Massive savings.", tokens: 10000, price: 2000000 },
-      { title: "Token Package 8", content: "Ultimate business plan.", tokens: 20000, price: 100000000 }
+      { title: "Token Package 1", content: "Best for small tasks.", tokens: 100, price: 20000, type_item: "token" },
+      { title: "Token Package 2", content: "Ideal for daily users.", tokens: 200, price: 30000, type_item: "token" },
+      { title: "Token Package 3", content: "Most popular package.", tokens: 500, price: 50000, type_item: "token" },
+      { title: "Token Package 4", content: "Professional use.", tokens: 1000, price: 100000, type_item: "token" },
+      { title: "Token Package 5", content: "Best value deal.", tokens: 2000, price: 200000, type_item: "token" },
+      { title: "Token Package 6", content: "Corporate package.", tokens: 5000, price: 300000, type_item: "token" },
+      { title: "Token Package 7", content: "Massive savings.", tokens: 10000, price: 2000000, type_item: "token" },
+      { title: "Token Package 8", content: "Ultimate business plan.", tokens: 20000, price: 100000000, type_item: "token" }
     ];
 
     const container = document.getElementById("card-container");
@@ -205,7 +235,7 @@ $siteurl = get_site_url();
         <div class="card-info">Price: $${pkg.price}</div>
         <div class="buttons">
           <button onclick="showDetails('${pkg.title}', '${pkg.content}')">View Details</button>
-          <button class="buy-now" onclick="buyNow('${pkg.title}', ${pkg.price}, ${pkg.tokens})">Buy Now</button>
+          <button class="buy-now" onclick="buyNow('${pkg.title}', ${pkg.price}, ${pkg.tokens}, '${pkg.type_item}')">Buy Now</button>
         </div>
       `;
 
@@ -221,46 +251,93 @@ $siteurl = get_site_url();
       });
     }
 
-    function buyNow(title, price, tokens) {
-      Swal.fire({
-        title: `Do you want to buy ${title}?`,
-        input: 'select',
-        inputOptions: {
-          '': 'VNPay',
-          'ACB': 'Asia Commercial Bank',
-          'TCB': 'Techcombank'
-        },
-        inputPlaceholder: 'Select payment method',
-        showCancelButton: true,
-        confirmButtonText: 'Pay Now',
-        html: `
-          <div class="form-group">
-            <h5>Chọn ngôn ngữ giao diện thanh toán:</h5>
-            <input type="radio" id="language-vn" name="language" value="vn" checked>
-            <label for="language-vn">Tiếng Việt</label><br>
-            <input type="radio" id="language-en" name="language" value="en">
-            <label for="language-en">Tiếng Anh</label><br>
-          </div>
-        `,
-        preConfirm: () => {
-          const selectedBankCode = Swal.getPopup().querySelector('select').value;
-          const selectedLanguage = Swal.getPopup().querySelector('input[name="language"]:checked').value;
-          return { selectedBankCode, selectedLanguage };
-        }
-      }).then((result) => {
-        if (result.isConfirmed) {
-          const { selectedBankCode, selectedLanguage } = result.value;
-          console.log(`Package: ${title}, Price: $${price}, Tokens: ${tokens}, BankCode: ${selectedBankCode}, Language: ${selectedLanguage}`);
+    var ajaxurl = "<?php echo admin_url('admin-ajax.php'); ?>";
 
-          // Submit form with payment details
-          document.getElementById('bankCode').value = selectedBankCode;
-          document.getElementById('amount').value = price;
-          document.getElementById('item').value = tokens;
-          document.getElementById('language').value = selectedLanguage;
-          document.getElementById('frmCreateOrder').submit();
-        }
-      });
+function buyNow(title, price, tokens, type_item) {
+  Swal.fire({
+    title: `Do you want to buy ${title}?`,
+    input: 'select',
+    inputOptions: {
+      'VNPay': 'VNPay',
+      'ACB': 'Asia Commercial Bank',
+      'TCB': 'Techcombank'
+    },
+    inputPlaceholder: 'Select payment method',
+    showCancelButton: true,
+    confirmButtonText: 'Pay Now',
+    html: `
+      <div class="form-group" style = "display:none">
+        <h5>Chọn ngôn ngữ giao diện thanh toán:</h5>
+        <input type="radio" id="language-vn" name="language" value="vn" checked>
+        <label for="language-vn">Tiếng Việt</label><br>
+        <input type="radio" id="language-en" name="language" value="en">
+        <label for="language-en">Tiếng Anh</label><br>
+      </div>
+    `,
+    preConfirm: () => {
+      const selectedBankCode = Swal.getPopup().querySelector('select').value;
+      const selectedLanguage = Swal.getPopup().querySelector('input[name="language"]:checked').value;
+      return { selectedBankCode, selectedLanguage };
     }
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const { selectedBankCode, selectedLanguage } = result.value;
+
+      document.getElementById('bankCode').value = '';
+      document.getElementById('amount').value = price;
+      document.getElementById('orderCode').value = sessionID;
+
+      document.getElementById('item').value = `${title}`;
+      document.getElementById('language').value = selectedLanguage;
+
+      addTransactionToDB(selectedBankCode, price, tokens, title, type_item)
+        .then(() => {
+          setTimeout(() => {
+           document.getElementById('frmCreateOrder').submit();
+          }, 2000); // Wait 2 seconds before submitting the form
+        })
+        .catch(() => {
+          Swal.fire('Error', 'Transaction failed. Please try again.', 'error');
+        });
+    }
+  });
+}
+
+function addTransactionToDB(typeTransaction, amount, tokens, title, type_item) {
+  return new Promise((resolve, reject) => {
+    const orderItem = JSON.stringify({ title: title, amount: amount, tokens: tokens, type_item: type_item });
+    const orderTime = new Date().toISOString();
+
+    jQuery.ajax({
+      url: ajaxurl,
+      type: "POST",
+      data: {
+        action: "handle_token_transaction",
+        type_transaction: typeTransaction,
+        amount: amount,
+        order_time: orderTime,
+        order_code: sessionID,
+        order_item: orderItem,
+        order_status: "pending"
+      },
+      success: function (response) {
+        if (response.success) {
+          console.log(response.data);
+          resolve(response.data);
+        } else {
+          console.error("Failed to add transaction");
+          reject();
+        }
+      },
+      error: function () {
+        console.error("AJAX error");
+        reject();
+      }
+    });
+  });
+}
+
+
   </script>
 </body>
 </html>

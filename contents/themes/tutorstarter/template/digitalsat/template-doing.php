@@ -17,6 +17,10 @@ if (is_user_logged_in()) {
 
     $post_id = get_the_ID();
     $user_id = get_current_user_id();
+    $current_user = wp_get_current_user();
+    $current_username = $current_user->user_login;
+    $username = $current_username;
+
     
     //$custom_number = get_post_meta($post_id, "_digitalsat_custom_number", true);
     $custom_number =intval(get_query_var('id_test'));
@@ -67,23 +71,132 @@ if (is_user_logged_in()) {
         console.log('Result ID: ' + resultId);
     </script>";
 
-    // Prepare the SQL statement
-    $sql =
-        "SELECT testname, time, test_type, question_choose, tag, number_question FROM digital_sat_test_list WHERE id_test = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $id_test);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    // Query to fetch test details
+$sql = "SELECT testname, time, test_type, question_choose, tag, number_question, token_need, role_access, permissive_management, time_allow 
+        FROM digital_sat_test_list 
+        WHERE id_test = ?";
 
-    if ($result->num_rows > 0) {
-        // Fetch test data if available
-        $data = $result->fetch_assoc();
-        $testname = $data['testname'];
 
-        add_filter('document_title_parts', function ($title) use ($testname) {
-            $title['title'] = $testname; // Use the $testname variable from the outer scope
-            return $title;
-        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* THÊM MỚI PHẦN CHECK ĐÃ MUA TEST CHƯA TẠI ĐÂY */
+
+
+
+// Query to fetch token details for the current username
+$sql2 = "SELECT token, token_use_history 
+         FROM user_token 
+         WHERE username = ?";
+
+// Prepare and execute the first query
+$stmt = $conn->prepare($sql);
+if (!$stmt) {
+    die("Error preparing statement 1: " . $conn->error);
+}
+$stmt->bind_param("i", $id_test);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows > 0) {
+    $data = $result->fetch_assoc();
+    $token_need = $data['token_need'];
+    $testname = $data['testname'];
+    $permissive_management = $data['permissive_management'];
+
+    add_filter('document_title_parts', function ($title) use ($testname) {
+        $title['title'] = $testname;
+        return $title;
+    });
+
+    $stmt2 = $conn->prepare($sql2);
+    if (!$stmt2) {
+        die("Error preparing statement 2: " . $conn->error);
+    }
+
+    $stmt2->bind_param("s", $current_username);
+    $stmt2->execute();
+    $result2 = $stmt2->get_result();
+
+    if ($result2->num_rows > 0) {
+        $token_data = $result2->fetch_assoc();
+        $token = $token_data['token'];
+        $token_use_history = $token_data['token_use_history'];
+
+        echo "Token: $token<br>";
+        echo "Token Use History: $token_use_history<br>";
+        echo "Mày tên: $current_username<br>";
+
+    } else {
+        echo "No token data found for the current user.";
+    }
+
+}
+        if($token_need == 0){
+
+        }
+            // Xử lý khi đề thi là bản mất tiền để làm
+        else  {
+            $permissiveManagement = json_decode($permissive_management, true);
+            
+            // Chuyển mảng PHP thành JSON string để có thể in trong console.log
+            echo "<script> 
+                    console.log('$permissive_management');
+                </script>";
+            
+            
+            $foundUser = null;
+            if (!empty($permissiveManagement)) {
+                foreach ($permissiveManagement as $entry) {
+                    if ($entry['username'] === $current_username) {
+                        $foundUser = $entry;
+                        break;
+                    }
+                }
+            }
+        }
+
+
+        
+            
+            if ($foundUser != null && $foundUser['time_left'] > 0) {
+                echo "<h3> Thông báo. 'Bạn còn {$foundUser['time_left']} lượt làm bài. success </h3>";
+            
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /* THÊM MỚI PHẦN CHECK ĐÃ MUA TEST CHƯA TẠI ĐÂY */
+
+    //$stmt2->close();
+
         
 
 
@@ -197,9 +310,9 @@ if (is_user_logged_in()) {
         echo "]};";
 
         echo "</script>";
-    } else {
+   /* } else {
         echo "<script>console.log('No data found for the given id_test');</script>";
-    }
+    }*/
     get_header(); // Gọi phần đầu trang (header.php)
 
     // Close statement and connection
@@ -1684,7 +1797,19 @@ function purple_highlight(spanId) {
     //get_footer();
 
 
-} else {
+    
+}
+
+else if (!$foundUser) {
+
+    echo "<h3>Bạn chưa mua đề thi này</h3>";
+} else if ($foundUser['time_left'] <= 0) {
+  
+        echo "<h3> Bạn đã hết lượt làm bài thi này, vui lòng mua thêm token</h3>";
+
+} 
+}
+else {
     get_header();
     echo "<p>Please log in to submit your answer.</p>";
     //get_footer();

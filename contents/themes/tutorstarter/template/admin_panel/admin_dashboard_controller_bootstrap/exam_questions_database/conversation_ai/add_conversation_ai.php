@@ -138,6 +138,9 @@ $result = $conn->query($sql);
         <th>time_limit</th>
         <th>sentence_limit</th>
         <th>cover_image</th>
+        <th>Token Price</th>
+        <th>Role Access</th>
+
         <th>Actions</th>
     </tr>
     <?php
@@ -162,6 +165,9 @@ if ($result->num_rows > 0) {
                 <td>{$row['time_limit']}</td>
                 <td>{$row['sentence_limit']}</td>
                 <td>{$row['cover_image']}</td>
+                <td>{$row['token_need']}</td>
+                <td>{$row['role_access']}</td>
+
                 <td>
                     <button class='btn btn-primary btn-sm' onclick='openEditModal({$row['number']})'>Edit</button>
                     <button class='btn btn-danger btn-sm' onclick='deleteRecord({$row['number']})'>Delete</button>
@@ -229,18 +235,20 @@ if ($result->num_rows > 0) {
                     <input type="hidden" id="edit_number" name="number">
                     
                     ID Test: <input type="text" id="edit_id_test" name="id_test" class="form-control" required><br>
-                    testname: <textarea type="text" id="edit_testname" name="testname" class="form-control" required></textarea><br>
-                    instruction: <textarea type="number" id="edit_instruction" name="instruction" class="form-control" required></textarea><br>
-                    target_1: <textarea id="edit_target_1" name="target_1" class="form-control" required></textarea><br>
-                    target_2: <textarea id="edit_target_2" name="target_2" class="form-control"></textarea><br>
-                    target_3: <textarea id="edit_target_3" name="target_3" class="form-control"></textarea><br>
-                    topic: <input  id="edit_topic" name="topic" class="form-control" required><br>
-                    ai_role: <input  id="edit_ai_role" name="ai_role" class="form-control" required><br>
-                    user_role: <input  id="edit_user_role" name="user_role" class="form-control" required><br>
-                    difficulty: <input  id="edit_difficulty" name="difficulty" class="form-control" required><br>
-                    time_limit: <input  id="edit_time_limit" name="time_limit" class="form-control" required><br>
-                    sentence_limit: <input  id="edit_sentence_limit" name="sentence_limit" class="form-control" required><br>
-                    cover_image: <input  id="edit_cover_image" name="cover_image" class="form-control" required><br>
+                    Test Name (context): <textarea type="text" id="edit_testname" name="testname" class="form-control" required></textarea><br>
+                    Instruction: <textarea type="number" id="edit_instruction" name="instruction" class="form-control" required></textarea><br>
+                    Target 1: <textarea id="edit_target_1" name="target_1" class="form-control" required></textarea><br>
+                    Target 2: <textarea id="edit_target_2" name="target_2" class="form-control"></textarea><br>
+                    Target 3: <textarea id="edit_target_3" name="target_3" class="form-control"></textarea><br>
+                    Topic: <input  id="edit_topic" name="topic" class="form-control" required><br>
+                    AI Role: <input  id="edit_ai_role" name="ai_role" class="form-control" required><br>
+                    User role: <input  id="edit_user_role" name="user_role" class="form-control" required><br>
+                    Difficulty: <input  id="edit_difficulty" name="difficulty" class="form-control" required><br>
+                    Time Limit: <input  id="edit_time_limit" name="time_limit" class="form-control" required><br>
+                    Sentence Limit: <input  id="edit_sentence_limit" name="sentence_limit" class="form-control" required><br>
+                    Cover Image: <input  id="edit_cover_image" name="cover_image" class="form-control" required><br>
+                    Token Need: <input type = "number" id="edit_token_need" name="token_need" class="form-control" required><br>
+                    Role Access: <textarea  id="edit_role_access" name="role_access" class="form-control" required></textarea> <br>
 
                 </form>
             </div>
@@ -263,18 +271,20 @@ if ($result->num_rows > 0) {
             <div class="modal-body">
                 <form id="addForm">
                     ID Test: <input type="text" id="add_id_test" name="id_test" class="form-control" required><br>
-                    contetestnamext_name: <textarea type="text" id="add_testname" name="testname" class="form-control" required></textarea><br>
-                    instruction: <textarea type="number" id="add_instruction" name="instruction" class="form-control" required></textarea><br>
-                    target_1: <textarea id="add_target_1" name="target_1" class="form-control" required></textarea><br>
-                    target_2: <textarea id="add_target_2" name="target_2" class="form-control"></textarea><br>
-                    target_3: <textarea id="add_target_3" name="target_3" class="form-control"></textarea><br>
-                    topic: <input  id="add_topic" name="topic" class="form-control" required><br>
-                    ai_role: <input  id="add_ai_role" name="ai_role" class="form-control" required><br>
-                    user_role: <input  id="add_user_role" name="user_role" class="form-control" required><br>
-                    difficulty: <input  id="add_difficulty" name="difficulty" class="form-control" required><br>
-                    time_limit: <input  id="add_time_limit" name="time_limit" class="form-control" required><br>
-                    sentence_limit: <input  id="add_sentence_limit" name="sentence_limit" class="form-control" required><br>
-                    cover_image: <input  id="add_cover_image" name="cover_image" class="form-control" required><br>
+                    Test Name (context): <textarea type="text" id="add_testname" name="testname" class="form-control" required></textarea><br>
+                    Intruction: <textarea type="number" id="add_instruction" name="instruction" class="form-control" required></textarea><br>
+                    Target 1: <textarea id="add_target_1" name="target_1" class="form-control" required></textarea><br>
+                    Target 2: <textarea id="add_target_2" name="target_2" class="form-control"></textarea><br>
+                    Target 3: <textarea id="add_target_3" name="target_3" class="form-control"></textarea><br>
+                    Topic: <input  id="add_topic" name="topic" class="form-control" required><br>
+                    AI Role: <input  id="add_ai_role" name="ai_role" class="form-control" required><br>
+                    User Role: <input  id="add_user_role" name="user_role" class="form-control" required><br>
+                    Difficulty: <input  id="add_difficulty" name="difficulty" class="form-control" required><br>
+                    Time Limit: <input  id="add_time_limit" name="time_limit" class="form-control" required><br>
+                    Sentence Limit: <input  id="add_sentence_limit" name="sentence_limit" class="form-control" required><br>
+                    Cover Image: <input  id="add_cover_image" name="cover_image" class="form-control" required><br>
+                    Token Need: <input type = "number" id="add_token_need" name="token_need" class="form-control" required><br>
+                    Role Access: <textarea  id="add_role_access" name="role_access" class="form-control" required></textarea> <br>
                 </form>
             </div>
             <div class="modal-footer">
@@ -345,6 +355,9 @@ function openEditModal(number) {
             $('#edit_time_limit').val(data.time_limit);
             $('#edit_sentence_limit').val(data.sentence_limit);
             $('#edit_cover_image').val(data.cover_image);
+
+            $('#edit_token_need').val(data.token_need);
+            $('#edit_role_access').val(data.role_access);
             $('#editModal').modal('show');
 
         }

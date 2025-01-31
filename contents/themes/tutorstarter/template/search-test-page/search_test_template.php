@@ -117,10 +117,24 @@ $query = new WP_Query($args);
         }
     ?>
         <div class="test-item">
+            <div class="price-icon">
+                   <!-- <i class="fa-solid fa-check" style="color: #63E6BE;"></i> -->
+                    <?php 
+                        if($test->token_need > 0)
+                        {
+                            echo esc_html($test->token_need )  ?> tokens <?php
+                        }
+                        else{
+                            echo 'Free';
+                        }
+                    
+                        ?>
+            </div>
+
             <h2><?php echo esc_html($test->testname); ?></h2>
             <div class="test-meta">
-                <p>⏱️ <?php echo esc_html($test->duration ?? '60 phút'); ?></p>
-                <p>📄 <?php echo esc_html($test->total_questions ?? 'Không rõ số câu'); ?></p>
+                <p>⏱️ <?php echo esc_html($test->time ?? ''); ?> minutes</p>
+                <p>📄 <?php echo esc_html($test->number_question ?? ''); ?> questions</p>
             </div>
             <?php if ($completed) : ?>
                 <div class="completed-icon">
@@ -316,6 +330,16 @@ $query = new WP_Query($args);
     color: #63E6BE;
     padding: 5px;
     border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+}
+.price-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #fff;
+    color: #63E6BE;
+    padding: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     font-size: 16px;
 }

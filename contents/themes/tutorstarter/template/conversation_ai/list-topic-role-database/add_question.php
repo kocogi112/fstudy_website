@@ -19,7 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $time_limit = wp_unslash($_POST['time_limit']);
     $sentence_limit = wp_unslash($_POST['sentence_limit']);
     $cover_image = wp_unslash($_POST['cover_image']);
-
+    $token_need = wp_unslash($_POST['token_need']);
+    $role_access = wp_unslash($_POST['role_access']);
 
     // Prepare the data for insertion
     $data = array(
@@ -36,6 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'sentence_limit' => $sentence_limit,
         'cover_image' => $cover_image,
         'id_test' => $id_test,
+        'token_need' => $token_need,
+        'role_access' => $role_access,
 
     );
 

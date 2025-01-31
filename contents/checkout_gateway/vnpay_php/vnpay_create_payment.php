@@ -10,10 +10,9 @@ date_default_timezone_set('Asia/Ho_Chi_Minh');
  */
 require_once("./config.php");
 
-$vnp_TxnRef = rand(1,10000); //Mã giao dịch thanh toán tham chiếu của merchant
+$vnp_TxnRef =  $_POST['orderCode']; //Mã giao dịch thanh toán tham chiếu của merchant
 $vnp_Amount = $_POST['amount']; // Số tiền thanh toán
 $vnp_Item = $_POST['item']; // Số tiền thanh toán
-
 $vnp_Locale = $_POST['language']; //Ngôn ngữ chuyển hướng thanh toán
 $vnp_BankCode = $_POST['bankCode']; //Mã phương thức thanh toán
 $vnp_IpAddr = $_SERVER['REMOTE_ADDR']; //IP Khách hàng thanh toán
@@ -27,8 +26,8 @@ $inputData = array(
     "vnp_CurrCode" => "VND",
     "vnp_IpAddr" => $vnp_IpAddr,
     "vnp_Locale" => $vnp_Locale,
-    "vnp_OrderInfo" => "Thanh toan GD: $vnp_Item",
-    //"vnp_OrderInfo" =>  $vnp_TxnRef,
+    //"vnp_OrderInfo" => "Thanh toan GD: $vnp_Item",
+    "vnp_OrderInfo" =>  $vnp_Item,
     "vnp_OrderType" => "other",
     "vnp_ReturnUrl" => $vnp_Returnurl,
     "vnp_TxnRef" => $vnp_TxnRef,

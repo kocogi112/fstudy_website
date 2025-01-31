@@ -18,6 +18,10 @@ global $wpdb;
    $time_limit = wp_kses_post($_POST['time_limit']);
    $sentence_limit = wp_kses_post($_POST['sentence_limit']);
    $cover_image = wp_kses_post($_POST['cover_image']);
+   $sentence_limit = wp_kses_post($_POST['sentence_limit']);
+   $cover_image = wp_kses_post($_POST['cover_image']);
+   $token_need = wp_unslash($_POST['token_need']);
+   $role_access = wp_unslash($_POST['role_access']);
 
 
    // Prepare the data for insertion
@@ -35,6 +39,8 @@ global $wpdb;
        'time_limit' => $time_limit,
        'sentence_limit' => $sentence_limit,
        'cover_image' => $cover_image,
+       'token_need' => $token_need,
+       'role_access' => $role_access,
        
 
    );

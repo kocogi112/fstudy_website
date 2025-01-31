@@ -12,7 +12,7 @@ $site_url = get_site_url();
 
 // Prepare the SQL statement
 $test_info = $wpdb->get_row($wpdb->prepare(
-    "SELECT testname, time, test_type, question_choose, tag, number_question, book 
+    "SELECT testname, time, test_type, token_need, role_access, permissive_management, question_choose, tag, number_question, book 
     FROM digital_sat_test_list 
     WHERE id_test = %d", 
     $id_test
@@ -25,6 +25,9 @@ $number_question = $test_info ? $test_info->number_question : '';
 $book = $test_info ? $test_info->book : '';
 $test_type = $test_info ? $test_info->test_type : '';
 
+$token_need = $test_info ? $test_info->token_need : '';
+$role_access = $test_info ? $test_info->role_access : '';
+$permissive_management = $test_info ? $test_info->permissive_management : '';
 
 
 // Add filter for document title
@@ -263,7 +266,7 @@ if (is_user_logged_in()) {
                 <h4 class="alert-heading">Pro tips:</h4> <hr>
                 <p>Sẵn sàng để bắt đầu làm full test? Để đạt được kết quả tốt nhất, bạn cần dành ra 40 phút cho bài test này.</p>
             </div><br>
-            <a class="btn-submit" href="<?php echo $site_url?>/digitalsat/<?php echo $custom_number?>/start/">Bắt đầu bài thi</a>
+            <a id="start-test-btn"  class="btn-submit" href="<?php echo $site_url?>/digitalsat/<?php echo $custom_number?>/start/">Bắt đầu bài thi</a>
         </div>
         <div id="practice-content" style="display: none;">
             <div class="alert alert-success" role="alert">
@@ -272,7 +275,7 @@ if (is_user_logged_in()) {
             </div><br>
 
             <p class="h2-test">Giới hạn thời gian (Để trống để làm bài không giới hạn):</p>
-            <form action="<?php echo $site_url?>/digitalsat/<?php echo $custom_number?>/start/" method="get">
+            <form id="practice-form" action="<?php echo $site_url?>/digitalsat/<?php echo $custom_number?>/start/" method="get">
                 <label style="font-size: 18px;" for="timer"></label>
 
                 <select id="timer" name="option">
