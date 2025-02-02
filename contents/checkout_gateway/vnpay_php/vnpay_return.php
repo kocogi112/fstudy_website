@@ -35,11 +35,69 @@ $order_info = urldecode($_GET['vnp_OrderInfo']);
         <meta name="author" content="">
         <title>VNPAY RESPONSE</title>
         <!-- Bootstrap core CSS -->
-        <link href="/wordpress/contents/checkout_gateway/vnpay_php/assets/bootstrap.min.css" rel="stylesheet"/>
-        <!-- Custom styles for this template -->
-        <link href="/wordpress/contents/checkout_gateway/vnpay_php/assets/jumbotron-narrow.css" rel="stylesheet">         
+       <!-- <link href="/wordpress/contents/checkout_gateway/vnpay_php/assets/bootstrap.min.css" rel="stylesheet"/>
+        <link href="/wordpress/contents/checkout_gateway/vnpay_php/assets/jumbotron-narrow.css" rel="stylesheet">        -->  
         <script src="/wordpress/contents/checkout_gateway/vnpay_php/assets/jquery-1.11.3.min.js"></script>
     </head>
+    <style>
+
+
+    .container1 {
+        height: 600px;
+        display: block;
+        margin: auto;
+        top: 50%;
+        left: 50%;
+
+      background: #ffffff;
+      padding: 30px 40px;
+      border-radius: 20px;
+      box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+    }
+
+    .status-success {
+      color: #2d8a3a;
+      font-weight: bold;
+    }
+
+    .status-fail {
+      color: #d9534f;
+      font-weight: bold;
+    }
+
+    .status-info {
+      margin-top: 15px;
+      color: #555;
+    }
+
+    .redirect-btn {
+      margin-top: 20px;
+      display: inline-block;
+      background: #007bff;
+      color: white;
+      padding: 10px 25px;
+      border: none;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .redirect-btn:hover {
+      background: #0056b3;
+    }
+
+    #countdown {
+      font-size: 16px;
+      color: #777;
+      margin-top: 10px;
+    }
+    .body1{
+        height:670px;
+    }
+  </style>
     <body>
         <?php
         require_once("./config.php");
@@ -68,7 +126,8 @@ $order_info = urldecode($_GET['vnp_OrderInfo']);
         $secureHash = hash_hmac('sha512', $hashData, $vnp_HashSecret);
         ?>
         <!--Begin display -->
-        <div class="container">
+        <div class="body1">
+            <div class = "container1">
             <div class="header clearfix">
             </div>
             <div class="table-responsive">
@@ -197,12 +256,38 @@ $order_info = urldecode($_GET['vnp_OrderInfo']);
                         ?>
 
                     </label>
+                    <a class="redirect-btn" href="<?php echo $site_url; ?>/dashboard/buy_token">Go to Dashboard</a>
+    <p id="countdown"></p>
                 </div> 
             </div>
             <p>
                 &nbsp;
             </p>
             
-        </div>  
+        </div>
+                </div>  
     </body>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      let countdown = 10; // Set the countdown duration
+      const countdownElement = document.getElementById("countdown");
+      const redirectUrl = "<?php echo $site_url; ?>/dashboard/buy_token";
+
+      function updateCountdown() {
+        countdownElement.textContent = `Redirecting in ${countdown} seconds...`;
+        if (countdown === 0) {
+          window.location.href = redirectUrl;
+        } else {
+          countdown--;
+          setTimeout(updateCountdown, 1000);
+        }
+      }
+
+      updateCountdown();
+    });
+  </script>
 </html>
+<?php
+get_footer(); // Gọi phần đầu trang (header.php)
+
+?>

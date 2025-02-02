@@ -13,6 +13,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $question_choose = wp_kses_post($_POST['question_choose']);
     $tag = wp_kses_post($_POST['tag']);
     $book = wp_kses_post($_POST['book']);
+    $token_need = wp_unslash($_POST['token_need']);
+    $role_access = wp_unslash($_POST['role_access']);
+    $time_allow = wp_unslash($_POST['time_allow']);
+
 
     // Check and process question_choose for specific patterns
     $processed_question_choose = '';
@@ -49,6 +53,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'question_choose' => $processed_question_choose,
         'tag' => $tag,
         'book' => $book,
+        'token_need' => $token_need,
+        'role_access' => $role_access,
+        'time_allow' => $time_allow,
     );
 
     // Insert the data into the database

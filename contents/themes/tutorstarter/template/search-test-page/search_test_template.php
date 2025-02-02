@@ -120,6 +120,7 @@ $query = new WP_Query($args);
             <div class="price-icon">
                    <!-- <i class="fa-solid fa-check" style="color: #63E6BE;"></i> -->
                     <?php 
+                    
                         if($test->token_need > 0)
                         {
                             echo esc_html($test->token_need )  ?> tokens <?php

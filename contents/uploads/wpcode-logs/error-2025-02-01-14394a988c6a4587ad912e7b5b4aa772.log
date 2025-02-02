@@ -1,0 +1,38 @@
+2025-02-01T01:46:57+00:00 Uncaught Error: Undefined constant "Undefined" in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\search-test-page\search_test_template.php:123
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(977): include()
+#1 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): my_tests_template_redirect('')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#3 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#5 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#7 {main}
+  thrown
+2025-02-01T03:32:27+00:00 Undefined property: stdClass::$idcategory
+2025-02-01T09:47:25+00:00 Undefined property: stdClass::$idcategory
+2025-02-01T11:49:54+00:00 Undefined property: stdClass::$idcategory
+2025-02-01T12:28:49+00:00 Cannot redeclare fetch_from_groq() (previously declared in C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code:34)
+2025-02-01T17:56:23+00:00 Uncaught Error: Failed opening required 'C:
+mpp\htdocs\wordpress\contents	hemes	utorstarter\checkpoint_test_permission\checkpoint.php' (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\digitalsat\template-doing.php:15
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(1339): include()
+#1 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): WPCode_Snippet_Execute->{closure}('')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#3 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#5 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#7 {main}
+  thrown
+2025-02-01T17:56:50+00:00 Uncaught Error: Failed opening required 'localhost\wordpress\contents	hemes	utorstarter\checkpoint_test_permission\checkpoint.php' (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\digitalsat\template-doing.php:15
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(1339): include()
+#1 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): WPCode_Snippet_Execute->{closure}('')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#3 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#5 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#7 {main}
+  thrown

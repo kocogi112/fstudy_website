@@ -11,6 +11,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $testname = wp_kses_post($_POST['testname']);
     $id_video = wp_kses_post($_POST['id_video']);
     $transcript = wp_unslash($_POST['transcript']);
+    $token_need = wp_unslash($_POST['token_need']);
+    $role_access = wp_unslash($_POST['role_access']);
+    $time_allow = wp_unslash($_POST['time_allow']);
 
 
     // Prepare the data for insertion
@@ -20,6 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'testname' => $testname,
         'id_video' => $id_video,
         'transcript' => $transcript,
+        'token_need' => $token_need,
+        'role_access' => $role_access,
+        'time_allow' => $time_allow,
 
     );
 

@@ -12,6 +12,9 @@ $test_type = wp_kses_post($_POST['test_type']);
 $question_choose = wp_kses_post($_POST['question_choose']);
 $tag = wp_kses_post($_POST['tag']);
 $book = wp_kses_post($_POST['book']);
+$token_need = wp_unslash($_POST['token_need']);
+$role_access = wp_unslash($_POST['role_access']);
+$time_allow = wp_unslash($_POST['time_allow']);
 
 
 
@@ -22,7 +25,10 @@ $data = array(
     'test_type' => $test_type,
     'question_choose' => $question_choose,
     'tag' => $tag,
-  'book' => $book,
+    'book' => $book,
+    'token_need' => $token_need,
+    'role_access' => $role_access,
+    'time_allow' => $time_allow,
 );
 
 // Update the record in the database

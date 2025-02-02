@@ -9,8 +9,9 @@
 if (is_user_logged_in()) {
     $post_id = get_the_ID();
     $user_id = get_current_user_id();
-
-$post_id = get_the_ID();
+    $current_user = wp_get_current_user();
+    $current_username = $current_user->user_login;
+    $username = $current_username;
 
 // Get the custom number field value
 //$custom_number = get_post_meta($post_id, '_ieltswritingtests_custom_number', true);
@@ -50,45 +51,136 @@ if (!$id_test) {
 
  // Create result_id
  $result_id = $hour . $minute . $second . $id_test . $user_id . $random_number;
+ $site_url = get_site_url();
 
  echo "<script> 
         var resultId = '" . $result_id . "';
         console.log('Result ID: ' + resultId);
+         var siteUrl = '" .
+        $site_url .
+        "';
+        var id_test = '" .
+        $id_test .
+        "';
+
+
     </script>";
 
 
 
 // Fetch the question_choose and time for the given id_test
-$sql = "SELECT question_choose,testname, time, test_type, tag,book  FROM ielts_writing_test_list WHERE id_test = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $custom_number); // 'i' is used for integer
-$stmt->execute();
-$result = $stmt->get_result();
+$sql_test = "SELECT *  FROM ielts_writing_test_list WHERE id_test = ?";
+$stmt_test = $conn->prepare($sql_test);
 
-$question_choose = [];
-$time = ''; // Variable to store the time
+$stmt_test->bind_param("i", $custom_number);
+$stmt_test->execute();
+$result_test = $stmt_test->get_result();
 
-if ($row = $result->fetch_assoc()) {
-    // Split the question_choose string into an array
-    $question_choose = explode(',', $row['question_choose']);
-    // Get the time directly from the query result
-    $time = $row['time'];
-    $testname = $row['testname'];
-    $test_type = $row['test_type'];
-}
-add_filter('document_title_parts', function ($title) use ($testname) {
-    $title['title'] = $testname; // Use the $testname variable from the outer scope
-    return $title;
-});
+
+
+// Query to fetch token details for the current username
+$sql2 = "SELECT token, token_use_history 
+         FROM user_token 
+         WHERE username = ?";
+
+
+// Prepare and execute the first query
+
+if ($result_test->num_rows > 0) {
+    
+   // $question_choose = [];
+    $time = ''; // Variable to store the time
+
+
+    // Lấy các ID từ question_choose (ví dụ: "1001,2001,3001")
+    $data = $result_test->fetch_assoc();
+    $question_choose = isset($data['question_choose']) ? explode(',', $data['question_choose']) : [];
+
+
+    $testname = $data['testname'];
+    $token_need = $data['token_need'];
+    $time_allow = $data['time_allow'];
+    $permissive_management = $data['permissive_management'];
+    $time = $data['time'];
+    $test_type = $data['test_type'];
+
+
+    add_filter('document_title_parts', function ($title) use ($testname) {
+        $title['title'] = $testname; // Use the $testname variable from the outer scope
+        return $title;
+    });
+    $stmt2 = $conn->prepare($sql2);
+    if (!$stmt2) {
+        die("Error preparing statement 2: " . $conn->error);
+    }
+
+    $stmt2->bind_param("s", $current_username);
+    $stmt2->execute();
+    $result2 = $stmt2->get_result();
+
+    if ($result2->num_rows > 0) {
+        $token_data = $result2->fetch_assoc();
+        $token = $token_data['token'];
+        $token_use_history = $token_data['token_use_history'];
+
+        echo "<script>console.log('Token: $token, Token Use History: $token_use_history, Mày tên: $current_username');</script>";
+       
+
+    } else {
+        echo "Lỗi đề thi";
+        
+    }
+
+
+      
+            $permissiveManagement = json_decode($permissive_management, true);
+            
+            // Chuyển mảng PHP thành JSON string để có thể in trong console.log
+            echo "<script> 
+                    console.log('$permissive_management');
+                </script>";
+            
+            
+            $foundUser = null;
+            if (!empty($permissiveManagement)) {
+                foreach ($permissiveManagement as $entry) {
+                    if ($entry['username'] === $current_username) {
+                        $foundUser = $entry;
+                        break;
+                    }
+                }
+            }
+        
+            $premium_test = "False"; // Default value
+            if ($foundUser != null && $foundUser['time_left'] > 0 || $token_need == 0) {
+                if ($token_need > 0) {
+                    $premium_test = "True";
+                }
+            
+            
+                echo '<script>
+                let premium_test = "' . $premium_test . '";
+                let token_need = "' . $token_need . '";
+                let change_content = "' . $testname . '";
+                let time_left = "' . (isset($foundUser['time_left']) ? $foundUser['time_left'] : 10) . '";
+            </script>';
+
+
+
+
+
 
 
 get_header(); // Gọi phần đầu trang (header.php)
 // Prepare an array to store the questions
-$questions = [];
-$topic = ''; // Variable to store the topic
 
 // Fetch Task 1 questions based on question_choose
 if (!empty($question_choose)) {
+    // Ensure $question_choose is an array before using count()
+
+// Create placeholders for SQL query
+
+
     $placeholders = implode(',', array_fill(0, count($question_choose), '?'));
     $sql1 = "SELECT id_test, task, question_type, question_content, image_link, sample_writing, important_add 
               FROM ielts_writing_task_1_question WHERE id_test IN ($placeholders)";
@@ -122,14 +214,14 @@ if (!empty($question_choose)) {
             "part" => $row['task'],
             "sample_essay" => $row['sample_writing'],
             "id_question" => $row['id_test'], // Use id_test for id_question
+            "topic" => $row['topic'],
 
             "image" => '',
         ];
 
         // Capture the topic (assuming the same topic for all rows)
-        if (!$topic) {
-            $topic = $row['topic'];
-        }
+       
+            
     }
 }
 
@@ -483,6 +575,58 @@ $conn->close();
   50%   {transform:scaleY(-1) rotate(0deg)}
   100%  {transform:scaleY(-1) rotate(-135deg)}
 }
+.start_test {
+  appearance: none;
+  background-color: #2ea44f;
+  border: 1px solid rgba(27, 31, 35, .15);
+  border-radius: 6px;
+  box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: -apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 20px;
+  padding: 6px 16px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.start_test:focus:not(:focus-visible):not(.focus-visible) {
+  box-shadow: none;
+  outline: none;
+}
+
+.start_test:hover {
+  background-color: #2c974b;
+}
+
+.start_test:focus {
+  box-shadow: rgba(46, 164, 79, .4) 0 0 0 3px;
+  outline: none;
+}
+
+.start_test:disabled {
+  background-color: #94d3a2;
+  border-color: rgba(27, 31, 35, .1);
+  color: rgba(255, 255, 255, .8);
+  cursor: default;
+}
+
+.start_test:active {
+  background-color: #298e46;
+  box-shadow: rgba(20, 70, 32, .2) 0 1px 0 inset;
+}
+
+
 /* Fixed bottom navigation for questions */
 
 </style>
@@ -498,8 +642,34 @@ $conn->close();
             <div style="display: none;" id="date" style="visibility:hidden;"></div>
             <div  style="display: none;"  id="id_test"  style="visibility:hidden;"><?php echo esc_html($custom_number);?></div>
             <div  style="display: none;"  id="title"  style="visibility:hidden;"></div>
+            <div id = "checkpoint" class = "checkpoint">
+                <?php
+                    if($premium_test == "True"){
+                        echo "<script >console.log('Thông báo. Bạn còn {$foundUser['time_left']} lượt làm bài. success ');</script>";
+                        echo " <p style = 'color:green'> Bạn còn {$foundUser['time_left']} lượt làm bài này <svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='#7ed321' stroke-width='2' stroke-linecap='round' stroke-linejoin='arcs'><path d='M22 11.08V12a10 10 0 1 1-5.93-9.14'></path><polyline points='22 4 12 14.01 9 11.01'></polyline></svg> </p> ";
+                        echo "<script>console.log('This is premium test');</script>";
+                    }
+                    else{
+                        echo "<script>console.log('This is free test');</script>"; 
+                    }
+                        ?>
+            </div>    
 
 
+
+            <div id = "quick-instruction">
+                <i>Quick Instruction:<br>
+                - If you find any errors from test (image,display,text,...), please let us know by clicking icon <i class="fa-solid fa-bug"></i><br> 
+                - Incon <i class="fa-solid fa-circle-info"></i> will give you a guide tour, in which you can understand the structure of test, include test's type, formation and how to answer questions<br>
+                - All these two icons are at the right-above side of test.
+            </i>
+
+            </div>
+            <div style="display: none;" id="date" style="visibility:hidden;"></div>
+            <div style="display: none;" id="title" style="visibility:hidden;"><?php the_title(); ?></div>
+            <div  style="display: none;"  id="id_test"  style="visibility:hidden;"><?php echo esc_html($custom_number);?></div>
+            <button  style="display: none;" class ="start_test" id="start_test"  onclick = "prestartTest()">Start test</button>
+            <i id = "welcome" style = "display:none">Click Start Test button to start the test now. Good luck</i>
         </div>
          
 
@@ -584,7 +754,6 @@ $conn->close();
 
                  
             </div>
-            <button class="button-3" style="display:none"  id="start-test" onclick="showLoadingPopup()">Bắt đầu làm bài</button>
             
             
          <!-- New add sửa đổi 3/8/2024-->
@@ -1074,8 +1243,11 @@ function main() {
     
     setTimeout(function(){
         console.log("Show Test!");
-        startTest();
-    }, 2000);
+        document.getElementById("start_test").style.display="block";
+        
+        document.getElementById("welcome").style.display="block";
+
+    }, 1000);
     
     
 
@@ -1371,32 +1543,7 @@ document.getElementById('input_normal').addEventListener('click', () => toggleIn
 
 //submitTest();
 
-function showLoadingPopup() {
-    let timerInterval;
-    Swal.fire({
-        title: "Đang tải bài thi",
-        html: "Vui lòng đợi trong giây lát.",
-        timer: 1000,
-        allowOutsideClick: false,
-        timerProgressBar: true,
-        didOpen: () => {
-            Swal.showLoading();
-            const timer = Swal.getPopup().querySelector("b");
-        },
-        willClose: () => {
-            clearInterval(timerInterval);
-        }
-    }).then((result) => {
-        if (result.dismiss === Swal.DismissReason.timer) {
-            Swal.fire({
-                icon: "success",
-                title: "Bài thi của bạn đã sẵn sàng",
-                html: "Nhấn vào <b>Bắt đầu làm bài</b> để bắt đầu bài thi."
-            });
-            startTest();
-        }
-    });
-}
+
 
 let duration = quizData.duration * 60; // Convert duration to seconds
 let countdownInterval;
@@ -1433,11 +1580,48 @@ function formatTime(seconds) {
 }
 
 
+function prestartTest()
+{
+    if(premium_test == "False"){
+        console.log("Cho phép làm bài")
+    }
+    else{
+    console.log(premium_test);
+    console.log(token_need);
+    console.log(change_content);
+    console.log(time_left);
+    // Giảm time_left tại frontend
+    time_left--;
+    console.log("Updated time_left:", time_left);
+
+    // Gửi request AJAX đến admin-ajax.php
+    jQuery.ajax({
+        url: `${siteUrl}/wp-admin/admin-ajax.php`,
+        type: "POST",
+        data: {
+            action: "update_time_left",
+           // username: change_content,
+            time_left: time_left,
+            id_test: id_test,
+            table_test: 'ielts_writing_test_list',
+
+        },
+        success: function (response) {
+            console.log("Server response:", response);
+        },
+        error: function (error) {
+            console.error("Error updating time_left:", error);
+        }
+    });
+}
+    startTest();
+}
+
+
 function startTest() {
     startCountdown(duration);
     document.getElementById("test-prepare").style.display = "none";
     document.getElementById("quiz-container").style.display = 'block';
-    document.getElementById("start-test").style.display = 'none';
     document.getElementById("clock-block").style.display = 'block';
     document.getElementById("submit-button").style.display = 'block';
     document.getElementById("navigation-buttons").style.display = 'flex';
@@ -1670,8 +1854,159 @@ The given table compares different means of transportation in terms of the annua
 
 <?php
 
+
+}
+else{
+    get_header();
+    if (!$foundUser) {
+        echo "
+        <div class='checkout-modal-overlay'>
+            <div class='checkout-modal'>
+                <h3>Bạn chưa mua đề thi này</h3>";     
+        } 
+
+    else if ($foundUser['time_left'] <= 0) {
+        echo "
+        <div class='checkout-modal-overlay'>
+            <div class='checkout-modal'>
+                <h3> Bạn đã từng mua test này nhưng số lượt làm test này đã hết rồi, vui lòng mua thêm token<i class='fa-solid fa-face-sad-tear'></i></h3>";
+    }
+
+    echo"
+            <p> Bạn đang có: $token token</p>
+            <p> Để làm test này bạn cần $token_need token. Bạn sẽ được làm test này $time_allow lần </p>
+            <p class = 'info-buy'>Bạn có muốn mua $time_allow lượt làm test này với $token_need không ?</button>
+                <div class='button-group'>
+                    <button class='process-token' onclick='preProcessToken()'>Mua ngay</button>
+                    <button style = 'display:none' class='close-modal'>Hủy</button>
+                </div>  
+            </div>
+        </div>
+        
+        <script>
+    
+    function preProcessToken() {
+        if ($token < $token_need) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                html: 'Bạn không đủ token để mua test này',
+                footer: `<a href='${site_url}/dashboard/buy_token/'>Nạp token vào tài khoản ngay</a>`
+            });
+        } else {
+            console.log(`Allow to next step`);
+            jQuery.ajax({
+                url: `${site_url}/wp-admin/admin-ajax.php`,
+                type: 'POST',
+                data: {
+                    action: 'update_buy_test',
+                    type_transaction: 'paid',
+                    table: 'ielts_writing_test_list',
+                    change_token: '$token_need',
+                    payment_gate: 'token',
+                    title: 'Renew test $testname with $id_test (Ielts Writing Test) with $token_need (Buy $time_allow time do this test)',
+                    id_test: id_test
+                },
+                success: function (response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Mua test thành công!',
+                        text: 'Trang sẽ được làm mới sau 2 giây.',
+                        showConfirmButton: false,
+                        timer: 2000,
+                        timerProgressBar: true,
+                        willClose: () => location.reload()
+                    });
+                },
+                error: function (error) {
+                    console.error('Error updating time_left:', error);
+                }
+            });
+        }
+    }
+        </script>
+        <style>
+.checkout-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.checkout-modal {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.checkout-modal h3 {
+    font-size: 18px;
+    color: #333;
+}
+
+.checkout-modal p {
+    margin: 10px 0;
+    color: #555;
+}
+
+.checkout-modal .button-group {
+    margin-top: 20px;
+}
+
+.process-token {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-right: 10px;
+    font-size: 14px;
+}
+
+.process-token:hover {
+    background-color: #0056b3;
+}
+
+.close-modal {
+    background-color: #ccc;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.close-modal:hover {
+    background-color: #aaa;
+}
+</style>
+
+<script>
+    document.querySelector('.close-modal')?.addEventListener('click', function() {
+        document.querySelector('.checkout-modal-overlay').style.display = 'none';
+    });
+</script>
+        ";
+        } 
+    }
+    
+ else {
+        get_header();
+            echo "<p>Không tìm thấy đề thi.</p>";
+            exit();
+    }
+
 } else {
     get_header();
-    echo '<p>Please log in to submit your answer.</p>';
-    get_footer();
+    echo "<p>Please log in to submit your answer.</p>";
+
 }

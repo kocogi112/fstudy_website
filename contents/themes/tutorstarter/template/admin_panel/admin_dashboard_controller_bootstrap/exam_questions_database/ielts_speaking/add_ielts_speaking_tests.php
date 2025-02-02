@@ -133,25 +133,17 @@ $result = $conn->query($sql);
         <th>Question Choose</th>
         <th>Tag</th>
         <th>Book</th>
+        <th>Token Need</th>
+        <th>Role Access</th>
+        <th>Permissive Management</th>
+        <th>Time Allow</th>
         
     </tr>
 
     <?php
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
-                // Process "Sample" and "Important Add" columns
-                $sample_words = explode(' ', $row['testname']);
-                $sample_display = count($sample_words) > 20 ? implode(' ', array_slice($sample_words, 0, 20)) . '...' : $row['testname'];
-                $sample_view_more = count($sample_words) > 20 ? "<button class='btn btn-link' onclick='showFullContent(\"Test Name\", \"{$row['testname']}\")'>View More</button>" : '';
-
-                $important_words = explode(',', $row['question_choose']);
-                if (count($important_words) > 3) {
-                    $important_display = implode(',', array_slice($important_words, 0, 3)) . '...';
-                    $important_view_more = "<button class='btn btn-link' onclick='showFullContent(\"Question Choose\", \"{$row['question_choose']}\")'>View More</button>";
-                } else {
-                    $important_display = $row['question_choose'];
-                    $important_view_more = '';
-                }
+               
 
                 echo "<tr id='row_{$row['number']}'>
                         <td>{$row['number']}</td>
@@ -162,9 +154,25 @@ $result = $conn->query($sql);
                         </td>
                         <td>{$row['testname']}</td>
                         <td>{$row['test_type']}</td>
-                        <td>{$important_display} $important_view_more</td>          
+                        <td>";
+        
+                        // Split the question_choose and generate links for each question
+                        $questions = explode(',', $row['question_choose']); // Tách các số trong question_choose
+                        foreach ($questions as $index => $question) {
+                            $templatePart = $index + 1;
+                            echo "<a href = 'http://localhost/wordpress/contents/themes/tutorstarter/template/admin_panel/admin_dashboard_controller_bootstrap/exam_questions_database/ielts_speaking/add_ielts_speaking_part_$templatePart.php?id_test_filter=$question' target='_blank'>$question</a>";
+                            if ($index < count($questions) - 1) {
+                                echo ", "; // Thêm dấu phẩy nếu chưa đến số cuối
+                            }
+                        }
+                        echo "</td>
+
                         <td>{$row['tag']}</td>
                         <td>{$row['book']}</td>
+                        <td>{$row['token_need']}</td>
+                        <td>{$row['role_access']}</td>
+                        <td>{$row['permissive_management']}</td>
+                        <td>{$row['time_allow']}</td>
                         <td>
                             <button class='btn btn-primary btn-sm' onclick='openEditModal({$row['number']})'>Edit</button>
                             <button class='btn btn-danger btn-sm' onclick='deleteRecord({$row['number']})'>Delete</button>
@@ -246,6 +254,9 @@ $result = $conn->query($sql);
                             <option value="">Select a Book</option>
                             <option value="SAT Suite Question Bank">SAT Suite Question Bank</option>
                         </select><br>
+                    Token Need: <input type = "number" id="edit_token_need" name="token_need" class="form-control" required><br>
+                    Role Access: <textarea  id="edit_role_access" name="role_access" class="form-control" required></textarea> <br>
+                    Time Allow: <textarea  id="edit_time_allow" name="time_allow" class="form-control" required></textarea> <br>
                    
                 </form>
             </div>
@@ -286,6 +297,9 @@ $result = $conn->query($sql);
                             <option value="">Select a Book</option>
                             <option value="SAT Suite Question Bank">SAT Suite Question Bank</option>
                         </select><br>
+                    Token Need: <input type = "number" id="add_token_need" name="token_need" class="form-control" required><br>
+                    Role Access: <textarea  id="add_role_access" name="role_access" class="form-control" required></textarea> <br>
+                    Time Allow: <textarea  id="add_time_allow" name="time_allow" class="form-control" required></textarea> <br>
 
                    
                 </form>
@@ -349,6 +363,9 @@ function openEditModal(number) {
             $('#edit_question_choose').val(data.question_choose);
             $('#edit_tag').val(data.tag);
             $('#edit_book').val(data.book);
+            $('#edit_token_need').val(data.token_need);
+            $('#edit_role_access').val(data.role_access);
+            $('#edit_time_allow').val(data.time_allow);
             $('#editModal').modal('show');
         }
     });

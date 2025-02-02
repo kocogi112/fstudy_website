@@ -4,18 +4,19 @@ require_once('C:\xampp\htdocs\wordpress\wp-load.php'); // Adjust the path as nec
 
 global $wpdb;
 
-// Get the data from the POST request
-$number = wp_kses_post($_POST['number']);
-$id_test = wp_kses_post($_POST['id_test']);
-$testname = wp_kses_post($_POST['testname']);
-$time = wp_kses_post($_POST['time']);
+    // Get the data from the POST request
+    $number = wp_kses_post($_POST['number']);
+    $id_test = wp_kses_post($_POST['id_test']);
+    $testname = wp_kses_post($_POST['testname']);
+    $time = wp_kses_post($_POST['time']);
 
-$test_type = wp_kses_post($_POST['test_type']);
-$question_choose = wp_kses_post($_POST['question_choose']);
-$tag = wp_kses_post($_POST['tag']);
-$book = wp_kses_post($_POST['book']);
-
-
+    $test_type = wp_kses_post($_POST['test_type']);
+    $question_choose = wp_kses_post($_POST['question_choose']);
+    $tag = wp_kses_post($_POST['tag']);
+    $book = wp_kses_post($_POST['book']);
+    $token_need = wp_unslash($_POST['token_need']);
+    $role_access = wp_unslash($_POST['role_access']);
+    $time_allow = wp_unslash($_POST['time_allow']);
     // Check and process question_choose for specific patterns
     $processed_question_choose = '';
     $lines = explode("\n", $question_choose);
@@ -49,7 +50,10 @@ $data = array(
     'test_type' => $test_type,
     'question_choose' => $processed_question_choose,
     'tag' => $tag,
-  'book' => $book,
+    'book' => $book,
+    'token_need' => $token_need,
+    'role_access' => $role_access,
+    'time_allow' => $time_allow,
 );
 
 // Update the record in the database
