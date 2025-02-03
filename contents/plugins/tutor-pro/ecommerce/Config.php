@@ -413,6 +413,23 @@ class Config {
 	}
 
 	/**
+	 * Get Momo config keys
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return array
+	 */
+	public static function get_momo_config_keys() {
+		return array(
+			'environment' => 'environment',
+			'client_id'   => 'secret_key',
+			'private_key' => 'secret_key',
+			'public_key'  => 'secret_key',
+			'region'      => 'alipay_region',
+		);
+	}
+
+	/**
 	 * Get Eway config keys
 	 *
 	 * @since 1.0.0

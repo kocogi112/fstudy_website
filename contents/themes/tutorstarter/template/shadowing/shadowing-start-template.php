@@ -137,7 +137,6 @@ if ($result_test->num_rows > 0) {
 
 
 
-get_header(); // Gọi phần đầu trang (header.php)
 
 echo '
 <script>
@@ -1341,7 +1340,7 @@ else{
                     table: 'shadowing_question',
                     change_token: '$token_need',
                     payment_gate: 'token',
-                    title: 'Renew test $testname with $id_test (Shadowing Test) with $token_need (Buy $time_allow time do this test)',
+                    title: 'Buy test $testname with $id_test (Shadowing Test) with $token_need token (Buy $time_allow time do this test)',
                     id_test: id_test
                 },
                 success: function (response) {

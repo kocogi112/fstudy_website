@@ -263,7 +263,7 @@ $result = $conn->query($sql);
                         </select><br>
                     Token Need: <input type = "number" id="edit_token_need" name="token_need" class="form-control" required><br>
                     Role Access: <textarea  id="edit_role_access" name="role_access" class="form-control" required></textarea> <br>
-                    Time Allow: <textarea  id="edit_time_allow" name="time_allow" class="form-control" required></textarea> <br>
+                    Time Allow: <input  type = "number"  id="edit_time_allow" name="time_allow" class="form-control" required> <br>
 
                 </form>
             </div>
@@ -310,7 +310,7 @@ $result = $conn->query($sql);
                     Token Need: <input type = "number" id="add_token_need" name="token_need" class="form-control" required><br>
                     Role Access: <textarea  id="add_role_access" name="role_access" class="form-control" required></textarea> <br>
                     
-                    Time Allow: <textarea  id="add_time_allow" name="time_allow" class="form-control" required></textarea> <br>
+                    Time Allow: <input  type = "number" id="add_time_allow" name="time_allow" class="form-control" required> <br>
 
                    
                 </form>

@@ -156,14 +156,14 @@ $siteurl = get_site_url();
 
          <div class="container" id="card-container"></div>
 
-  <form action="/wordpress/contents/checkout_gateway/vnpay_php/vnpay_create_payment.php" id="frmCreateOrder" method="post" style="display:none;">
-    <input type="hidden" name="bankCode" id="bankCode">
-    <input type="hidden" name="amount" id="amount">
-    <input type="hidden" name="orderCode" id="orderCode">
+        <form action="/wordpress/contents/checkout_gateway/checkout.php" id="frmCreateOrder" method="post" style="display:none;">
+          <input type="hidden" name="bankCode" id="bankCode">
+          <input type="hidden" name="amount" id="amount">
+          <input type="hidden" name="orderCode" id="orderCode">
 
-    <input type="hidden" name="item" id="item">
-    <input type="hidden" name="language" id="language" value="vn">
-  </form>
+          <input type="hidden" name="item" id="item">
+          <input type="hidden" name="language" id="language" value="vn">
+        </form>
 
 
 
@@ -258,9 +258,9 @@ function buyNow(title, price, tokens, type_item) {
     title: `Do you want to buy ${title}?`,
     input: 'select',
     inputOptions: {
-      'VNPay': 'VNPay',
-      'ACB': 'Asia Commercial Bank',
-      'TCB': 'Techcombank'
+      'vnpay': 'VNPay',
+      'payUrl': 'Momo',
+      'cod': 'Cod'
     },
     inputPlaceholder: 'Select payment method',
     showCancelButton: true,
@@ -283,17 +283,16 @@ function buyNow(title, price, tokens, type_item) {
     if (result.isConfirmed) {
       const { selectedBankCode, selectedLanguage } = result.value;
 
-      document.getElementById('bankCode').value = '';
+      document.getElementById('bankCode').value = selectedBankCode;
       document.getElementById('amount').value = price;
       document.getElementById('orderCode').value = sessionID;
-
       document.getElementById('item').value = `${title}`;
       document.getElementById('language').value = selectedLanguage;
 
       addTransactionToDB(selectedBankCode, price, tokens, title, type_item)
         .then(() => {
           setTimeout(() => {
-           document.getElementById('frmCreateOrder').submit();
+            document.getElementById("frmCreateOrder").submit();
           }, 2000); // Wait 2 seconds before submitting the form
         })
         .catch(() => {

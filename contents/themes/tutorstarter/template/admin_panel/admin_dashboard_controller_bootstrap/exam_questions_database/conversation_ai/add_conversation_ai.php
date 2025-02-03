@@ -140,7 +140,8 @@ $result = $conn->query($sql);
         <th>cover_image</th>
         <th>Token Price</th>
         <th>Role Access</th>
-
+        <th>Permissive Management</th>
+        <th>Time Allow</th>
         <th>Actions</th>
     </tr>
     <?php
@@ -167,7 +168,8 @@ if ($result->num_rows > 0) {
                 <td>{$row['cover_image']}</td>
                 <td>{$row['token_need']}</td>
                 <td>{$row['role_access']}</td>
-
+                <td>{$row['permissive_management']}</td>
+                <td>{$row['time_allow']}</td>
                 <td>
                     <button class='btn btn-primary btn-sm' onclick='openEditModal({$row['number']})'>Edit</button>
                     <button class='btn btn-danger btn-sm' onclick='deleteRecord({$row['number']})'>Delete</button>
@@ -249,6 +251,7 @@ if ($result->num_rows > 0) {
                     Cover Image: <input  id="edit_cover_image" name="cover_image" class="form-control" required><br>
                     Token Need: <input type = "number" id="edit_token_need" name="token_need" class="form-control" required><br>
                     Role Access: <textarea  id="edit_role_access" name="role_access" class="form-control" required></textarea> <br>
+                    Time Allow: <input  type = "number"  id="edit_time_allow" name="time_allow" class="form-control" required> <br>
 
                 </form>
             </div>
@@ -285,6 +288,8 @@ if ($result->num_rows > 0) {
                     Cover Image: <input  id="add_cover_image" name="cover_image" class="form-control" required><br>
                     Token Need: <input type = "number" id="add_token_need" name="token_need" class="form-control" required><br>
                     Role Access: <textarea  id="add_role_access" name="role_access" class="form-control" required></textarea> <br>
+                    Time Allow: <input  type = "number" id="add_time_allow" name="time_allow" class="form-control" required> <br>
+
                 </form>
             </div>
             <div class="modal-footer">
@@ -358,6 +363,8 @@ function openEditModal(number) {
 
             $('#edit_token_need').val(data.token_need);
             $('#edit_role_access').val(data.role_access);
+            $('#edit_time_allow').val(data.time_allow);
+
             $('#editModal').modal('show');
 
         }

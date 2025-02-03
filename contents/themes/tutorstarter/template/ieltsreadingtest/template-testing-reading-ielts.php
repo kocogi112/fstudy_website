@@ -875,7 +875,7 @@ html {
                         echo "<script>console.log('This is free test');</script>"; 
                     }
                         ?>
-                    </div>    
+        </div>    
         <div id = "quick-instruction">
             <i>Quick Instruction:<br>
             - If you find any errors from test (image,display,text,...), please let us know by clicking icon <i class="fa-solid fa-bug"></i><br> 

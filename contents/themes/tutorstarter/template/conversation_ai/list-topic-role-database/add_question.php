@@ -7,20 +7,21 @@ global $wpdb;
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Get the input data and sanitize it
     $id_test = wp_unslash($_POST['id_test']);
-    $testname = wp_kses_post($_POST['testname']);
-    $instruction = wp_kses_post($_POST['instruction']);
-    $target_1 = wp_kses_post($_POST['target_1']);
-    $target_2 = wp_kses_post($_POST['target_2']);
-    $target_3 = wp_kses_post($_POST['target_3']);
-    $topic = wp_kses_post($_POST['topic']);
-    $ai_role = wp_kses_post($_POST['ai_role']);
-    $user_role = wp_kses_post($_POST['user_role']);
+    $testname = wp_unslash($_POST['testname']);
+    $instruction = wp_unslash($_POST['instruction']);
+    $target_1 = wp_unslash($_POST['target_1']);
+    $target_2 = wp_unslash($_POST['target_2']);
+    $target_3 = wp_unslash($_POST['target_3']);
+    $topic = wp_unslash($_POST['topic']);
+    $ai_role = wp_unslash($_POST['ai_role']);
+    $user_role = wp_unslash($_POST['user_role']);
     $difficulty = wp_unslash($_POST['difficulty']);
     $time_limit = wp_unslash($_POST['time_limit']);
     $sentence_limit = wp_unslash($_POST['sentence_limit']);
     $cover_image = wp_unslash($_POST['cover_image']);
     $token_need = wp_unslash($_POST['token_need']);
     $role_access = wp_unslash($_POST['role_access']);
+    $time_allow = wp_unslash($_POST['time_allow']);
 
     // Prepare the data for insertion
     $data = array(
@@ -39,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'id_test' => $id_test,
         'token_need' => $token_need,
         'role_access' => $role_access,
+        'time_allow' => $time_allow,
 
     );
 

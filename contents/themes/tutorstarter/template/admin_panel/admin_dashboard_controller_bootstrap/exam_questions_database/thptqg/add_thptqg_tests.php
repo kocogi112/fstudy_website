@@ -124,14 +124,17 @@ $result = $conn->query($sql);
     <tr>
         <th>Number</th>
         <th>ID Test</th>
-        <th>subject</th>
-        <th>year</th>
-        <th>testname</th>
-        <th>link_file</th>
-
-        <th>time</th>
-        <th>number_question</th>
-        <th>testcode</th>
+        <th>Subject</th>
+        <th>Year</th>
+        <th>Test Name</th>
+        <th>Link test file</th>
+        <th>Time</th>
+        <th>Number Question</th>
+        <th>Test Code (JSON)</th>
+        <th>Token Need</th>
+        <th>Role Access</th>
+        <th>Permissive Management</th>
+        <th>Time Allow</th>
         <th>Actions</th>
     </tr>
 
@@ -156,6 +159,10 @@ $result = $conn->query($sql);
                         <td>{$row['time']}</td>
                         <td>{$row['number_question']}</td>
                         <td>{$testcode_display} $testcode_view_more</td>
+                        <td>{$row['token_need']}</td>
+                        <td>{$row['role_access']}</td>
+                        <td>{$row['permissive_management']}</td>
+                        <td>{$row['time_allow']}</td>
                         <td>
                             <button class='btn btn-primary btn-sm' onclick='openEditModal({$row['number']})'>Edit</button>
                             <button class='btn btn-danger btn-sm' onclick='deleteRecord({$row['number']})'>Delete</button>
@@ -224,12 +231,15 @@ $result = $conn->query($sql);
                     ID Test: <input type="text" id="edit_id_test" name="id_test" class="form-control" required><br>
                     subject: <input type="text" id="edit_subject" name="subject" class="form-control" required><br>
                     year: <input type="text" id="edit_year" name="year" class="form-control" required><br>
-                    testname: <textarea id="edit_testname" name="testname" class="form-control" required></textarea><br>
-                    link_file: <textarea id="edit_link_file" name="link_file" class="form-control" required></textarea><br>
+                    Test name: <textarea id="edit_testname" name="testname" class="form-control" required></textarea><br>
+                    Link file: <textarea id="edit_link_file" name="link_file" class="form-control" required></textarea><br>
 
-                    time: <textarea id="edit_time" name="time" class="form-control"></textarea><br>
-                    number_question: <textarea id="edit_number_question" name="number_question" class="form-control"></textarea><br>
-                    testcode: <textarea  id="edit_testcode" name="testcode" class="form-control" required></textarea> <br>
+                    Time: <input type = "number" id="edit_time" name="time" class="form-control"><br>
+                    Number Question: <textarea id="edit_number_question" name="number_question" class="form-control"></textarea><br>
+                    Test Code json: <textarea  id="edit_testcode" name="testcode" class="form-control" required></textarea> <br>
+                    Token Need: <input type = "number" id="edit_token_need" name="token_need" class="form-control" required><br>
+                    Role Access: <textarea  id="edit_role_access" name="role_access" class="form-control" required></textarea> <br>
+                    Time Allow: <input type = "number"  id="edit_time_allow" name="time_allow" class="form-control" required> <br>
                 </form>
             </div>
             <div class="modal-footer">
@@ -251,14 +261,19 @@ $result = $conn->query($sql);
             <div class="modal-body">
                 <form id="addForm">
                     ID Test: <input type="text" id="add_id_test" name="id_test" class="form-control" required><br>
-                    subject: <input type="text" id="add_subject" name="subject" class="form-control" required><br>
-                    year: <input type="text" id="add_year" name="year" class="form-control" required><br>
-                    testname: <textarea id="add_testname" name="testname" class="form-control" required></textarea><br>
-                    link_file: <textarea id="add_link_file" name="link_file" class="form-control" required></textarea><br>
+                    Subject: <input type="text" id="add_subject" name="subject" class="form-control" required><br>
+                    Year: <input type="text" id="add_year" name="year" class="form-control" required><br>
+                    Test Name: <textarea id="add_testname" name="testname" class="form-control" required></textarea><br>
+                    Link file: <textarea id="add_link_file" name="link_file" class="form-control" required></textarea><br>
 
-                    time: <textarea id="add_time" name="time" class="form-control"></textarea><br>
-                    number_question: <textarea id="add_number_question" name="number_question" class="form-control"></textarea><br>
-                    testcode: <textarea  id="add_testcode" name="testcode" class="form-control" required></textarea> <br>
+                    Time: <textarea id="add_time" name="time" class="form-control"></textarea><br>
+                    Number Question: <textarea id="add_number_question" name="number_question" class="form-control"></textarea><br>
+                    Test Code: <textarea  id="add_testcode" name="testcode" class="form-control" required></textarea> <br>
+
+                    Token Need: <input type = "number" id="add_token_need" name="token_need" class="form-control" required><br>
+                    Role Access: <textarea  id="add_role_access" name="role_access" class="form-control" required></textarea> <br>
+                    Time Allow: <input  type = "number" id="add_time_allow" name="time_allow" class="form-control" required> <br>
+
                 </form>
             </div>
             <div class="modal-footer">
@@ -321,6 +336,9 @@ function openEditModal(number) {
             $('#edit_time').val(data.time);
             $('#edit_number_question').val(data.number_question);
             $('#edit_testcode').val(data.testcode);
+            $('#edit_token_need').val(data.token_need);
+            $('#edit_role_access').val(data.role_access);
+            $('#edit_time_allow').val(data.time_allow);
             $('#editModal').modal('show');
         }
     });

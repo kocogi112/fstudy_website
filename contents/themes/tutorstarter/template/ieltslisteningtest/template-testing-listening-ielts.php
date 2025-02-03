@@ -1225,7 +1225,7 @@ else{
                     table: 'ielts_listening_test_list',
                     change_token: '$token_need',
                     payment_gate: 'token',
-                    title: 'Renew test $testname with $id_test (Ielts Listening Test) with $token_need (Buy $time_allow time do this test)',
+                    title: 'Buy test $testname with $id_test (Ielts Listening Test) with $token_need tokens (Buy $time_allow time do this test)',
                     id_test: id_test
                 },
                 success: function (response) {

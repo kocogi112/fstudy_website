@@ -14,7 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $time = wp_kses_post($_POST['time']);
     $number_question = wp_kses_post($_POST['number_question']);
     $testcode = wp_unslash(wp_kses_post($_POST['testcode']));
-
+    $token_need = wp_unslash($_POST['token_need']);
+    $role_access = wp_unslash($_POST['role_access']);
+    $time_allow = wp_unslash($_POST['time_allow']);
     // Prepare the data for insertion
     $data = array(
         'id_test' => $id_test,
@@ -24,7 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'link_file' => $link_file,
         'time' => $time,
         'number_question' => $number_question,
-        'testcode' => $testcode
+        'testcode' => $testcode,
+        'token_need' => $token_need,
+        'role_access' => $role_access,
+        'time_allow' => $time_allow
     );
 
     // Insert the data into the database

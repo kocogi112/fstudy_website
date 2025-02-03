@@ -131,6 +131,11 @@ $result = $conn->query($sql);
         <th>Test name</th>
         <th>ID Video</th>
         <th>Transcript</th>
+        <th>Token Need</th>
+        <th>Role Access</th>
+        <th>Permissive Management</th>
+        <th>Time Allow</th>
+        <th>Action</th>
 
     </tr>
 
@@ -145,12 +150,16 @@ $result = $conn->query($sql);
                 echo "<tr id='row_{$row['number']}'>
                         <td>{$row['number']}</td>
                         <td>
-                            <a href='http://localhost/wordpress/dictationexercise/{$row['id_test']}' target='_blank'> {$row['id_test']}</a> 
+                            <a href='http://localhost/wordpress/dictation/{$row['id_test']}' target='_blank'> {$row['id_test']}</a> 
                         </td>
                         <td>{$row['type_test']}</td>
                         <td>{$row['testname']}</td>
                         <td>{$row['id_video']}</td>
                         <td>{$sample_display} $sample_view_more</td>
+                        <td>{$row['token_need']}</td>
+                        <td>{$row['role_access']}</td>
+                        <td>{$row['permissive_management']}</td>
+                        <td>{$row['time_allow']}</td>
 
                         <td>
                             <button class='btn btn-primary btn-sm' onclick='openEditModal({$row['number']})'>Edit</button>
@@ -229,6 +238,9 @@ $result = $conn->query($sql);
                     Test name: <input type="text" id="edit_testname" name="testname" class="form-control" required><br>
                     ID Video: <textarea id="edit_id_video" name="id_video" class="form-control"></textarea><br>
                     Transcript: <textarea id="edit_transcript" name="transcript" class="form-control"></textarea><br>
+                    Token Need: <input type = "number" id="edit_token_need" name="token_need" class="form-control" required><br>
+                    Role Access: <textarea  id="edit_role_access" name="role_access" class="form-control" required></textarea> <br>
+                    Time Allow: <input type = "number"  id="edit_time_allow" name="time_allow" class="form-control" required> <br>
 
                 </form>
             </div>
@@ -263,6 +275,9 @@ $result = $conn->query($sql);
                     Test name: <input type="text" id="add_testname" name="testname" class="form-control" required><br>
                     ID Video: <textarea id="add_id_video" name="id_video" class="form-control"></textarea><br>
                     Transcript: <textarea id="add_transcript" name="transcript" class="form-control"></textarea><br>
+                    Token Need: <input type = "number" id="add_token_need" name="token_need" class="form-control" required><br>
+                    Role Access: <textarea  id="add_role_access" name="role_access" class="form-control" required></textarea> <br>
+                    Time Allow: <input  type = "number" id="add_time_allow" name="time_allow" class="form-control" required> <br>
 
 
                 </form>
@@ -326,6 +341,9 @@ function openEditModal(number) {
             $('#edit_testname').val(data.testname);
             $('#edit_id_video').val(data.id_video);
             $('#edit_transcript').val(data.transcript);
+            $('#edit_token_need').val(data.token_need);
+            $('#edit_role_access').val(data.role_access);
+            $('#edit_time_allow').val(data.time_allow);
 
             $('#editModal').modal('show');
         }
