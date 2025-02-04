@@ -132,7 +132,7 @@ if ( Ecommerce::MONETIZE_BY === $monetize_by ) {
 								<tr>
 								<td>
 									<div class="tutor-fs-7">
-										#<?php echo esc_html( $order->id ); ?>
+										<?php echo esc_html( $order->vn_paygate_order_content_id ); ?>
 									</div>
 								</td>
 								<td>
@@ -277,16 +277,18 @@ if ( Ecommerce::MONETIZE_BY === $monetize_by ) {
 										$pay_now_url = esc_url( $wc_order->get_checkout_payment_url() );
 									}
 									?>
+									
 									<div class="tutor-order-history-actions">
 										<?php if ( 'wc-pending' === $status ) : ?>
 										<a href="<?php echo esc_url( $pay_now_url ); ?>" 
 											class="tutor-btn tutor-btn-outline-primary tutor-btn-sm tutor-mr-8">
 											<?php esc_html_e( 'Pay', 'tutor-pro' ); ?>	
-										</a>
+										</a> 
 										<?php endif; ?>
 										<a href="javascript:;" class="tutor-export-purchase-history tutor-iconic-btn tutor-iconic-btn-secondary" data-order="<?php echo esc_attr( $order->ID ); ?>" data-course-name="<?php echo esc_attr( get_the_title( $course['course_id'] ) ); ?>" data-price="<?php echo esc_attr( $raw_price ); ?>" data-date="<?php echo esc_attr( date_i18n( get_option( 'date_format' ), strtotime( $order->post_date ) ) ); ?>" data-status="<?php echo esc_attr( $order_status_text ); ?>">
 											<span class="tutor-icon-receipt-line" area-hidden="true"></span>
 										</a>
+										
 									</div>
 								</td>
 							</tr>

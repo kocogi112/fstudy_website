@@ -156,11 +156,11 @@ $siteurl = get_site_url();
 
          <div class="container" id="card-container"></div>
 
-        <form action="/wordpress/contents/checkout_gateway/checkout.php" id="frmCreateOrder" method="post" style="display:none;">
+        <form action="/wordpress/contents/checkout_gateway/checkout_controller.php" id="frmCreateOrder" method="post" style="display:none;">
           <input type="hidden" name="bankCode" id="bankCode">
           <input type="hidden" name="amount" id="amount">
           <input type="hidden" name="orderCode" id="orderCode">
-
+          <input type="hidden" name="typeItem" id="typeItem">
           <input type="hidden" name="item" id="item">
           <input type="hidden" name="language" id="language" value="vn">
         </form>
@@ -288,6 +288,7 @@ function buyNow(title, price, tokens, type_item) {
       document.getElementById('orderCode').value = sessionID;
       document.getElementById('item').value = `${title}`;
       document.getElementById('language').value = selectedLanguage;
+      document.getElementById('typeItem').value = 'token';
 
       addTransactionToDB(selectedBankCode, price, tokens, title, type_item)
         .then(() => {

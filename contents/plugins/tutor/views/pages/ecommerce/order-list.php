@@ -72,6 +72,8 @@ $available_status = array(
 		tutor_load_template_from_custom_path( $navbar_template, $navbar_data );
 		tutor_load_template_from_custom_path( $filters_template, $filters );
 	?>
+	<!-- Search Bar for Order ID -->
+
 	<div class="tutor-admin-body">
 		<div class="tutor-mt-24">
 			<div class="tutor-table-responsive">
@@ -87,6 +89,9 @@ $available_status = array(
 							<th class="tutor-table-rows-sorting">
 								<?php esc_html_e( 'ID', 'tutor' ); ?>
 								<span class="a-to-z-sort-icon tutor-icon-ordering-a-z"></span>
+							</th>
+							<th >
+								<?php esc_html_e( 'Order ID', 'tutor' ); ?>
 							</th>
 							<th>
 								<?php esc_html_e( 'Name', 'tutor' ); ?>
@@ -132,6 +137,10 @@ $available_status = array(
 											<?php echo esc_html( '#' . $order->id ); ?>
 										</div>
 									</td>
+									<td>
+											<?php echo esc_html($order->vn_paygate_order_content_id ); ?>
+									</td>
+
 
 									<td>
 										<div class="tutor-d-flex tutor-align-center">

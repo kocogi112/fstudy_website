@@ -173,6 +173,7 @@ class HooksHandler {
 				'order_status'     => $order_details->order_status,
 				'payment_status'   => $new_payment_status,
 				'payment_payloads' => $res->payment_payload,
+				'vn_paygate_order_content_id' => $res->vn_paygate_order_content_id,
 				'transaction_id'   => $transaction_id,
 				'earnings'         => $res->earnings,
 				'fees'             => $res->fees,

@@ -178,7 +178,7 @@ class OrderController {
 	 *
 	 * @return mixed order id or order data.
 	 */
-	public function create_order( int $user_id, array $items, string $payment_status, string $order_type, $coupon_code = null, array $args = array(), $return_id = true ) {
+	public function create_order( int $user_id, array $items, string $payment_status, string $order_type, $coupon_code = null, string $vn_paygate_order_content_id, array $args = array(), $return_id = true ) {
 		$items          = Input::sanitize_array( $items );
 		$payment_status = Input::sanitize( $payment_status );
 		$coupon_code    = Input::sanitize( $coupon_code );
@@ -228,12 +228,12 @@ class OrderController {
 			'total_price'    => $total_price,
 			'net_payment'    => $total_price,
 			'user_id'        => $user_id,
-			'payment_status' => $payment_status,
 			'order_status'   => $this->model::PAYMENT_PAID === $payment_status ? $this->model::ORDER_COMPLETED : $this->model::ORDER_INCOMPLETE,
 			'created_at_gmt' => current_time( 'mysql', true ),
 			'created_by'     => get_current_user_id(),
 			'updated_at_gmt' => current_time( 'mysql', true ),
 			'updated_by'     => get_current_user_id(),
+			'vn_paygate_order_content_id' => $vn_paygate_order_content_id,
 		);
 
 		if ( isset( $args['discount_amount'] ) && $args['discount_amount'] > 0 ) {

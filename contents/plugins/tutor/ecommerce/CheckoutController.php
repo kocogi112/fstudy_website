@@ -398,6 +398,7 @@ class CheckoutController {
 			'payment_method',
 			'payment_type',
 			'order_type',
+			'vn_paygate_order_content_id',
 		);
 
 		$request = array_intersect_key( $request, array_flip( $order_payment_fields ) );
@@ -431,6 +432,7 @@ class CheckoutController {
 
 		$object_ids     = array_filter( explode( ',', $request['object_ids'] ), 'is_numeric' );
 		$coupon_code    = isset( $request['coupon_code'] ) ? $request['coupon_code'] : '';
+		$vn_paygate_order_content_id = $_POST['orderID'];
 		$payment_method = $request['payment_method'];
 		$payment_type   = $request['payment_type'];
 		$order_type     = $request['order_type'];
@@ -478,7 +480,7 @@ class CheckoutController {
 		);
 
 		if ( empty( $errors ) ) {
-			$order_data = ( new OrderController( false ) )->create_order( $current_user_id, $items, OrderModel::PAYMENT_UNPAID, $order_type, $coupon_code, $args, false );
+			$order_data = ( new OrderController( false ) )->create_order( $current_user_id, $items, OrderModel::PAYMENT_UNPAID, $order_type, $coupon_code, $vn_paygate_order_content_id, $args, false );
 			if ( ! empty( $order_data ) ) {
 				if ( 'automate' === $payment_type ) {
 					try {

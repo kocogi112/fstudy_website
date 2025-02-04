@@ -13,6 +13,7 @@ tutor_utils()->tutor_custom_header();
 $order_status;
 $order_id;
 $payment_gateways;
+$vn_paygate_order_content_id;
 
 ?><div class="tutor-container tutor-order-status-wrapper">
 	<div class="tutor-d-flex tutor-flex-column tutor-align-center tutor-gap-2 tutor-px-20 tutor-py-80 tutor-text-center">
