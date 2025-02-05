@@ -342,7 +342,7 @@ if (window.MathJax) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title></title>
-    <link rel="stylesheet" href="/wordpress/contents/themes/tutorstarter/system-test-toolkit/style/style_6.css">
+    <link rel="stylesheet" href="/wordpress/contents/themes/tutorstarter/system-test-toolkit/style/style_7.css">
     <style type="text/css">
 
 #time-remaining-container {
@@ -730,13 +730,14 @@ img {
         display: flex;
         align-items: center;
         justify-content: center; /* Center content horizontally */
-        padding: 6px 14px;
+        padding: 10px 18px;
         font-family: -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
         border-radius: 6px;
         font-size: 15px;
         border: none;
         color: #fff;
-        background: linear-gradient(180deg, #4B91F7 0%, #367AF6 100%);
+        /*background: linear-gradient(180deg, #4B91F7 0%, #367AF6 100%);*/
+        background: black;
         background-origin: border-box;
         box-shadow: 0px 0.5px 1.5px rgba(54, 122, 246, 0.25), inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2);
         user-select: none;
@@ -871,6 +872,15 @@ img {
     user-select: none;
     cursor: pointer;
     transition: all .2s 0s ease;
+}
+.ctn-checkbox {
+    display: flex;
+    align-items: center; /* Căn giữa theo chiều dọc */
+}
+
+.ctn-cbx {
+    font-size: 19px;
+    margin-right: 8px; /* Khoảng cách giữa text và svg */
 }
 
    </style>
@@ -1304,7 +1314,7 @@ img {
                         <div class="dropdown-menu usermap" style=""></div>
                     </div>
                                 
-                    <button class="quick-view-checkbox-button" id="checkbox-button">Quick View All Questions</button>
+                    <button class="quick-view-checkbox-button" id="checkbox-button"></button>
 
                     <div id ="navi-button" style="display: none;">
                         <button class="button-navigate-test" id="prev-button" onclick="showPrevQuestion()">Quay lại</button>
@@ -1613,6 +1623,7 @@ let questionStartTime = {};  // Để lưu trữ thời gian bắt đầu cho t�
 let questionTimes = {}; // Đối tượng lưu trữ tổng thời gian của mỗi câu hỏi
 
 
+let checkBoxBtn = document.getElementById("checkbox-button");
 function showPrevQuestion() {
     countTimeSpecific(currentQuestionIndex);
 
@@ -1738,6 +1749,14 @@ function dragElement(elmnt) {
 }
 function showQuestion(index) {
     const questions = document.getElementsByClassName("questions");
+    checkBoxBtn.innerHTML = `
+        <div class="ctn-checkbox"> 
+            <div class="ctn-cbx"> Question ${index+1} of ${questions.length} </div> 
+            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 15l-6-6-6 6"/>
+            </svg>
+        </div>`;
+
 
     // giao diện 2
     document.getElementById('change_appearane_2').addEventListener('click', function() {
@@ -1854,7 +1873,7 @@ function purple_highlight(spanId) {
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/color-background.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/start-digital-sat-Test.js"></script>
 <!-- <script type="text/javascript" src="function/quick-view-answer.js"></script> -->
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/checkbox_remember.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/checkbox_and_remember.js"></script>
 
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/reload-test.js"></script>
 <script type ="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/change-mode.js"></script> 

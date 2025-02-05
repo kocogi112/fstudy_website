@@ -1147,6 +1147,12 @@ let audioBlob;
 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
+    let mediaRecorder;
+    let isRecording = false;
+    let recognition;
+    let audioChunks = [];
+    let transcript = []; // Add transcript array for storing recognized text
+
     // Bắt đầu ghi âm
     document.getElementById('startRecord').addEventListener('click', async () => {
         try {
@@ -1159,7 +1165,7 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             };
 
             mediaRecorder.onstop = () => {
-                audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                 const audioURL = URL.createObjectURL(audioBlob);
 
                 // Hiển thị đoạn ghi âm
@@ -1177,13 +1183,16 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             // Kết hợp với Web Speech API
             if ('webkitSpeechRecognition' in window) {
                 recognition = new webkitSpeechRecognition();
-                recognition.continuous = false;
+                recognition.continuous = true; // Đảm bảo nhận diện liên tục
                 recognition.lang = 'en-US';
-                recognition.interimResults = false;
+                recognition.interimResults = true; // Cho phép nhận diện tạm thời
 
                 recognition.onresult = (event) => {
-                    const spokenText = event.results[0][0].transcript.trim();
+                    const spokenText = event.results[event.resultIndex][0].transcript.trim();
                     document.getElementById('recordedText').innerText = `You said: ${spokenText}`;
+
+                    // Lưu trữ văn bản nhận diện vào transcript để xử lý sau
+                    transcript.push(spokenText);
 
                     const currentItem = transcript[currentTranscriptIndex];
                     const sanitizedSpokenText = sanitizeInput(spokenText);
@@ -1195,7 +1204,8 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                         document.getElementById('confidentialLevel').innerText = "Try again.";
                     }
                 };
-                recognition.start();
+
+                recognition.start(); // Bắt đầu nhận diện giọng nói liên tục
             }
         } catch (error) {
             console.error('Error accessing microphone', error);
@@ -1212,13 +1222,14 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             document.getElementById('stopRecord').disabled = true;
 
             if (recognition) {
-                recognition.stop();
+                recognition.stop(); // Dừng nhận diện khi nhấn "Stop Record"
             }
         }
     });
 } else {
     console.error("MediaRecorder not supported on this browser");
 }
+
 
         let player;
         let currentTranscriptIndex = 0;
@@ -1268,9 +1279,15 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     document.getElementById('next').addEventListener('click', () => navigateTranscript(1));
     document.getElementById('checkAnswer').addEventListener('click', checkAnswer);
 
-        function sanitizeInput(input) {
-            return input.replace(/[^a-zA-Z0-9\s]/g, "").toLowerCase();
-        }
+    function sanitizeInput(input) {
+    // Kiểm tra nếu input không phải là undefined hoặc null
+    if (input === undefined || input === null) {
+        return ''; // Trả về một chuỗi trống nếu input không hợp lệ
+    }
+    // Thực hiện việc loại bỏ ký tự đặc biệt và chuyển đổi thành chữ thường
+    return input.replace(/[^a-zA-Z0-9\s]/g, "").toLowerCase();
+}
+
         function onPlayerReady() {
         updateTranscript();
     }

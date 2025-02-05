@@ -76,32 +76,88 @@ $notations = $wpdb->get_results(
                 <th>Source</th>
                 <th>Test Type</th>
                 <th>ID Test</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             <?php if (!empty($notations)) : ?>
+                <?php $rowNumber = 1; ?>
                 <?php foreach ($notations as $notation) : ?>
-                    <tr>
-                        <td><?php echo esc_html($notation->number); ?></td>
+                    <tr id="row-<?php echo $notation->number; ?>">
+                        <td><?php echo $rowNumber++; ?></td>
                         <td><?php echo esc_html(date('Y-m-d', strtotime($notation->save_time))); ?></td>
                         <td><?php echo esc_html($notation->username); ?></td>
-                        <td><?php echo esc_html($notation->word_save); ?></td>
-                        <td><?php echo esc_html($notation->meaning_or_explanation); ?></td>
+                        <td id="word-<?php echo $notation->number; ?>"><?php echo esc_html($notation->word_save); ?></td>
+                        <td id="meaning-<?php echo $notation->number; ?>"><?php echo esc_html($notation->meaning_or_explanation); ?></td>
                         <td><?php echo esc_html($notation->is_source); ?></td>
                         <td><?php echo esc_html($notation->test_type); ?></td>
                         <td><?php echo esc_html($notation->id_test); ?></td>
+                        <td>
+                            <button class="button-10" onclick="openEditPopup(<?php echo $notation->number; ?>)">Sửa</button>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             <?php else : ?>
                 <tr>
-                    <td colspan="8">Không có từ nào được lưu.</td>
+                    <td colspan="9">Không có từ nào được lưu.</td>
                 </tr>
             <?php endif; ?>
         </tbody>
     </table>
 </div>
+<!-- Edit Popup -->
+<div id="editPopup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#fff; padding:20px; box-shadow:0 2px 10px rgba(0,0,0,0.1); z-index:1000;">
+    <h3>Chỉnh sửa từ đã lưu</h3>
+    <input type="hidden" id="editNumber">
+    <label for="editWord">Word Save:</label>
+    <input type="text" id="editWord" style="width: 100%; margin-bottom: 10px;">
+    <label for="editMeaning">Meaning or Explanation:</label>
+    <textarea id="editMeaning" style="width: 100%; margin-bottom: 10px;"></textarea>
+    <button class="button-10" onclick="saveEdit()">Lưu</button>
+    <button class="button-10" onclick="closeEditPopup()">Đóng</button>
+</div>
 
 <script>
+    function openEditPopup(number) {
+        document.getElementById("editNumber").value = number;
+        document.getElementById("editWord").value = document.getElementById("word-" + number).innerText;
+        document.getElementById("editMeaning").value = document.getElementById("meaning-" + number).innerText;
+        document.getElementById("editPopup").style.display = "block";
+    }
+
+    function closeEditPopup() {
+        document.getElementById("editPopup").style.display = "none";
+    }
+
+    function saveEdit() {
+        let number = document.getElementById("editNumber").value;
+        let wordSave = document.getElementById("editWord").value;
+        let meaningOrExplanation = document.getElementById("editMeaning").value;
+
+        // Gửi AJAX request để cập nhật database
+        let data = new FormData();
+        data.append('action', 'update_notation');
+        data.append('number', number);
+        data.append('word_save', wordSave);
+        data.append('meaning_or_explanation', meaningOrExplanation);
+
+        fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+            method: 'POST',
+            body: data
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                document.getElementById("word-" + number).innerText = wordSave;
+                document.getElementById("meaning-" + number).innerText = meaningOrExplanation;
+                closeEditPopup();
+                alert("Cập nhật thành công!");
+            } else {
+                alert("Cập nhật thất bại!");
+            }
+        });
+    }
+
     const date = new Date().toISOString().split('T')[0]
 
     // Xuất bảng ra CSV
