@@ -76,6 +76,8 @@ if ($result_test->num_rows > 0) {
     });
     
     get_header();
+    $sidebar = get_theme_mod( 'sidebar_type_select' );
+
     $stmt_user = $conn->prepare($sql_user);
     if (!$stmt_user) {
         die("Error preparing statement 2: " . $conn->error);
@@ -141,7 +143,6 @@ if ($result_test->num_rows > 0) {
 
 
 
-get_header(); // Gọi phần đầu trang (header.php)
 
 echo '
 <script>
@@ -375,6 +376,7 @@ body {
   width: 100%;
   padding: 10px;
   overflow: auto; /* Add this to make sides scrollable independently */
+  display:none;
 }
 
 .left-side {
@@ -963,11 +965,23 @@ border: 3px solid transparent;
 <div class="container1">
     <div id = "before-content">
         <div class = "bf-content-setting-class" id = "bf-content-setting">
-            
+
+        
 
         </div>
     </div>
+   
+
+
     <div id="content1">
+    <div id ="intro" style="text-align: center;">
+          <h3> <?php echo $testname; ?></h3>
+          <p>This speech/ conversation has been collected from <?php echo $type_test; ?></p>
+            <p id = 'number-sentences'>Number of sentence: </p>
+            <p>Guidelines: </p>
+            <button onclick ="pregetStart()" class="button-1">Start Now</button>
+        </div>
+
         <div id = 'left-side' class="left-side">
         <div id = "checkpoint" class = "checkpoint">
                 <?php
@@ -981,13 +995,6 @@ border: 3px solid transparent;
                     }
                         ?>
         </div>    
-        <div id ="intro" style="text-align: center;">
-          <h3> <?php echo $testname; ?></h3>
-          <p>This speech/ conversation has been collected from <?php echo $type_test; ?></p>
-            <p id = 'number-sentences'>Number of sentence: </p>
-            <p>Guidelines: </p>
-            <button onclick ="pregetStart()" class="button-1">Start Now</button>
-        </div>
         
 
     <div id ="start-dictation" style="display: none;">
@@ -1114,6 +1121,9 @@ function getStart() {
   updateTranscript();
     document.getElementById("intro").style.display = "none";
     document.getElementById("start-dictation").style.display = "block";
+    document.getElementById("left-side").style.display = "block";
+    document.getElementById("right-side").style.display = "block";
+
     navigateTranscript(0);
 }
 document.getElementById('listenAgain').addEventListener('click', () => {

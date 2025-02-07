@@ -179,7 +179,37 @@ $siteurl = get_site_url();
     .btn-plan{
         display: none;
     }
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
+  .popup-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    text-align: center;
+  }
+
+  .popup-buttons {
+    margin-top: 10px;
+  }
+
+  .popup-buttons button {
+    margin: 5px;
+  }
+
+  .hidden {
+    display: none;
+  }
 
 </style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
@@ -245,15 +275,41 @@ $siteurl = get_site_url();
                             <button id="closePopupBtn">Đóng</button>
                         </div>
                     </form>
-
                 </div>
             </div>
+        </div>
         </div>
         <div id="tab2" class="tab-pane">
             <div class = "aim-set">
                 <p>Mục tiêu của bạn</p>
+                <div class = "target-area" id = "target-area">
+                    <div class = "target-container" id = "target-container"></div>
+                    <button class = "btn-add-target" id = "btn-add-target" >Thêm mục tiêu</button>
+                </div>
                 <!--Set môn thi, điểm target, ngày thi-->
             </div>
+        </div>
+        <!-- Popup Modal -->
+        <div id="popup-add-target" class="popup-overlay hidden">
+        <div class="popup-content">
+            <h2>Thêm Mục Tiêu</h2>
+            <label for="target-select">Chọn Target:</label>
+            <select id="target-select">
+            <option value="Digital SAT">Digital SAT</option>
+            <option value="IELTS">IELTS</option>
+            <option value="THPTQG">THPTQG</option>
+            <option value="other">Khác</option>
+            </select>
+            
+            <label for="aim-input">Nhập điểm mục tiêu:</label>
+            <input type="number" id="aim-input" placeholder="Nhập điểm" min="0" />
+            
+            <div class="popup-buttons">
+                
+            <button id="saveTargetButton">Lưu</button>
+            <button id="close-popup-btn">Đóng</button>
+            </div>
+        </div>
         </div>
         
     </div>
@@ -469,7 +525,42 @@ $siteurl = get_site_url();
 
     // Render the calendar initially
     renderCalendar();
+    console.log(userTargets)
 
+    const userPlanAndTarget = userTargets;
+
+    function renderTargetTable(data) {
+      if (data.length === 0) {
+        document.getElementById("target-container").innerHTML = "<p>Không có mục tiêu nào.</p>";
+        return;
+      }
+
+      let tableHTML = `
+        <table border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse; text-align: left;">
+          <thead>
+            <tr>
+              <th>Mục tiêu</th>
+              <th>Điểm Mục Tiêu</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      data.forEach(item => {
+        tableHTML += `
+          <tr>
+            <td>${item.target}</td>
+            <td>${item.aim_point}</td>
+          </tr>
+        `;
+      });
+
+      tableHTML += `</tbody></table>`;
+      document.getElementById("target-container").innerHTML = tableHTML;
+    }
+
+    // Initial render
+    renderTargetTable(userPlanAndTarget);
     
     prevNextIcon = document.querySelectorAll(".icons span");
 
@@ -526,6 +617,68 @@ $siteurl = get_site_url();
     });
 
     });
+
+
+
+
+
+
+    // DOM Elements
+    const addTargetButton = document.getElementById("btn-add-target");
+    const popup = document.getElementById("popup-add-target");
+    const closePopupButton = document.getElementById("close-popup-btn");
+    const saveTargetButton = document.getElementById("saveTargetButton");
+    const targetSelect = document.getElementById("target-select");
+    const aimInput = document.getElementById("aim-input");
+
+    // Show popup
+    addTargetButton.addEventListener("click", () => {
+    popup.classList.remove("hidden");
+    });
+
+    // Close popup
+    closePopupButton.addEventListener("click", () => {
+    popup.classList.add("hidden");
+    });
+
+
+
+  
+    
+
+    document.querySelector("#saveTargetButton").addEventListener("click", function (e) {
+    e.preventDefault();
+
+    const aim_pointContext = targetSelect.value; // Điểm mục tiêu
+    const targetSelected = aimInput.value; // Mục tiêu đã chọn
+
+    var ajaxurl = "<?php echo admin_url('admin-ajax.php'); ?>";
+
+    jQuery.ajax({
+        url: ajaxurl,
+        type: "POST",
+        data: {
+            action: "save_user_target", // Tên action cần khớp với add_action ở backend
+            username: currentUsername,
+            target: aim_pointContext,  // Lưu target
+            aim_point: targetSelected, // Lưu điểm mục tiêu
+        },
+        success: function (response) {
+            if (response.success) {
+                console.log(response.data.message);
+                alert("Đã thiết lập target");
+            } else {
+                console.error(response.data.message);
+                alert("Lưu target thất bại!");
+            }
+        },
+        error: function () {
+            console.error("AJAX error");
+            alert("Có lỗi xảy ra trong quá trình gửi AJAX.");
+        }
+    });
+});
+
 </script>
 <?php
 ?>

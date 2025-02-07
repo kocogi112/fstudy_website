@@ -303,6 +303,7 @@ $result = $conn->query($sql);
                         <option value="Text Structure and Purpose">Text Structure and Purpose</option>
                         <option value="Transition">Transition</option>
                         <option value="Rhetorical Analysis">Rhetorical Analysis</option>
+                        <option value="Command of Evidence">Command of Evidence</option>
 
                     </select><br>
 

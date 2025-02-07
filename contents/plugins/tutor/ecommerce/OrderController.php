@@ -178,7 +178,7 @@ class OrderController {
 	 *
 	 * @return mixed order id or order data.
 	 */
-	public function create_order( int $user_id, array $items, string $payment_status, string $order_type, $coupon_code = null, string $vn_paygate_order_content_id, array $args = array(), $return_id = true ) {
+	public function create_order( int $user_id, array $items, string $payment_status, string $order_type, $coupon_code = null, $vn_paygate_order_content_id = null, array $args = array(), $return_id = true ) {
 		$items          = Input::sanitize_array( $items );
 		$payment_status = Input::sanitize( $payment_status );
 		$coupon_code    = Input::sanitize( $coupon_code );

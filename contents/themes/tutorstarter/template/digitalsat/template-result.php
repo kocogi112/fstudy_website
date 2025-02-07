@@ -1,7 +1,7 @@
 <?php
 /*
  * Template Name: Result Template Digital SAT
- * Template Post Type: digitalsat
+ * Template Post Type: digitalsat-result
  */
 
 $post_id = get_the_ID();
@@ -62,7 +62,6 @@ $site_url = get_site_url();
 
 
 
-
 if ($result->num_rows > 0) {
     $data = $result->fetch_assoc();  
 
@@ -85,6 +84,8 @@ echo '
         
         var linkTest = "'.$site_url .'/digitalsat/' . $id_test . '";
        
+        var currentLink = "'.$site_url .'/digitalsat/result/' . $testsavenumber . '";
+
     </script>
 ';
 
@@ -457,7 +458,7 @@ $new_skip_ans = 0;
         echo'<button class="button-10" onclick ="redirectToTest()"> Làm lại bài thi </button>';
         echo'<button class="button-10" onclick = "opensharePermission()">Chia sẻ bài làm</button>';
         echo'<button class="button-10" onclick = "openRemarkTest()" >Chấm lại </button>';
-        echo'<button class="button-10"> Làm lại các câu sai</button><br><br>';
+        echo'<button class="button-10" onclick = "redoWrongAns()"> Làm lại các câu sai</button><br><br>';
 
       
 
@@ -517,7 +518,7 @@ $new_skip_ans = 0;
         // Loop through all question IDs in the questions array
         foreach ($questions as $question_id) {
             // Query for each question to get detailed data
-            $sql_question = "SELECT explanation, id_question, type_question, question_content, answer_1, answer_2, answer_3, answer_4, correct_answer FROM digital_sat_question_bank_verbal WHERE id_question = ?";
+            $sql_question = "SELECT explanation, id_question, type_question, question_content, answer_1, answer_2, answer_3, answer_4, correct_answer, image_link FROM digital_sat_question_bank_verbal WHERE id_question = ?";
             $stmt_question = $conn->prepare($sql_question);
             $stmt_question->bind_param("s", $question_id);
             $stmt_question->execute();
@@ -591,7 +592,7 @@ $new_skip_ans = 0;
                 $explanation = isset($question_data['explanation']) ? htmlspecialchars($question_data['explanation'], ENT_QUOTES, 'UTF-8') : 'Explanation not available';
 
                 // Use $explanation safely in the JavaScript function
-                echo '<td><a onclick="openDetailExplanation(\'' . esc_js($question_number) . '\',  \'' . esc_js($question_data['id_question']) . '\', \'' . esc_js($question_data['question_content']) . '\', \'' . esc_js($question_data['answer_1']) . '\', \'' . esc_js($question_data['answer_2']) . '\', \'' . esc_js($question_data['answer_3']) . '\', \'' . esc_js($question_data['answer_4']) . '\', \'' . esc_js($correct_answer_text) . '\', \'' . esc_js($user_answer) . '\', `' . htmlspecialchars($question_data['explanation'], ENT_QUOTES, 'UTF-8') . '`)" id="quick-view-' . $question_data['id_question'] . '">Review</a></td>';
+                echo '<td><a onclick="openDetailExplanation(\'' . esc_js($question_number) . '\',  \'' . esc_js($question_data['id_question']) . '\', \'' . esc_js($question_data['question_content']) . '\', \'' . esc_js($question_data['image_link']) . '\', \'' . esc_js($question_data['answer_1']) . '\', \'' . esc_js($question_data['answer_2']) . '\', \'' . esc_js($question_data['answer_3']) . '\', \'' . esc_js($question_data['answer_4']) . '\', \'' . esc_js($correct_answer_text) . '\', \'' . esc_js($user_answer) . '\', `' . htmlspecialchars($question_data['explanation'], ENT_QUOTES, 'UTF-8') . '`)" id="quick-view-' . $question_data['id_question'] . '">Review</a></td>';
                                 
                 echo '</tr>';
 
@@ -619,6 +620,9 @@ $new_skip_ans = 0;
             <div class="left-popup"> 
                 <div id="popup_question_id">Question ID: 123</div>
                 <div id="popup_question_content">This is the question content.</div>
+                <div id="popup_question_image_container">
+                    <image id = "popup_question_image"></image>
+                </div>
             </div>    
 
             <!-- Cột bên phải -->
@@ -751,18 +755,35 @@ function closeDetailExplanation() {
 }
 
 
-function openDetailExplanation(questionNumber, questionId, questionContent, answer1, answer2, answer3, answer4, correctAnswer,userAnswer, explanationQuestion) {
+
+function  redoWrongAns(){
+   
+  //var currentLink = "<?= $site_url ?>/digitalsat/result/<?= $testsavenumber ?>";
+  window.location.href = currentLink + "/practice";
+}
+
+
+function openDetailExplanation(questionNumber, questionId, questionContent, imageQuestion, answer1, answer2, answer3, answer4, correctAnswer, userAnswer, explanationQuestion) {
     console.log('Question ID:', questionId); // Log the received questionId
     document.getElementById('explanation_popup').style.display = 'block';
-    document.getElementById('popup_question_id').innerHTML = '<b> Question '+ questionNumber + ' - ID: ' + questionId+'</b>'; // Set the ID in the popup
+    document.getElementById('popup_question_id').innerHTML = '<b> Question ' + questionNumber + ' - ID: ' + questionId + '</b>'; // Set the ID in the popup
     document.getElementById('popup_question_content').innerHTML = questionContent; // Set the question content in the popup
+
+    // Set the image source dynamically
+    const imageElement = document.getElementById('popup_question_image');
+    if (imageQuestion) {
+        imageElement.src = imageQuestion; // Assign the image source
+        imageElement.style.display = 'block'; // Ensure the image is visible
+    } else {
+        imageElement.style.display = 'none'; // Hide the image if no source is provided
+    }
+
     document.getElementById('popup_question_answer').innerHTML = `A. ${answer1}<br>B. ${answer2}<br>C. ${answer3}<br>D. ${answer4}`; // Set the question answers in the popup
-    document.getElementById('popup_question_correct_answer').innerHTML = `<b style = "color:green"> Correct Answer: ${correctAnswer}</b>`; // Use correctAnswer parameter
+    document.getElementById('popup_question_correct_answer').innerHTML = `<b style="color:green"> Correct Answer: ${correctAnswer}</b>`; // Use correctAnswer parameter
     document.getElementById('popup_question_user_answer').innerHTML = `Your answer: ${userAnswer}`; // Use correctAnswer parameter
-    document.getElementById('popup_question_explanation').innerHTML = `Explanation:  ${explanationQuestion} `; // This will render HTML tags properly
-
-
+    document.getElementById('popup_question_explanation').innerHTML = `Explanation: ${explanationQuestion}`; // This will render HTML tags properly
 }
+
 
 function closeRemarkTest() {
     document.getElementById('remark_popup').style.display = 'none';

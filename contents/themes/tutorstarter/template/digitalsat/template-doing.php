@@ -312,6 +312,7 @@ if ($result->num_rows > 0) {
         echo "]};";
 
         echo "</script>";
+
    /* } else {
         echo "<script>console.log('No data found for the given id_test');</script>";
     }*/
@@ -342,8 +343,9 @@ if (window.MathJax) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title></title>
-    <link rel="stylesheet" href="/wordpress/contents/themes/tutorstarter/system-test-toolkit/style/style_7.css">
+    <link rel="stylesheet" href="/wordpress/contents/themes/tutorstarter/system-test-toolkit/style/style_8.css">
     <style type="text/css">
+
 
 #time-remaining-container {
     /*width: 100%;
@@ -882,7 +884,24 @@ img {
     font-size: 19px;
     margin-right: 8px; /* Khoảng cách giữa text và svg */
 }
+.neutral {
+    border-color: #2d2f31 !important;
+}
+.true {
+    border-color: limegreen;
+}
 
+.false {
+    border-color: red;
+}
+
+.pass {
+    color: limegreen;
+}
+
+.fail {
+    color: red;
+}
    </style>
 
 </head>
