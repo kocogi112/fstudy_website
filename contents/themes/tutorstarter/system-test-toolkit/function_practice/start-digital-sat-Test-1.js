@@ -48,6 +48,7 @@ function closePopup() {
 
 function prestartTest()
 {
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
     if(premium_test == "False"){
         console.log("Cho phép làm bài")
     }
@@ -79,12 +80,15 @@ function prestartTest()
         }
     });
 }
+
     startTest();
 }
 
 
 
 function startTest() {
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+
     document.getElementById("test-prepare").style.display = "none";
     document.getElementById("user-button").style.display = 'block';
 

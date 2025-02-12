@@ -9,12 +9,11 @@ if (!defined("ABSPATH")) {
     exit(); // Exit if accessed directly.
 }
 
-remove_filter("the_content", "wptexturize");
-remove_filter("the_title", "wptexturize");
-remove_filter("comment_text", "wptexturize");
+
 //include_once get_template_directory() . '/checkpoint_test_permission/checkpoint.php';
 
 if (is_user_logged_in()) {
+    
 
     $post_id = get_the_ID();
     $user_id = get_current_user_id();
@@ -306,12 +305,117 @@ if ($result->num_rows > 0) {
                     echo "}";
                 }
             }
+            else if (strpos($question_id, "math") === 0) {
+                // Query only from digital_sat_question_bank_verbal table
+                $sql_question =
+                    "SELECT id_question, type_question, question_content, answer_1, answer_2, answer_3, answer_4, correct_answer, explanation, image_link FROM digital_sat_question_bank_math WHERE id_question = ?";
+                $stmt_question = $conn->prepare($sql_question);
+                $stmt_question->bind_param("s", $question_id);
+                $stmt_question->execute();
+                $result_question = $stmt_question->get_result();
+
+                if ($result_question->num_rows > 0) {
+                    $question_data = $result_question->fetch_assoc();
+
+                    if (!$first) {
+                        echo ",";
+                    }
+                    $first = false;
+
+                    echo "{";
+                    echo "'type': " .
+                        json_encode($question_data["type_question"]) .
+                        ",";
+                    echo "'question': " .
+                        json_encode($question_data["question_content"]) .
+                        ",";
+                    /*echo "'image': " .
+                        json_encode($question_data["image_link"]) .
+                        ",";
+                        */
+                    echo "'image': '',";
+                    
+                    echo "'question_category': '',";
+                    echo "'id_question': " .
+                        json_encode($question_data["id_question"]) .
+                        ",";
+                    /*echo "'category': " .
+                        json_encode($question_data["category"]) .
+                        ",";
+                        */
+  
+                     
+
+                    echo "'answer': [";
+                    echo "[" .
+                    json_encode($question_data["answer_1"]) .
+                        "," .
+                        json_encode($question_data["correct_answer"] == "answer_1"
+                            ? "true"
+                            : "false") .
+                        "],";
+
+
+                    echo "[" .
+                    json_encode($question_data["answer_2"]) .
+                        "," .
+                        json_encode($question_data["correct_answer"] == "answer_2"
+                            ? "true"
+                            : "false") .
+                        "],";
+
+
+                    echo "[" .
+                    json_encode($question_data["answer_3"]) .
+                        "," .
+                        json_encode($question_data["correct_answer"] == "answer_3"
+                            ? "true"
+                            : "false") .
+                        "],";
+
+
+                    echo "[" .
+                    json_encode($question_data["answer_4"]) .
+                        "," .
+                        json_encode($question_data["correct_answer"] == "answer_4"
+                            ? "true"
+                            : "false") .
+                        "]";
+                    echo "],";
+                    echo "'explanation': " .
+                        json_encode($question_data["explanation"]) .
+                        ",";
+                    echo "'section': '',";
+                    echo "'related_lectures': ''";
+                    echo "}";
+                }
+            }
         }
 
         // Close the questions array and the main object
         echo "]};";
 
+        remove_filter("the_content", "wptexturize");
+        remove_filter("the_title", "wptexturize");
+        remove_filter("comment_text", "wptexturize");
+
+
         echo "</script>";
+        
+        echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>';
+        echo '<script type="text/javascript">
+            window.MathJax = {
+                tex2jax: {
+                    inlineMath: [["$", "$"], ["\\\(", "\\\)"]],
+                    processEscapes: true
+                }
+            };
+            document.addEventListener("DOMContentLoaded", function () {
+                    MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+
+            });
+    </script>';
+    
 
    /* } else {
         echo "<script>console.log('No data found for the given id_test');</script>";
@@ -327,16 +431,7 @@ if ($result->num_rows > 0) {
 
 <html lang="en">
 <head>
-<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML">
-if (window.MathJax) {
-        MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [["$", "$"], ["\\(", "\\)"]],
-            processEscapes: true
-        }
-    });
-}
-</script>    
+
 <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 
 
@@ -1265,7 +1360,8 @@ img {
                  
                  
                         <img id = "change-mode-button"class="small-button" onclick="DarkMode()" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/icon-small-button/dark-mode.png" height="30px" width="30px" ></img>
-                        
+                        <img id = "change-mode-button"class="small-button" onclick="reloadTest()" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/reload.png" height="30px" width="30px" ></img>
+
                       </div>
                    
                 </div>
@@ -1319,7 +1415,6 @@ img {
                     
          
                     <div class = "fixedleftsmallbuttoncontainer" style="display: none;">
-                                <button  class ="buttonsidebar" onClick="reloadTest()"><img width="25px"  src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/reload.png" ></button><br>
                                 <button  class ="buttonsidebar" id="print-exam-button" ><img width="28px" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/print.png" ></button><br>
                                 <button id="change_appearance"  class ="buttonsidebar" ><img width="28px" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/setting.png" ></button><br>
                                 <button id="quick-view"  class ="buttonsidebar" ><img width="28px" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/quick-view.png" ></button>
@@ -1873,7 +1968,7 @@ function purple_highlight(spanId) {
         </script>
 
 <!--<script type="text/javascript" src="function/alert_leave_page.js"></script> -->
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/main_sat_3.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/main_sat_5.js"></script>
 
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/translate.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/zoom-text.js"></script>
@@ -1882,7 +1977,7 @@ function purple_highlight(spanId) {
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/report-error.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/note-sidebar.js"></script>
 
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/submit_answer_2.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/submit_answer_4.js"></script>
 <!--<script type="module" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/check_dev_tool.js"></script>
     -->
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/highlight_text_3.js"></script>
@@ -1890,7 +1985,7 @@ function purple_highlight(spanId) {
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/format-time-1.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/draft-popup.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/color-background.js"></script>
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/start-digital-sat-Test.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/start-digital-sat-Test-1.js"></script>
 <!-- <script type="text/javascript" src="function/quick-view-answer.js"></script> -->
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/checkbox_and_remember.js"></script>
 

@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Get the input data and sanitize it
     $id_test = wp_kses_post($_POST['id_test']);
     $type_test = wp_kses_post($_POST['type_test']);
-    $testname = wp_kses_post($_POST['testname']);
+    $testname = wp_unslash($_POST['testname']);
     $id_video = wp_kses_post($_POST['id_video']);
     $transcript = wp_unslash($_POST['transcript']);
     $token_need = wp_unslash($_POST['token_need']);

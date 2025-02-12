@@ -16,7 +16,7 @@ if (is_user_logged_in()) {
     $custom_number = intval(get_query_var('id_test'));
    
     //$custom_number = get_post_meta($post_id, '_ieltsreadingtest_custom_number', true);
-    // Thông tin kết nối database
+    // Thông tin kết nối databasef
     $servername = "localhost";
     $username = "root";
     $password = ""; // No password by default
@@ -516,26 +516,15 @@ html {
 }
 
 .number-question {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    width: 32px;
-    height: 32px;
-    font-size: 16px;
-    font-weight: 500;
-    color: #282828;
-    flex-shrink: 0;
-    background-color: #fff;
-    cursor: pointer;
-    opacity: 1;
-    font-family: "Montserrat", Helvetica, Arial, sans-serif;
-    -moz-transition: all ease 0.2s;
-    -o-transition: all ease 0.2s;
-    -webkit-transition: all ease 0.2s;
-    transition: all ease 0.2s;
-    font-size: 12px;
-    border: 1px solid #EAECEF;
+    border-radius: 50%; 
+    background-color: #e8f2ff;
+    color: #35509a;
+    width: 35px;
+    height: 35px;
+    line-height: 35px;
+    font-size: 15px;
+    text-align: center;
+    display: inline-block;
 }
 .highlight-marked {
     background-color: yellow !important;
@@ -912,12 +901,15 @@ html {
             </div>
 
             <div class="content-left">
+                <div class = "top-left"></div>
 
                 <div id="paragraph-container">
                     <!-- Paragraph will be loaded dynamically -->
                 </div>
             </div>
             <div class="content-right">
+            <div class = "top-right"></div>
+
                 <div id="questions-container">
                     <!-- Questions will be loaded dynamically -->
                 </div>
@@ -935,7 +927,7 @@ html {
     
   
      <span id="message" style="display:none" ></span>
-     <form id="saveReadingResult">
+     <form id="saveReadingResult"  style="display:none" >
                 <div class="card">
                     <div class="card-header">Form lưu kết quả</div>
                     <div class="card-body" >
@@ -1054,7 +1046,7 @@ html {
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://smtpjs.com/v3/smtp.js"></script>
-    <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/script_reading.js"></script>
+    <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/script_reading_1.js"></script>
     <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/highlight-text.js"></script>
 
 </body>

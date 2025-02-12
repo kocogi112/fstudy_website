@@ -1,6 +1,6 @@
-2025-02-07T15:40:36+00:00 Uncaught Error: Call to a member function prepare() on null in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\digitalsat\template-practice.php:207
+2025-02-08T16:02:44+00:00 Uncaught Error: Call to a member function bind_param() on bool in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\digitalsat\template-doing.php:314
 Stack trace:
-#0 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(1311): include()
+#0 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(754): include()
 #1 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): WPCode_Snippet_Execute->{closure}('')
 #2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
 #3 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
@@ -9,4 +9,4 @@ Stack trace:
 #6 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
 #7 {main}
   thrown
-2025-02-07T17:41:40+00:00 Cannot redeclare update_permission_link_callback() (previously declared in C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code:195)
+2025-02-08T16:02:57+00:00 Cannot redeclare add_custom_query_vars() (previously declared in C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code:365)

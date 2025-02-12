@@ -1,0 +1,146 @@
+2025-02-08T15:50:51+00:00 Uncaught Error: Call to a member function bind_param() on bool in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\digitalsat\template-doing.php:314
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(1297): include()
+#1 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): WPCode_Snippet_Execute->{closure}('')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#3 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#5 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#7 {main}
+  thrown
+2025-02-08T15:51:01+00:00 Uncaught Error: Call to a member function bind_param() on bool in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\digitalsat\template-doing.php:314
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(1297): include()
+#1 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): WPCode_Snippet_Execute->{closure}('')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#3 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#5 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#7 {main}
+  thrown
+2025-02-08T15:53:06+00:00 Uncaught Error: Call to a member function bind_param() on bool in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\digitalsat\template-doing.php:314
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(1297): include()
+#1 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): WPCode_Snippet_Execute->{closure}('')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#3 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#5 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#7 {main}
+  thrown
+2025-02-08T15:55:59+00:00 Cannot redeclare getFirstSentence() (previously declared in C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code:311)
+2025-02-08T16:02:02+00:00 Uncaught Error: Call to a member function bind_param() on bool in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\digitalsat\template-doing.php:314
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(820): include()
+#1 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): WPCode_Snippet_Execute->{closure}('')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#3 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#5 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#7 {main}
+  thrown
+2025-02-08T16:02:08+00:00 Uncaught Error: Call to a member function bind_param() on bool in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\digitalsat\template-doing.php:314
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(820): include()
+#1 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): WPCode_Snippet_Execute->{closure}('')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#3 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#5 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#7 {main}
+  thrown
+2025-02-08T16:02:14+00:00 Uncaught Error: Call to a member function bind_param() on bool in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\digitalsat\template-doing.php:314
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(820): include()
+#1 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): WPCode_Snippet_Execute->{closure}('')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#3 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#5 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#7 {main}
+  thrown
+2025-02-08T16:02:23+00:00 Uncaught Error: Call to a member function bind_param() on bool in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\digitalsat\template-doing.php:314
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(820): include()
+#1 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): WPCode_Snippet_Execute->{closure}('')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#3 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#5 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#7 {main}
+  thrown
+2025-02-08T16:02:41+00:00 Cannot redeclare add_some_links_dashboard() (previously declared in C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code:300)
+2025-02-08T16:02:44+00:00 Uncaught Error: Call to a member function bind_param() on bool in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\digitalsat\template-doing.php:314
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(754): include()
+#1 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): WPCode_Snippet_Execute->{closure}('')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#3 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#5 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#7 {main}
+  thrown
+2025-02-08T16:02:57+00:00 Cannot redeclare add_custom_query_vars() (previously declared in C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code:365)
+2025-02-08T16:03:12+00:00 Uncaught Error: Call to a member function bind_param() on bool in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\digitalsat\template-doing.php:314
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(820): include()
+#1 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): WPCode_Snippet_Execute->{closure}('')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#3 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#5 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#7 {main}
+  thrown
+2025-02-08T16:03:13+00:00 Uncaught Error: Call to a member function bind_param() on bool in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\digitalsat\template-doing.php:314
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(820): include()
+#1 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): WPCode_Snippet_Execute->{closure}('')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#3 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#5 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#7 {main}
+  thrown
+2025-02-08T16:03:38+00:00 Uncaught Error: Call to a member function bind_param() on bool in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\digitalsat\template-doing.php:314
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(820): include()
+#1 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): WPCode_Snippet_Execute->{closure}('')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#3 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#5 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#7 {main}
+  thrown
+2025-02-08T16:04:11+00:00 Uncaught Error: Call to a member function bind_param() on bool in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\digitalsat\template-doing.php:314
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(820): include()
+#1 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): WPCode_Snippet_Execute->{closure}('')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#3 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#5 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#7 {main}
+  thrown
+2025-02-08T16:05:16+00:00 Uncaught Error: Call to a member function bind_param() on bool in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\digitalsat\template-doing.php:314
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(820): include()
+#1 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): WPCode_Snippet_Execute->{closure}('')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#3 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#5 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#7 {main}
+  thrown

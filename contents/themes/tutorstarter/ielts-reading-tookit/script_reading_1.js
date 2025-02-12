@@ -40,7 +40,13 @@ function rememberQuestion(i) {
 
 
 function loadPart(partIndex) {
+    
+
     const part = quizData.part[partIndex];
+
+    
+
+
     console.log("Passed LoadPart");
     console.log(`Highlights saved: ${JSON.stringify(highlights)}`);
 
@@ -59,6 +65,7 @@ function loadPart(partIndex) {
     const questionsContainer = document.getElementById('questions-container');
     questionsContainer.innerHTML = ''; // Clear previous content
 
+    
     // Calculate the starting question number for this part
     let currentQuestionNumber = getStartingQuestionNumber(partIndex);
 
@@ -137,14 +144,8 @@ function loadPart(partIndex) {
 
                 const inputElementHtml = `
                 <div style="display: inline-flex; align-items: center;">
-                    <span id = "mark-question-${completionNumber}" class = "number-question"> <p type = "${questionType}" style="margin: 0;"> <b >${completionNumber}</b> </p> </span> <input class="form-control" name = "question-id-${completionNumber}"  type="text" id="answer-input-${completionNumber}" class="answer-input" name="question-${completionNumber}"  placeholder="Question ${completionNumber}"/>
-                    <image style = 'display:none' id="bookmark-question-${completionNumber}" 
-                            src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/bookmark_empty.png" 
-                            class="bookmark-btn" 
-                            style="margin-left: 10px; cursor: pointer;" 
-                            onclick="rememberQuestion(${completionNumber})">
-                        </image>
-                    </div>
+                    <span id = "mark-question-${completionNumber}" class = "number-question"> <p type = "${questionType}" style="margin: 0;"> <b >${completionNumber}</b> </p> </span> <input class="form-control" name = "question-id-${completionNumber}"  type="text" id="answer-input-${completionNumber}" class="answer-input" name="question-${completionNumber}"  placeholder="Question ${completionNumber}"/>    
+                </div>
                     `;
                 questionContent = questionContent.replace('<input>', inputElementHtml);
                 completionInputIds.push(`answer-input-${completionNumber}`);
@@ -260,6 +261,8 @@ function loadPart(partIndex) {
 
     document.getElementById("test-prepare").style.display = "none";
     document.getElementById("content1").style.display = "block";
+
+
 }
 
 function checkboxCurrent(currentQuestionNumber) {
@@ -540,7 +543,9 @@ function PreSubmit(){
                     logUserAnswers(i);
                 }
                  //ResultInput();
-                 submitAnswerAndGenerateLink();
+                 //fulltestResult();
+                submitAnswerAndGenerateLink();
+
 
               }
             });
@@ -671,9 +676,7 @@ function startTimer(duration) {
             clearInterval(timerInterval);
             if (!isSubmitted) {
                 isSubmitted = true;
-                for (let i = 0; i < quizData.part.length; i++) {
-                    logUserAnswers(i); // Log answers for all parts
-                }
+                
                 PreSubmit();
             }
         }

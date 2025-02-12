@@ -157,7 +157,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dictation Exercise</title>
+    <title>Shadowing Exercise</title>
     <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   </head>
@@ -355,7 +355,7 @@ body {
 
 #content1
 {
-  height: 550px;
+  height: 100%;
   border-radius: 4%;
   border: 1px solid #ddd;
   box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.2);
@@ -370,11 +370,10 @@ body {
   width: 100%;
   padding: 10px;
   overflow: auto; /* Add this to make sides scrollable independently */
+  display:none;
 }
 
-.left-side {
-  overflow: auto; /* If you don't want the left side to scroll */
-}
+
 
 .right-side {
   overflow: auto; /* Allow right side to scroll */
@@ -492,7 +491,7 @@ body {
 }
 
 @media (max-width: 768px) {
-    #content {
+    #content1 {
         flex-direction: column;
     }
     .left-side .right-side {
@@ -934,22 +933,94 @@ border: 3px solid transparent;
   width: 100%;
 }
 
+#test-prepare {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: fixed; /* Giữ loader cố định giữa màn hình */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Căn giữa theo cả chiều ngang và dọc */
+    height: 200px;
+    z-index: 1001; /* Đảm bảo loader ở trên các phần tử khác */
+}
+/* HTML: <div class="loader"></div> */
+.loader {
+  width: 70px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 8px solid #514b82;
+  animation: l20-1 0.8s infinite linear alternate, l20-2 1.6s infinite linear;
+}
+
+.start_test {
+  appearance: none;
+  background-color: #2ea44f;
+  border: 1px solid rgba(27, 31, 35, .15);
+  border-radius: 6px;
+  box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: -apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 20px;
+  padding: 6px 16px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.start_test:focus:not(:focus-visible):not(.focus-visible) {
+  box-shadow: none;
+  outline: none;
+}
+.icon {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+}
+
+.start_test:hover {
+  background-color: #2c974b;
+}
+
+.start_test:focus {
+  box-shadow: rgba(46, 164, 79, .4) 0 0 0 3px;
+  outline: none;
+}
+
+.start_test:disabled {
+  background-color: #94d3a2;
+  border-color: rgba(27, 31, 35, .1);
+  color: rgba(255, 255, 255, .8);
+  cursor: default;
+}
+
+.start_test:active {
+  background-color: #298e46;
+  box-shadow: rgba(20, 70, 32, .2) 0 1px 0 inset;
+}
 </style>
 </head>
-<body>
+<body onload = "main()">
 
 
  
 
 <div class="container1">
-    <div id = "before-content">
-        <div class = "bf-content-setting-class" id = "bf-content-setting">
-            
-
-        </div>
-    </div>
-    <div id="content1">
-        <div id = 'left-side' class="left-side">
+   
+    <div id = "test-prepare">
+        <div class="loader"></div>
+        <h3>Your test will begin shortly</h3>
         <div id = "checkpoint" class = "checkpoint">
                 <?php
                     if($premium_test == "True"){
@@ -962,14 +1033,43 @@ border: 3px solid transparent;
                     }
                         ?>
         </div>    
-        <div id ="intro" style="text-align: center;">
-            <h3>Dictation 1: 10 things you didn't know about orgasm</h3>
-            <p>This speech/ conversation has been collected from TED TALK</p>
-            <p id = 'number-sentences'>Number of sentence: </p>
-            <p>Guidelines: </p>
-            <button onclick ="pregetStart()" class="button-1">Start Now</button>
+        <div id = "quick-instruction">
+            <i>Quick Instruction:<br>
+            - If you find any errors from test (image,display,text,...), please let us know by clicking icon <i class="fa-solid fa-bug"></i><br> 
+            - Incon <i class="fa-solid fa-circle-info"></i> will give you a guide tour, in which you can understand the structure of test, include test's type, formation and how to answer questions<br>
+            - All these two icons are at the right-above side of test.
+        </i>
+
         </div>
-        
+        <div style="display: none;" id="date" style="visibility:hidden;"></div>
+        <div style="display: none;" id="title-test"><?php echo esc_html($testname);?></div>
+        <div  style="display: none;"  id="id_test"  style="visibility:hidden;"><?php echo esc_html($custom_number);?></div>
+        <button  style="display: none;" class ="start_test" id="start_test"  onclick = "pregetStart()">Start test</button>
+        <i id = "welcome" style = "display:none">Click Start Test button to start the test now. Good luck</i>
+
+
+    </div>
+
+
+
+
+    <div id="content1">
+        <div id = 'left-side' class="left-side">
+
+
+        <div id = "checkpoint" class = "checkpoint">
+                <?php
+                    if($premium_test == "True"){
+                        echo "<script >console.log('Thông báo. Bạn còn {$foundUser['time_left']} lượt làm bài. success ');</script>";
+                        echo " <p style = 'color:green'> Bạn còn {$foundUser['time_left']} lượt làm bài này <svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='#7ed321' stroke-width='2' stroke-linecap='round' stroke-linejoin='arcs'><path d='M22 11.08V12a10 10 0 1 1-5.93-9.14'></path><polyline points='22 4 12 14.01 9 11.01'></polyline></svg> </p> ";
+                        echo "<script>console.log('This is premium test');</script>";
+                    }
+                    else{
+                        echo "<script>console.log('This is free test');</script>"; 
+                    }
+                        ?>
+        </div>    
+       
 
     <div id ="start-dictation" style="display: none;">
         <div id="video-container">
@@ -1007,17 +1107,17 @@ border: 3px solid transparent;
 
 
       <button id="listenAgain" class="button-4" role="button"><i class="fa-solid fa-play"></i> Listen Again</button><br>
-      <textarea class = "textarea" type="text" id="userInput" placeholder="Enter transcript text here"></textarea>
+      <textarea class = "textarea" type="text" id="userInput" style = "display:none" placeholder="Enter transcript text here"></textarea>
 
       
     <div class="controls">
-      <button id="checkAnswer" class="button-10" role="button">Check Answer</button>
-      <button id="listenAgain" class="button-11" role="button">Listen Again</button>
+      <button id="checkAnswer" class="button-10" role="button" style = "display:none" >Check Answer</button>
+      <button id="listenAgain" class="button-11" role="button"  style = "display:none" >Listen Again</button>
   </div>
 
   <div class="record-controls">
-    <button id="startRecord">Start Record</button>
-    <button id="stopRecord" disabled>Stop Record</button>
+    <button id="startRecord"><svg  class="icon" version="1.1" id="Uploaded to svgrepo.com" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32" xml:space="preserve" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <style type="text/css"> .isometric_zeven{fill:#FF7344;} .isometric_tien{fill:#7BD6C4;} .isometric_elf{fill:#72C0AB;} .isometric_twaalf{fill:#569080;} .isometric_dertien{fill:#225B49;} .st0{fill:#F28103;} .st1{fill:#BE1E2D;} .st2{fill:#F05A28;} .st3{fill:#F29227;} .st4{fill:#F8F7C5;} .st5{fill:#F5DF89;} .st6{fill:#AD9A74;} .st7{fill:none;} .st8{fill:#F2D76C;} .st9{fill:#72C0AB;} .st10{fill:#7BD6C4;} .st11{fill:#569080;} </style> <g> <path class="isometric_dertien" d="M21.496,11.298l-3.174-3.174l-2.161-2.161c-1.562-1.562-4.095-1.562-5.657,0 c-1.562,1.562-1.562,4.095,0,5.657l2.179,2.179l3.156,3.156c1.562,1.562,4.095,1.562,5.657,0 C23.058,15.392,23.058,12.86,21.496,11.298z"></path> <path class="isometric_tien" d="M18.987,20.926c-2.306-0.004-3.994,1.11-3.987,2.302c0.016,3.027,8.016,3.036,8,0.014 C22.993,22.053,21.307,20.931,18.987,20.926z"></path> <path class="isometric_twaalf" d="M20.83,11.727c-0.29-0.186-0.84-0.471-0.991-0.555c-0.703-0.391-2.563,0.833-2.563,2.75 c0,0.469,0.137,0.801,0.374,0.968c0.168,0.118,0.771,0.425,0.995,0.558c0.263,0.216,0.664,0.21,1.15-0.07 c0.933-0.539,1.513-1.616,1.513-2.607C21.308,12.221,21.131,11.862,20.83,11.727z"></path> <path class="isometric_elf" d="M18.308,14.503c0-1.019,0.63-2.098,1.513-2.608c0.883-0.51,1.487-0.143,1.487,0.876 c0,0.991-0.58,2.068-1.513,2.607C18.913,15.887,18.308,15.494,18.308,14.503z M19.044,10.439c-0.085,0.323-0.218,0.648-0.387,0.965 c0.451-0.29,0.906-0.386,1.183-0.232c0.109,0.061,0.43,0.228,0.708,0.386c0.101-0.624-0.016-1.131-0.286-1.496l-1.436-1.436 C19.139,9.052,19.246,9.668,19.044,10.439z M17.65,14.891c-0.237-0.167-0.374-0.499-0.374-0.968c0-0.316,0.051-0.612,0.138-0.886 c-0.707,0.688-1.554,1.225-2.396,1.455c-0.775,0.212-1.4,0.117-1.833-0.19l1.436,1.436c0.432,0.307,1.058,0.402,1.833,0.19 c0.546-0.149,1.089-0.436,1.597-0.805C17.88,15.03,17.724,14.942,17.65,14.891z"></path> <path class="st11" d="M19.011,22.448v-0.056C19.01,22.4,19,22.407,19,22.415C19,22.426,19.009,22.437,19.011,22.448z"></path> <path class="isometric_twaalf" d="M23,23.243v1.388h-0.011c0.171,3.089-8.085,3.106-7.98,0H15v-1.403 C15.016,26.257,23.016,26.263,23,23.243z M18.048,22.241v0.509c-0.038,1.128,2.962,1.121,2.9,0l0.004-0.504 C20.958,23.343,18.054,23.34,18.048,22.241z M21.896,14.185l-1.913-1.111c-0.299,0.044-0.62,0.49-0.525,0.852l1.434,0.833 c-0.005,1,0.235,4.641-2.121,4.641c-1.682,0-3.461-1.943-4.45-3.963c-1.066-1.066-1.293-1.293-1.706-1.706 c0.981,3.574,3.638,6.67,6.156,6.67c0.082,0,0.162-0.003,0.24-0.009v2c0,0.448,1.044,0.403,0.988,0.003v-2.241 C22.06,19.206,21.888,15.78,21.896,14.185z"></path> <path class="isometric_zeven" d="M16.44,23.728c-0.28-0.28-0.195-0.591,0.19-0.694c0.385-0.103,0.925,0.04,1.205,0.321 c0.28,0.28,0.195,0.591-0.19,0.694C17.259,24.152,16.72,24.008,16.44,23.728z"></path> </g> </g></svg>Start Record</button>
+    <button id="stopRecord" disabled> <svg  class="icon" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M512 1024C229.7 1024 0 794.3 0 512S229.7 0 512 0s512 229.7 512 512-229.7 512-512 512z m0-938.7C276.7 85.3 85.3 276.7 85.3 512S276.7 938.7 512 938.7 938.7 747.3 938.7 512 747.3 85.3 512 85.3z" fill="#3688FF"></path><path d="M640 682.7H384c-23.6 0-42.7-19.1-42.7-42.7V384c0-23.6 19.1-42.7 42.7-42.7h256c23.6 0 42.7 19.1 42.7 42.7v256c0 23.6-19.1 42.7-42.7 42.7z m-213.3-85.4h170.7V426.7H426.7v170.6z" fill="#5F6379"></path></g></svg>Stop Record</button>
   </div>
   <div id="recordedText"></div>
   <div id="confidentialLevel"></div>
@@ -1028,8 +1128,8 @@ border: 3px solid transparent;
 
 
   
-    <button id="hintButton">Show Hint</button>
-    <div id="hint"></div>
+    <button id="hintButton"  style = "display:none" >Show Hint</button>
+    <div id="hint"  style = "display:none" ></div>
 
 
 </div>
@@ -1046,6 +1146,56 @@ border: 3px solid transparent;
     
 
     <script>
+      function main(){
+    console.log("Passed Main");
+    
+    
+    setTimeout(function(){
+        console.log("Show Test!");
+        document.getElementById("start_test").style.display="block";
+        
+        document.getElementById("welcome").style.display="block";
+
+    }, 1000);
+    
+}
+
+function pregetStart()
+{
+    if(premium_test == "False"){
+        console.log("Cho phép làm bài")
+    }
+    else{
+    console.log(premium_test);
+    console.log(token_need);
+    console.log(change_content);
+    console.log(time_left);
+    // Giảm time_left tại frontend
+    time_left--;
+    console.log("Updated time_left:", time_left);
+
+    // Gửi request AJAX đến admin-ajax.php
+    jQuery.ajax({
+        url: `${siteUrl}/wp-admin/admin-ajax.php`,
+        type: "POST",
+        data: {
+            action: "update_time_left",
+           // username: change_content,
+            time_left: time_left,
+            id_test: id_test,
+            table_test: 'shadowing_question',
+
+        },
+        success: function (response) {
+            console.log("Server response:", response);
+        },
+        error: function (error) {
+            console.error("Error updating time_left:", error);
+        }
+    });
+}
+getStart();
+}
 function pregetStart()
 {
     if(premium_test == "False"){
@@ -1083,9 +1233,12 @@ function pregetStart()
 getStart();
 }
 
+function getStart() {    
+  document.getElementById("test-prepare").style.display = "none";
+ 
+    document.getElementById("left-side").style.display = "block";
+    document.getElementById("right-side").style.display = "block";
 
-function getStart() {     
-    document.getElementById("intro").style.display = "none";
     document.getElementById("start-dictation").style.display = "block";
     navigateTranscript(0);
 }
@@ -1241,16 +1394,20 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
         function onYouTubeIframeAPIReady() {
-            player = new YT.Player('player', {
-                height: '315',
-                width: '560',
-                videoId: '<?php echo esc_html($id_video);?>', // Replace with the desired video ID
-                playerVars: { enablejsapi: 1 },
-                events: {
-                    onReady: onPlayerReady
-                }
-            });
-        }
+          player = new YT.Player('player', {
+              height: '315',
+              width: '560',
+              videoId: '<?php echo esc_html($id_video);?>', // Thay bằng ID video mong muốn
+              playerVars: { 
+                  enablejsapi: 1, 
+                  cc_load_policy: 0 // Tắt phụ đề mặc định
+              },
+              events: {
+                  onReady: onPlayerReady
+              }
+          });
+      }
+
 
 
 

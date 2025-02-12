@@ -42,3 +42,6 @@ Stack trace:
 #6 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
 #7 {main}
   thrown
+2025-02-07T17:41:40+00:00 Cannot redeclare fetch_from_groq() (previously declared in C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code:34)
+2025-02-07T17:41:41+00:00 Cannot redeclare update_permission_link_callback() (previously declared in C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code:195)
+2025-02-07T17:41:43+00:00 Cannot redeclare fetch_from_groq() (previously declared in C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code:34)

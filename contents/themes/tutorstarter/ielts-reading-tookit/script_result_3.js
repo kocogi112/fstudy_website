@@ -394,7 +394,7 @@ function logUserAnswers(partIndex) {
             else if (group.type_group_question === "multiple-choice") {
                 questionNumber = `${currentQuestionNumber}`;
                 const savedAnswerIndex = question.answers.findIndex((answer, answerIndex) => isAnswerSelected(partIndex, groupIndex, questionIndex, answerIndex));
-                userAnswer = savedAnswerIndex !== -1 ? question.answers[savedAnswerIndex][0] : "Not answered";
+                //userAnswer = savedAnswerIndex !== -1 ? question.answers[savedAnswerIndex][0] : "Not answered";
                 
                 const correctAnswerIndex = question.answers.findIndex(answer => answer[1] === true); // Find the correct answer
                 correctAnswer = correctAnswerIndex !== -1 ? question.answers[correctAnswerIndex][0] : "Not available";
@@ -889,11 +889,7 @@ function coppyShareContentBtn() {
     });
 }
 
-function redirectToTest(){
-    
-    window.location.href = `${linkTest}`;
 
-}
 
 document.addEventListener("DOMContentLoaded", function () {
     const updatePermission = document.getElementById("updatePermission");

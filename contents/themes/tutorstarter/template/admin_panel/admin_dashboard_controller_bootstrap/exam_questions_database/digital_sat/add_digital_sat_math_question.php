@@ -60,7 +60,7 @@ $result = $conn->query($sql);
         rel="stylesheet">
 
     <!-- Custom styles for this template-->
-    <link href="../../css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="../../css/sb-admin-2.css" rel="stylesheet">
 
     <meta charset="UTF-8">
     <title>Digital Practice SAT Questions Database</title>
@@ -120,7 +120,10 @@ if (window.MathJax) {
 
              
 <h1>Digital Practice SAT Questions Database - Math</h1>
-
+<p>math1-math29: Circles</p>
+<p>math30-math108: Equivalent expressions</p>
+<p>math109-math118: Evaluating statistical claims Observational studies and experiments</p>
+<p>math119-math138: Inference from sample statistics and margin of error</p>
 
 <!-- Filter form -->
 <form method="GET" action="">
@@ -278,7 +281,7 @@ if (window.MathJax) {
                     </select><br>
 
                     Question: <textarea id="edit_question_content" name="question_content" class="form-control" required></textarea><br>
-                    Support Latex (add $...$ at each function):
+                    <span class="tex2jax_ignore">Support Latex (add $...$ at each function)</span>:
                     <div id="equation-editor">
                         <div id="history"></div>
                         <div id="toolbar"></div>
@@ -458,13 +461,13 @@ function openEditModal(number) {
             $('#edit_answer_3').val(data.answer_3);
             $('#edit_answer_4').val(data.answer_4);
             $('#edit_correct_answer').val(data.correct_answer);
-if (data.type_question === 'completion') {
-    $('#edit_custom_correct_answer').val(data.correct_answer); // Show custom input for completion type
-    $('#edit_correct_answer_input').show(); // Show the custom input field
-} else {
-    $('#edit_correct_answer').val(data.correct_answer);
-    $('#edit_correct_answer_input').hide(); // Hide the custom input for multiple choice
-}
+            if (data.type_question === 'completion') {
+                $('#edit_custom_correct_answer').val(data.correct_answer); // Show custom input for completion type
+                $('#edit_correct_answer_input').show(); // Show the custom input field
+            } else {
+                $('#edit_correct_answer').val(data.correct_answer);
+                $('#edit_correct_answer_input').hide(); // Hide the custom input for multiple choice
+            }
             $('#edit_explanation').val(data.explanation);
             $('#edit_image_link').val(data.image_link);
             

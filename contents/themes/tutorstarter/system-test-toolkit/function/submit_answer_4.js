@@ -43,7 +43,8 @@ function submitButton() {
 
         if (elements.length > 0 && elements[0].type === 'text') {
             var userAnswer = document.getElementById('question-' + z + '-input').value.trim();
-            var correctAnswer = quizData.questions[z - 1].answer.map(a => a.toLowerCase());
+           // var correctAnswer = quizData.questions[z - 1].answer.map(a => a.toLowerCase());
+            var correctAnswer = quizData.questions[z - 1].answer;
 
             if (userAnswer === "") {
                 skip_number++;

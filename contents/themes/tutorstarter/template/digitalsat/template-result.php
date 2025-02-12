@@ -93,6 +93,9 @@ echo '
 get_header(); // Gọi phần đầu trang (header.php)
 
 ?>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
 <style>
     table {
     width: 100%;
@@ -332,7 +335,6 @@ body {
 <head>
     <title>Digital SAT Report</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script type="text/javascript">var lbplugin_event_opt={"extension_enable":true,"dict_type":1,"dbclk_event":{"trigger":"none","enable":false,"display":2},"select_event":{"trigger":"none","enable":true,"display":2}};function loadScript(t,e){var n=document.createElement("script");n.type="text/javascript",n.readyState?n.onreadystatechange=function(){("loaded"===n.readyState||"complete"===n.readyState)&&(n.onreadystatechange=null,e())}:n.onload=function(){e()},n.src=t,document.getElementsByTagName("head")[0].appendChild(n)}setTimeout(function(){null==document.getElementById("lbdictex_find_popup")&&loadScript("https://stc-laban.zdn.vn/dictionary/js/plugin/lbdictplugin.min.js?"+Date.now()%1e4,function(){lbDictPlugin.init(lbplugin_event_opt)})},1e3);</script></body>
 
 
 </head>
@@ -363,12 +365,6 @@ if (!empty($results)) {
         }
     }
 
-    
-$questions = explode(",", $data['question_choose']);
-// Normalize question IDs to handle spaces
-$questions = array_map(function($id) {
-    return str_replace(' ', '', trim($id)); // Remove spaces and trim
-}, $questions);
 
 
 $new_correct_ans = 0;
@@ -514,35 +510,61 @@ $new_skip_ans = 0;
         // Counter for question numbering
         $question_number = 1;
     
+            
+        $questions = explode(",", $data['question_choose']);
+        // Normalize question IDs to handle spaces
+        $questions = array_map(function($id) {
+            return str_replace(' ', '', trim($id)); // Remove spaces and trim
+        }, $questions);
+
+
 
         // Loop through all question IDs in the questions array
         foreach ($questions as $question_id) {
-            // Query for each question to get detailed data
-            $sql_question = "SELECT explanation, id_question, type_question, question_content, answer_1, answer_2, answer_3, answer_4, correct_answer, image_link FROM digital_sat_question_bank_verbal WHERE id_question = ?";
-            $stmt_question = $conn->prepare($sql_question);
-            $stmt_question->bind_param("s", $question_id);
-            $stmt_question->execute();
-            $result_question = $stmt_question->get_result();
+            if (strpos($question_id, "verbal") === 0) {
+                // Query for each question to get detailed data
+                $sql_question = "SELECT explanation, id_question, type_question, question_content, answer_1, answer_2, answer_3, answer_4, correct_answer, image_link FROM digital_sat_question_bank_verbal WHERE id_question = ?";
+                $stmt_question = $conn->prepare($sql_question);
+                $stmt_question->bind_param("s", $question_id);
+                $stmt_question->execute();
+                $result_question = $stmt_question->get_result();
+            }
+            else  if (strpos($question_id, "math") === 0) {
+                // Query for each question to get detailed data
+                $sql_question = "SELECT explanation, id_question, type_question, question_content, answer_1, answer_2, answer_3, answer_4, correct_answer, image_link FROM digital_sat_question_bank_math WHERE id_question = ?";
+                $stmt_question = $conn->prepare($sql_question);
+                $stmt_question->bind_param("s", $question_id);
+                $stmt_question->execute();
+                $result_question = $stmt_question->get_result();
+            }
 
             if ($result_question->num_rows > 0) {
                 $question_data = $result_question->fetch_assoc();
+                
                 error_log(print_r($question_data, true)); // Check the output in your PHP error log
 
-                // Determine the correct answer text
-                $correct_answer_text = '';
-                switch ($question_data['correct_answer']) {
-                    case 'answer_1':
-                        $correct_answer_text = 'A';
-                        break;
-                    case 'answer_2':
-                        $correct_answer_text = 'B';
-                        break;
-                    case 'answer_3':
-                        $correct_answer_text = 'C';
-                        break;
-                    case 'answer_4':
-                        $correct_answer_text = 'D';
-                        break;
+                if ($question_data['type_question'] == 'multiple-choice')  {
+
+                    // Determine the correct answer text
+                    $correct_answer_text = '';
+                    switch ($question_data['correct_answer']) {
+                        case 'answer_1':
+                            $correct_answer_text = 'A';
+                            break;
+                        case 'answer_2':
+                            $correct_answer_text = 'B';
+                            break;
+                        case 'answer_3':
+                            $correct_answer_text = 'C';
+                            break;
+                        case 'answer_4':
+                            $correct_answer_text = 'D';
+                            break;
+                    }
+                }
+                else if ($question_data['type_question'] == 'completion')  {
+                    $correct_answer_text = '';
+                    $correct_answer_text = $question_data['correct_answer'];              
                 }
 
                 // User's answer for the current question
@@ -592,7 +614,7 @@ $new_skip_ans = 0;
                 $explanation = isset($question_data['explanation']) ? htmlspecialchars($question_data['explanation'], ENT_QUOTES, 'UTF-8') : 'Explanation not available';
 
                 // Use $explanation safely in the JavaScript function
-                echo '<td><a onclick="openDetailExplanation(\'' . esc_js($question_number) . '\',  \'' . esc_js($question_data['id_question']) . '\', \'' . esc_js($question_data['question_content']) . '\', \'' . esc_js($question_data['image_link']) . '\', \'' . esc_js($question_data['answer_1']) . '\', \'' . esc_js($question_data['answer_2']) . '\', \'' . esc_js($question_data['answer_3']) . '\', \'' . esc_js($question_data['answer_4']) . '\', \'' . esc_js($correct_answer_text) . '\', \'' . esc_js($user_answer) . '\', `' . htmlspecialchars($question_data['explanation'], ENT_QUOTES, 'UTF-8') . '`)" id="quick-view-' . $question_data['id_question'] . '">Review</a></td>';
+                echo '<td><a onclick="openDetailExplanation(\'' . esc_js($question_number) . '\',  \'' . esc_js($question_data['id_question']) . '\', \'' . esc_js(json_encode($question_data['question_content'])) . '\', \'' . esc_js($question_data['image_link']) . '\', \'' . esc_js(json_encode($question_data['answer_1'])) . '\', \'' . esc_js(json_encode($question_data['answer_2'])) . '\', \'' . esc_js(json_encode($question_data['answer_3'])) . '\', \'' . esc_js(json_encode($question_data['answer_4'])) . '\', \'' . esc_js(json_encode($correct_answer_text)) . '\', \'' . esc_js($user_answer) . '\', `' . htmlspecialchars($question_data['explanation'], ENT_QUOTES, 'UTF-8') . '`)" id="quick-view-' . $question_data['id_question'] . '">Review</a></td>';
                                 
                 echo '</tr>';
 
@@ -602,6 +624,27 @@ $new_skip_ans = 0;
 
         // End the table
         echo '</table>';
+
+
+        remove_filter("the_content", "wptexturize");
+        remove_filter("the_title", "wptexturize");
+        remove_filter("comment_text", "wptexturize");
+
+
+        
+        echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>';
+        echo '<script type="text/javascript">
+            window.MathJax = {
+                tex2jax: {
+                    inlineMath: [["$", "$"], ["\\\(", "\\\)"]],
+                    processEscapes: true
+                }
+            };
+            document.addEventListener("DOMContentLoaded", function () {
+                    MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+
+            });
+    </script>';
     }
 } else {
     // If no results with testsavenumber
@@ -618,19 +661,21 @@ $new_skip_ans = 0;
         <div class="container-popup">
             <!-- Cột bên trái -->
             <div class="left-popup"> 
-                <div id="popup_question_id">Question ID: 123</div>
-                <div id="popup_question_content">This is the question content.</div>
+                <div id="popup_question_id"></div>
+                <div id="popup_question_content"></div>
                 <div id="popup_question_image_container">
                     <image id = "popup_question_image"></image>
                 </div>
+                <button class="button-10" onclick = "renderMath()">Fix định dạng đề</button>
+
             </div>    
 
             <!-- Cột bên phải -->
             <div class="right-popup">
-                <div id="popup_question_answer">Answer: A</div>
-                <div id="popup_question_correct_answer">Correct Answer: B</div>
-                <div id="popup_question_user_answer">Your Answer: C</div>
-                <div id="popup_question_explanation">Explanation: This is the explanation.</div>
+                <div id="popup_question_answer"></div>
+                <div id="popup_question_correct_answer"></div>
+                <div id="popup_question_user_answer"></div>
+                <div id="popup_question_explanation"></div>
             </div>
         </div>
     </div>
@@ -689,72 +734,25 @@ $new_skip_ans = 0;
 
 
 <script>
-    /*
-    // Lấy phần tử canvas
-    const ctx = document.getElementById('myLineChart').getContext('2d');
+  
+  document.addEventListener("DOMContentLoaded", function () {
+                    MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
 
-    // Dữ liệu và cấu hình biểu đồ
-    const myLineChart = new Chart(ctx, {
-        type: 'line', // Loại biểu đồ
-        data: {
-            labels: ['January', 'February', 'March', 'April', 'May', 'June'], // Nhãn trục X
-            datasets: [
-                {
-                    label: 'Dataset 1', // Nhãn của dữ liệu
-                    data: [10, 20, 15, 25, 30, 40], // Dữ liệu trên trục Y
-                    borderColor: 'rgba(75, 192, 192, 1)', // Màu đường
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)', // Màu nền bên dưới đường
-                    tension: 0.4, // Độ cong của đường (0 là thẳng, 1 là cong tối đa)
-                },
-                {
-                    label: 'Dataset 2',
-                    data: [5, 15, 10, 20, 25, 35],
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    tension: 0.4,
-                },
-            ],
-        },
-        options: {
-            responsive: true, // Đáp ứng kích thước
-            plugins: {
-                legend: {
-                    display: true, // Hiển thị chú thích
-                },
-            },
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Months', // Tiêu đề trục X
-                    },
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Values', // Tiêu đề trục Y
-                    },
-                    beginAtZero: true, // Bắt đầu từ 0
-                },
-            },
-        },
-    });
-
-
-
-
-*/
-
-//document.getElementById('quick-view').addEventListener('click', openChangeDisplayPopup);
-
-
+            });
 
 // Close the draft popup when the close button is clicked
 function closeDetailExplanation() {
     document.getElementById('explanation_popup').style.display = 'none';
 }
 
-
+function renderMath(){
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+    Swal.fire({
+  title: "Thành công",
+  text: "Đã tải lại câu hỏi và đáp án đề thi. Nếu đề thi còn lỗi, hãy báo lỗi để chúng tôi fix nhanh nhất !",
+  icon: "success"
+});
+}
 
 function  redoWrongAns(){
    
@@ -782,6 +780,8 @@ function openDetailExplanation(questionNumber, questionId, questionContent, imag
     document.getElementById('popup_question_correct_answer').innerHTML = `<b style="color:green"> Correct Answer: ${correctAnswer}</b>`; // Use correctAnswer parameter
     document.getElementById('popup_question_user_answer').innerHTML = `Your answer: ${userAnswer}`; // Use correctAnswer parameter
     document.getElementById('popup_question_explanation').innerHTML = `Explanation: ${explanationQuestion}`; // This will render HTML tags properly
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+
 }
 
 

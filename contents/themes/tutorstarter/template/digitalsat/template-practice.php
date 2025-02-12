@@ -561,12 +561,104 @@ $new_skip_ans = 0;
                     echo "'related_lectures': ''";
                     echo "}";
                 }
+                else if (strpos($question_id, "math") === 0) {
+                    // Query only from digital_sat_question_bank_verbal table
+                    $sql_question =
+                        "SELECT id_question, type_question, question_content, answer_1, answer_2, answer_3, answer_4, correct_answer, explanation, image_link FROM digital_sat_question_bank_math WHERE id_question = ?";
+                    $stmt_question = $conn->prepare($sql_question);
+                    $stmt_question->bind_param("s", $question_id);
+                    $stmt_question->execute();
+                    $result_question = $stmt_question->get_result();
+    
+                    if ($result_question->num_rows > 0) {
+                        $question_data = $result_question->fetch_assoc();
+    
+                        if (!$first) {
+                            echo ",";
+                        }
+                        $first = false;
+    
+                        echo "{";
+                        echo "'type': " .
+                            json_encode($question_data["type_question"]) .
+                            ",";
+                        echo "'question': " .
+                            json_encode($question_data["question_content"]) .
+                            ",";
+                        /*echo "'image': " .
+                            json_encode($question_data["image_link"]) .
+                            ",";
+                            */
+                        echo "'image': '',";
+                        
+                        echo "'question_category': '',";
+                        echo "'id_question': " .
+                            json_encode($question_data["id_question"]) .
+                            ",";
+                        /*echo "'category': " .
+                            json_encode($question_data["category"]) .
+                            ",";
+                            */
+      
+    
+                        echo "'answer': [";
+                        echo "['" .
+                            $question_data["answer_1"] .
+                            "', '" .
+                            ($question_data["correct_answer"] == "answer_1"
+                                ? "true"
+                                : "false") .
+                            "'],";
+                        echo "['" .
+                            $question_data["answer_2"] .
+                            "', '" .
+                            ($question_data["correct_answer"] == "answer_2"
+                                ? "true"
+                                : "false") .
+                            "'],";
+                        echo "['" .
+                            $question_data["answer_3"] .
+                            "', '" .
+                            ($question_data["correct_answer"] == "answer_3"
+                                ? "true"
+                                : "false") .
+                            "'],";
+                        echo "['" .
+                            $question_data["answer_4"] .
+                            "', '" .
+                            ($question_data["correct_answer"] == "answer_4"
+                                ? "true"
+                                : "false") .
+                            "']";
+                        echo "],";
+                        echo "'explanation': " .
+                            json_encode($question_data["explanation"]) .
+                            ",";
+                        echo "'section': '',";
+                        echo "'related_lectures': ''";
+                        echo "}";
+                    }
+                }
             }
         }
         // Close the questions array and the main object
         echo "]};";
+        
 
         echo "</script>";
+        echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>';
+        echo '<script type="text/javascript">
+            window.MathJax = {
+                tex2jax: {
+                    inlineMath: [["$", "$"], ["\\(", "\\)"]],
+                    processEscapes: true
+                }
+            };
+            document.addEventListener("DOMContentLoaded", function () {
+                    MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+    
+            });
+        </script>';
     }
 } else {
     // If no results with testsavenumber
@@ -1948,7 +2040,7 @@ function purple_highlight(spanId) {
         </script>
 
 <!--<script type="text/javascript" src="function/alert_leave_page.js"></script> -->
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function_practice/main_sat_4.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function_practice/main_sat_5.js"></script>
 
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function_practice/translate.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function_practice/zoom-text.js"></script>
@@ -1965,7 +2057,7 @@ function purple_highlight(spanId) {
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function_practice/format-time-1.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function_practice/draft-popup.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function_practice/color-background.js"></script>
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function_practice/start-digital-sat-Test.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function_practice/start-digital-sat-Test-1.js"></script>
 <!-- <script type="text/javascript" src="function_practice/quick-view-answer.js"></script> -->
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function_practice/checkbox_and_remember.js"></script>
 

@@ -158,7 +158,11 @@ function getLabelLetter(index) {
 function main() {
     
    // document.getElementById("start-test").style.display  ='block';
-    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+
+   MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+
+
+
     if (quizData.logoname == undefined) {
         quizData.logoname = '';
     }
@@ -306,7 +310,8 @@ answerBox.forEach(answer => {
     `;
 });
 
-contentQuestions += '</div><p class="question">'+ ' Câu ' + questionNumber + ' (ID: ' + question.id_question+')'+':'+
+    contentQuestions += '</div><p class="question">'+ ' Câu ' + questionNumber + '<span class="tex2jax_ignore">(ID: ' + question.id_question + ')</span>'+':'+
+
     '<br>' +(imageSrc ? '<img width="100%" src="' + imageSrc + '" onclick="openModal(\'' + imageSrc + '\')">' : '') +  question.question +
     '</p></div>' +
     
@@ -486,7 +491,7 @@ function PreSubmit(){
               if (result.dismiss === Swal.DismissReason.timer) {
                 console.log("Displayed Result");
                  //ResultInput();
-                 submitButton();
+                 submitAnswerAndGenerateLink();
 
               }
             });
@@ -498,7 +503,31 @@ function PreSubmit(){
 
                 
 
+
+
+
+           
           }
 
 
+          async function submitAnswerAndGenerateLink() {
+            await filterAnswerForEachType();
+            await ResultInput();
+          
+            Swal.fire({
+              title: "Kết quả đã có",
+              html: "Chúc mừng bạn đã hoàn thành bài thi. Click vào link dưới để nhận kết quả ngay <i class='fa-regular fa-face-smile'></i>",
+              allowOutsideClick: false,
+              showCancelButton: false,
+              confirmButtonColor: "#3085d6",
+              confirmButtonText: "Xem kết quả",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                // Chuyển đến link chứa resultId
+                //const resultId = 123; // Thay bằng giá trị resultId thực tế
+                window.location.href = `${siteUrl}/digitalsat/result/${resultId}`;
+              }
+            });
+          }
+          
           

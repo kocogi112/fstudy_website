@@ -6,15 +6,15 @@ global $wpdb;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Get the input data and sanitize it
-    $id_question = wp_kses_post($_POST['id_question']);
-    $type_question = wp_kses_post($_POST['type_question']);
+    $id_question = wp_unslash($_POST['id_question']);
+    $type_question = wp_unslash($_POST['type_question']);
 
-    $question_content = stripslashes($_POST['question_content']);
+    $question_content = wp_unslash($_POST['question_content']);
     // Tiếp tục với các bước lưu vào cơ sở dữ liệu
-    $answer_1 = wp_kses_post($_POST['answer_1']);
-    $answer_2 = wp_kses_post($_POST['answer_2']);
-    $answer_3 = wp_kses_post($_POST['answer_3']);
-    $answer_4 = wp_kses_post($_POST['answer_4']);
+    $answer_1 = wp_unslash($_POST['answer_1']);
+    $answer_2 = wp_unslash($_POST['answer_2']);
+    $answer_3 = wp_unslash($_POST['answer_3']);
+    $answer_4 = wp_unslash($_POST['answer_4']);
 
     if ($_POST['type_question'] === 'completion') {
         $correct_answer = $_POST['custom_correct_answer'];
@@ -23,8 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     
     // Tiếp tục xử lý và lưu vào cơ sở dữ liệu
-        $explanation = wp_kses_post($_POST['explanation']);
-    $image_link = wp_kses_post($_POST['image_link']);
+        $explanation = wp_unslash($_POST['explanation']);
+    $image_link = wp_unslash($_POST['image_link']);
     // Prepare the data for insertion
     $data = array(
         'id_question' => $id_question,

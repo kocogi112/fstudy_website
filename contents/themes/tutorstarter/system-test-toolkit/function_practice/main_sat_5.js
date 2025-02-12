@@ -158,7 +158,11 @@ function getLabelLetter(index) {
 function main() {
     
    // document.getElementById("start-test").style.display  ='block';
-    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+
+   MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+
+
+
     if (quizData.logoname == undefined) {
         quizData.logoname = '';
     }
@@ -306,7 +310,8 @@ answerBox.forEach(answer => {
     `;
 });
 
-contentQuestions += '</div><p class="question">'+ ' Câu ' + questionNumber + ' (ID: ' + question.id_question+')'+':'+
+    contentQuestions += '</div><p class="question">'+ ' Câu ' + questionNumber + '<span class="tex2jax_ignore">(ID: ' + question.id_question + ')</span>'+':'+
+
     '<br>' +(imageSrc ? '<img width="100%" src="' + imageSrc + '" onclick="openModal(\'' + imageSrc + '\')">' : '') +  question.question +
     '</p></div>' +
     

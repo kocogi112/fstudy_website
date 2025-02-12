@@ -195,7 +195,6 @@ $siteurl = get_site_url();
     background: white;
     padding: 20px;
     border-radius: 10px;
-    width: 300px;
     text-align: center;
   }
 
@@ -209,6 +208,17 @@ $siteurl = get_site_url();
 
   .hidden {
     display: none;
+  }
+  .plan-input{
+    width: 100%;
+  height: 150px;
+  padding: 12px 20px;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+  font-size: 16px;
+  resize: none;
   }
 
 </style>
@@ -266,7 +276,7 @@ $siteurl = get_site_url();
                     <form id="eventPopup" style="display: none;">
                         <div class="popupContent">
                             <p id="selectedDate">Ngày: </p>
-                            <textarea id="plan_context" placeholder="Nhập kế hoạch"></textarea>
+                            <textarea class ="plan-input" id="plan_context" placeholder="Nhập kế hoạch"></textarea>
                             <select id="level">
                                 <option value="Important">Quan trọng</option>
                                 <option value="Normal">Bình thường</option>
@@ -298,7 +308,6 @@ $siteurl = get_site_url();
             <option value="Digital SAT">Digital SAT</option>
             <option value="IELTS">IELTS</option>
             <option value="THPTQG">THPTQG</option>
-            <option value="other">Khác</option>
             </select>
             
             <label for="aim-input">Nhập điểm mục tiêu:</label>
