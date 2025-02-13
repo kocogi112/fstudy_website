@@ -73,12 +73,48 @@ $limit = 12;
 $offset = ($paged - 1) * $limit;
 
 if (!empty($table_name)) {
+    $price_filter = $_GET['price'] ?? '';  
+    if (!is_array($price_filter)) {
+        $price_filter = [$price_filter]; // Chuyển về mảng nếu chỉ có một giá trị
+    }
+
+    $test_type_filter = $_GET['test_type'] ?? [];
+    if (!is_array($test_type_filter)) {
+        $test_type_filter = [$test_type_filter]; // Chuyển về mảng nếu chỉ có một giá trị
+    }
+    
+    $conditions = [];
+    $params = ['%' . $wpdb->esc_like($search_term) . '%', $limit, $offset];
+
+    // Điều kiện lọc theo giá
+    if (in_array('free', $price_filter) && in_array('premium', $price_filter)) {
+        // Không cần điều kiện gì vì cả free và premium đều được chấp nhận
+    } elseif (in_array('free', $price_filter)) {
+        $conditions[] = "token_need = 0";
+    } elseif (in_array('premium', $price_filter)) {
+        $conditions[] = "token_need > 0";
+    }
+    
+  
+    
+
+    if (in_array('Practice', $test_type_filter) && in_array('Full Length', $test_type_filter)) {
+        // Không cần điều kiện vì chấp nhận cả hai
+    } elseif (in_array('Practice', $test_type_filter)) {
+        $conditions[] = "test_type = 'Practice'";
+    } elseif (in_array('Full Length', $test_type_filter)) {
+        $conditions[] = "test_type = 'Full Length'";
+    }
+    
+
+    // Gộp các điều kiện thành câu SQL
+    $where_clause = !empty($conditions) ? 'AND ' . implode(' AND ', $conditions) : '';
+
     $query = $wpdb->prepare(
-        "SELECT * FROM {$table_name} WHERE testname LIKE %s LIMIT %d OFFSET %d",
-        '%' . $wpdb->esc_like($search_term) . '%',
-        $limit,
-        $offset
+        "SELECT * FROM {$table_name} WHERE testname LIKE %s $where_clause LIMIT %d OFFSET %d",
+        ...$params
     );
+
     $results = $wpdb->get_results($query);
 } else {
     $results = [];
@@ -102,12 +138,23 @@ if (!empty($table_name)) {
     <?php endforeach; ?>
 </div>
 
+<div class="search-feature">
+    <!-- Search Form -->
+    <form method="get" action="<?php echo esc_url(home_url('/tests/' . ($current_post_type ? $current_post_type : ''))); ?>" class="search-form">
+        <input type="text" name="term" placeholder="Nhập từ khóa..." value="<?php echo esc_attr($search_term); ?>" />
 
-<!-- Search Form -->
-<form method="get" action="<?php echo esc_url(home_url('/tests/' . ($current_post_type ? $current_post_type : ''))); ?>" class="search-form">
-    <input type="text" name="term" placeholder="Nhập từ khóa..." value="<?php echo esc_attr($search_term); ?>" />
-    <button type="submit">Tìm kiếm</button>
-</form>
+        <div class="test-type-option">
+            <label><input type="checkbox" name="price[]" value="free" <?php if (in_array('free', $price_filter)) echo 'checked'; ?>> Free</label>
+            <label><input type="checkbox" name="price[]" value="premium" <?php if (in_array('premium', $price_filter)) echo 'checked'; ?>> Premium</label>
+
+            <label><input type="checkbox" name="test_type[]" value="Practice" <?php if (in_array('Practice', $test_type_filter)) echo 'checked'; ?>> Practice</label>
+            <label><input type="checkbox" name="test_type[]" value="Full Length" <?php if (in_array('Full Length', $test_type_filter)) echo 'checked'; ?>> Full Length</label>
+
+        </div>
+
+        <button type="submit">Tìm kiếm & Lọc</button>
+    </form>
+</div>
 
 <?php
 // Set up the query arguments

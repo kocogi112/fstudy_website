@@ -281,7 +281,8 @@ if (window.MathJax) {
                     </select><br>
 
                     Question: <textarea id="edit_question_content" name="question_content" class="form-control" required></textarea><br>
-                    <span class="tex2jax_ignore">Support Latex (add $...$ at each function)</span>:
+                    <span class="tex2jax_ignore">Support Latex (add $...$ at each function)<br> To ignor mathjax: div class="tex2jax_ignore" </span>:
+
                     <div id="equation-editor">
                         <div id="history"></div>
                         <div id="toolbar"></div>

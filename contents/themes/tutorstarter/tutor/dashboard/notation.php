@@ -44,6 +44,17 @@ $notations = $wpdb->get_results(
   -webkit-user-select: none;
   touch-action: manipulation;
 }
+.text-area-meaning{
+   width: 100%;
+  height: 150px;
+  padding: 12px 20px;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+  font-size: 16px;
+  resize: none;
+}
 
 .export-buttons {
         display: flex;
@@ -54,6 +65,8 @@ $notations = $wpdb->get_results(
   box-shadow: inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2), 0px 0.5px 1.5px rgba(54, 122, 246, 0.25), 0px 0px 0px 3.5px rgba(58, 108, 217, 0.5);
   outline: 0;
 }
+.controls{
+    margin-bottom: 20px; display: flex; gap: 10px;}
 </style>
 <div class="notation-table-container">
     <h2>Bảng từ đã lưu của bạn</h2>
@@ -112,12 +125,18 @@ $notations = $wpdb->get_results(
     <label for="editWord">Word Save:</label>
     <input type="text" id="editWord" style="width: 100%; margin-bottom: 10px;">
     <label for="editMeaning">Meaning or Explanation:</label>
-    <textarea id="editMeaning" style="width: 100%; margin-bottom: 10px;"></textarea>
-    <button class="button-10" onclick="saveEdit()">Lưu</button>
-    <button class="button-10" onclick="closeEditPopup()">Đóng</button>
+    <textarea id="editMeaning" class = "text-area-meaning" style="width: 100%; margin-bottom: 10px;"></textarea>
+    <div class = "controls">
+        <button class="button-10" onclick="saveEdit()">Lưu</button>
+        <button class="button-10" onclick="closeEditPopup()">Đóng</button>
+    </div>
 </div>
 
 <script>
+
+
+
+
     function openEditPopup(number) {
         document.getElementById("editNumber").value = number;
         document.getElementById("editWord").value = document.getElementById("word-" + number).innerText;

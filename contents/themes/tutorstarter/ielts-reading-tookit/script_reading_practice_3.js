@@ -82,12 +82,20 @@ function loadPart(partIndex) {
             const questionElement = document.createElement('div');
             questionElement.classList.add('question');
 
+            const correctAnswerElement = document.createElement('div');
+            correctAnswerElement.classList.add('correct-answer');
+
             // Multi-select questions
             if (group.type_group_question === "multi-select") {
                 const answerChoiceCount = parseInt(question.number_answer_choice) || 1;
                 const questionRange = `${currentQuestionNumber}-${currentQuestionNumber + answerChoiceCount - 1}`;
 
                 questionElement.innerHTML = `<span id = "mark-question-${currentQuestionNumber}" class = "number-question"> <p  name = "question-id-${currentQuestionNumber}"  id ="question-id-${questionRange}"> <b>${questionRange}.</b> </p> </span>  <p> ${question.question}</p> `;
+
+                const correctAnswers = question.answers
+                    .filter(answer => answer[1] === true)
+                    .map(answer => answer[0]);
+    
 
                 question.answers.forEach((answer, answerIndex) => {
                     const answerOption = document.createElement('div');
@@ -100,6 +108,8 @@ function loadPart(partIndex) {
                             <input type="checkbox" id="${inputId}" name="question-${currentQuestionNumber}" value="${answer[0]}">
                             ${answer[0]}
                         </label>
+                        <br> 
+                        <p><b>Correct Answer:</b> ${correctAnswers.length > 0 ? correctAnswers.join(', ') : "Not available"}</p>
                     `;
 
                     const checkbox = answerOption.querySelector('input');
@@ -127,11 +137,13 @@ function loadPart(partIndex) {
            if (group.type_group_question === "completion") {
             let questionContent = question.question;
             const completionInputIds = []; // Lưu trữ danh sách các ID để kiểm tra sau
-        
+            const correctAnswers = question.box_answers.map(box => box.answer || "Not available");
+
             // Thay thế tất cả placeholder <input> bằng thẻ input động
             question.box_answers.forEach((boxAnswer, boxIndex) => {
                 const completionNumber = currentQuestionNumber + boxIndex;
                 const questionNumber = completionNumber;
+
                 let questionType = ""; // Mặc định là chuỗi rỗng
 
                 // Kiểm tra trước khi gán giá trị từ part.question_types
@@ -141,12 +153,25 @@ function loadPart(partIndex) {
 
                 
                 
+            var inputElementHtml;
+                
 
-                const inputElementHtml = `
+                    if (DoingTest == true){
+                        inputElementHtml = `
                 <div style="display: inline-flex; align-items: center;">
-                    <span id = "mark-question-${completionNumber}" class = "number-question"> <p type = "${questionType}" style="margin: 0;"> <b >${completionNumber}</b> </p> </span> <input class="form-control" name = "question-id-${completionNumber}"  type="text" id="answer-input-${completionNumber}" class="answer-input" name="question-${completionNumber}"  placeholder="Question ${completionNumber}"/>    
+                    <span id = "mark-question-${completionNumber}" class = "number-question"> <p type = "${questionType}" style="margin: 0;"> <b >${completionNumber}</b> </p> </span> <input class="form-control"  autocomplete="off" name = "question-id-${completionNumber}"  type="text" id="answer-input-${completionNumber}" class="answer-input" name="question-${completionNumber}" />    
                 </div>
                     `;
+                    }
+                        else if(DoingTest == false){
+                            inputElementHtml = `
+                            <div style="display: inline-flex; align-items: center;">
+                                <span id = "mark-question-${completionNumber}" class = "number-question"> <p type = "${questionType}" style="margin: 0;"> <b >${completionNumber}</b> </p> </span> <input class="form-control"  autocomplete="off" name = "question-id-${completionNumber}"  type="text" id="answer-input-${completionNumber}" class="answer-input" name="question-${completionNumber}" disabled />    
+                            </div>
+                                `;                 
+                    }
+
+                    
                 questionContent = questionContent.replace('<input>', inputElementHtml);
                 completionInputIds.push(`answer-input-${completionNumber}`);
                 
@@ -154,8 +179,22 @@ function loadPart(partIndex) {
             let currentIndexQuestion = currentQuestionNumber;
         
             // Gắn nội dung đã thay thế vào DOM
-            questionElement.innerHTML = `<p>${questionContent}</p>`;
-        
+            questionElement.innerHTML = `
+                    <p>${questionContent}</p>
+
+            `;
+
+
+            if (DoingTest == true){
+                correctAnswerElement.innerHTML = `<p class ="correct-ans" style = "display:none"><b>Correct Answer:</b> ${correctAnswers.join(', ')}</p>`;
+            }
+            else if(DoingTest == false){
+                correctAnswerElement.innerHTML = `<p class ="correct-ans" style = "display:block"><b>Correct Answer:</b> ${correctAnswers.join(', ')}</p>`;
+            }
+
+
+            questionElement.appendChild(correctAnswerElement);
+
             // Chờ DOM cập nhật hoàn tất rồi mới gán sự kiện
             setTimeout(() => {
                 completionInputIds.forEach((inputId, boxIndex) => {
@@ -204,6 +243,7 @@ function loadPart(partIndex) {
                if (part.question_types && part.question_types[questionNumber]) {
                 questionType = part.question_types[questionNumber];
             }
+             const correctAnswer = question.answers.find(answer => answer[1] === true)?.[0] || "Not available";
 
                 questionElement.innerHTML = `
                 <div style="display: inline-flex; align-items: center;">
@@ -217,7 +257,6 @@ function loadPart(partIndex) {
                            onclick="rememberQuestion(${currentQuestionNumber})">
                     </image>
                 </div>`;
-
                 
                 let currentIndexQuestion = currentQuestionNumber;
                 question.answers.forEach((answer, answerIndex) => {
@@ -228,10 +267,21 @@ function loadPart(partIndex) {
                         <input type="radio" name="multiplechoice-${partIndex}-${groupIndex}-${questionIndex}" value="${answer[0]}" id="${inputId}">
                         ${answer[0]}
                     `;*/
-                     answerElement.innerHTML = `
+                    if (DoingTest == true){
+                        answerElement.innerHTML = `
                         <input type="radio" name="question-${currentQuestionNumber}"  value="${answer[0]}" id="answer-input-${inputId}">
                         ${answer[0]}
                     `;
+                    }
+                        else if(DoingTest == false){
+                            answerElement.innerHTML = `
+                            <input disabled type="radio" name="question-${currentQuestionNumber}"  value="${answer[0]}" id="answer-input-${inputId}">
+                            ${answer[0]}
+                        `;                        
+                    }
+
+
+                     
 
                     answerElement.querySelector('input').addEventListener('change', (event) => {
                         const allAnswers = document.querySelectorAll(`input[name="question-${currentIndexQuestion}"]`);
@@ -249,11 +299,25 @@ function loadPart(partIndex) {
             
                     questionElement.appendChild(answerElement);
                 });
+                
+                if (DoingTest == true){
+                correctAnswerElement.innerHTML += `<p class ="correct-ans" style = "display:none"><b>Correct Answer:</b> ${correctAnswer}</p>`;
+                }
+                else if(DoingTest == false){
+                    correctAnswerElement.innerHTML += `<p class ="correct-ans"  style = "display:block"><b>Correct Answer:</b> ${correctAnswer}</p>`;
+                }
+
+
+           
+
+            questionElement.appendChild(correctAnswerElement);
 
                 currentQuestionNumber++;
+                
             }
 
             groupContainer.appendChild(questionElement);
+            
         });
 
         questionsContainer.appendChild(groupContainer);
@@ -542,6 +606,16 @@ function PreSubmit(){
                 for (let i = 0; i < quizData.part.length; i++) {
                     logUserAnswers(i);
                 }
+                loadPart(0);
+                var correctAnswerDivs = document.getElementsByClassName('correct-ans');
+
+    for (var i = 0; i < correctAnswerDivs.length; i++) {
+        if (correctAnswerDivs[i].style.display === "none") {
+            correctAnswerDivs[i].style.display = "block";
+        } else {
+            correctAnswerDivs[i].style.display = "block";
+        }
+    }
                  //ResultInput();
                  //fulltestResult();
                 submitAnswerAndGenerateLink();
@@ -561,29 +635,17 @@ function PreSubmit(){
 
 async function submitAnswerAndGenerateLink() {
     await fulltestResult();
-    await filterAnswerForEachType();
+    //await filterAnswerForEachType();
 
-    await ResultInput();
+    //await ResultInput();
     clearInterval(timerInterval); // Ngừng bộ đếm thời gian
 
 
 
   
-    Swal.fire({
-      title: "Kết quả đã có",
-      html: "Chúc mừng bạn đã hoàn thành bài thi. Click vào link dưới để nhận kết quả ngay <i class='fa-regular fa-face-smile'></i>",
-      allowOutsideClick: false,
-      showCancelButton: false,
-      confirmButtonColor: "#3085d6",
-      confirmButtonText: "Xem kết quả",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Chuyển đến link chứa resultId
-        //const resultId = 123; // Thay bằng giá trị resultId thực tế
-        window.location.href = `${siteUrl}/ieltsreadingtest/result/${resultId}`;
-      }
-    });
+    
   }
+
 
 
 partNavigation.appendChild(submitButton); // This will place the Submit button at the end
@@ -696,6 +758,11 @@ let correct_answer_array = [];
 
 function logUserAnswers(partIndex) {
     let userAnswerdiv = document.getElementById('useranswerdiv');
+    
+    
+
+
+
     const endTime = Date.now(); // Lấy thời gian hiện tại
     const timeSpent = Math.floor((endTime - startTime) / 1000); // Tính số giây đã trôi qua
     const minutesSpent = Math.floor(timeSpent / 60);
@@ -864,66 +931,8 @@ function logUserAnswers(partIndex) {
 }
 
 
-async function filterAnswerForEachType()
-{
-    console.log(`Incorrect/Skip array: ${incorrect_skip_answer_array }`);
-    console.log(`Correct array: ${correct_answer_array  }`);
-    console.log(`Filter các loại: ${JSON.stringify(quizData.filterTypeQuestion)}`);
-    await analyzeAnswersByType();
-}
 
-async function analyzeAnswersByType() {
-    const analysis = {};
 
-    quizData.filterTypeQuestion.forEach((item) => {
-        const questionNumber = Object.keys(item)[0];
-        const questionType = item[questionNumber];
-
-        if (!analysis[questionType]) {
-            analysis[questionType] = {
-                correct: 0,
-                incorrect: 0,
-                skipped: 0,
-            };
-        }
-
-        if (correct_answer_array.includes(parseInt(questionNumber))) {
-            analysis[questionType].correct++;
-        } else if (incorrect_skip_answer_array.includes(parseInt(questionNumber))) {
-            analysis[questionType].incorrect++;
-        } else {
-            analysis[questionType].skipped++;
-        }
-    });
-
-    console.log("Analysis by question type:", analysis);
-
-    var link = "http://localhost/wordpress/wp-admin/admin-ajax.php";
-
-    // Gửi dữ liệu tới WordPress qua AJAX
-    
-    jQuery.ajax({
-        url: link, // Sử dụng URL đã chèn từ PHP
-        method: 'POST',
-        data: {
-            action: 'save_analysis_result',
-            analysisData: analysis,
-        },
-        success: function(response) {
-            if (response.success) {
-                console.log('Dữ liệu đã được lưu thành công!');
-            } else {
-                console.log('Lỗi: ' + response.data);
-            }
-        },
-        error: function() {
-            alert('Lỗi kết nối tới server');
-        }
-    });
-    
-
-    return analysis;
-}
 
 
 let ieltsBandScore;
@@ -1093,8 +1102,9 @@ function prestartTest()
 function startTest()
 {
     startTimer(full_time * 60); // 1 hour
-    loadPart(currentPartIndex, full_time);
     DoingTest = true;
+
+    loadPart(currentPartIndex, full_time);
 }
 
 

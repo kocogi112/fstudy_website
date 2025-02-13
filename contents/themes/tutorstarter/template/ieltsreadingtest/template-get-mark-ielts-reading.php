@@ -321,7 +321,7 @@ if (!empty($results)) {
         echo'<button class="button-10" onclick ="redirectToTest()"> Làm lại bài thi </button>';
         echo'<button class="button-10" onclick = "opensharePermission()">Chia sẻ bài làm</button>';
         echo'<button class="button-10" onclick = "openRemarkTest()" >Chấm lại </button>';
-        echo'<button class="button-10"> Làm lại các câu sai</button><br><br>';
+        echo'<button class="button-10"  onclick ="redoWrongAns()"> Làm lại các câu sai</button><br><br>';
 
     
         // Process user answers
@@ -1007,7 +1007,11 @@ function redirectToTest(){
 
         
 
-
+function redoWrongAns(){
+    
+  //var currentLink = "<?= $site_url ?>/digitalsat/result/<?= $testsavenumber ?>";
+  window.location.href = currentLink + "/practice";
+}
 
 
 </script>

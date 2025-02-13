@@ -369,7 +369,8 @@ body {
  }
  
  .form-control{
-   width: 100%;
+    width: 150px;
+
    position: relative;
    z-index: 3;
    height: 35px;
@@ -473,6 +474,13 @@ body {
     align-items: center; /* Căn chỉnh theo chiều dọc */
 }
 
+.above-test i {
+    margin: 0 10px; /* Tạo khoảng cách giữa các icon */
+    cursor: pointer; /* Cho hiệu ứng con trỏ khi hover */
+
+}
+
+
 .above-test .fa-regular.fa-clock {
     margin-right: 10px; /* Tạo khoảng cách giữa fa-clock và timer */
 }
@@ -481,7 +489,7 @@ body {
     margin-right: 20px; /* Tạo khoảng cách giữa timer và fa-bug */
 }
 
-.above-test .fa-solid.fa-bug {
+.above-test .fa-solid.fa-bug.fa-expand {
     margin-right: 20px; /* Tạo khoảng cách giữa fa-bug và fa-circle-info */
 }
 
@@ -887,12 +895,15 @@ html {
     
     
     <div id="content1" style="display: none;">
-            <div class = "above-test">
-                <div id="question-range-of-part" class="question-range"></div>
-                <i class="fa-regular fa-clock"></i><span id="timer" class="timer" style="font-weight: bold"></span>
-                <i class="fa-solid fa-bug"></i>
-                <i class="fa-solid fa-circle-info"></i>
-            </div>
+        <div class="above-test">
+            <div id="question-range-of-part" class="question-range"></div>
+            <i class="fa-regular fa-clock"></i>
+            <span id="timer" class="timer" style="font-weight: bold"></span>
+            <i class="fa-solid fa-bug"></i>
+            <i class="fa-solid fa-circle-info"></i>
+            <i id="fullscreen-toggle" class="fa-solid fa-expand"></i>
+        </div>
+
 
         <div class="quiz-container">
             <div class = "group-control-part-btn">
@@ -1046,11 +1057,26 @@ html {
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://smtpjs.com/v3/smtp.js"></script>
-    <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/script_reading_1.js"></script>
+    <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/script_reading_2.js"></script>
     <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/highlight-text.js"></script>
 
 </body>
 <script>
+    document.getElementById("fullscreen-toggle").addEventListener("click", function () {
+    if (!document.fullscreenElement) {
+        // Kích hoạt fullscreen
+        document.documentElement.requestFullscreen();
+        this.classList.remove("fa-expand");
+        this.classList.add("fa-compress");
+    } else {
+        // Thoát fullscreen
+        document.exitFullscreen();
+        this.classList.remove("fa-compress");
+        this.classList.add("fa-expand");
+    }
+});
+
+
     // function save data qua ajax
 jQuery('#saveReadingResult').submit(function(event) {
     event.preventDefault(); // Prevent the default form submission

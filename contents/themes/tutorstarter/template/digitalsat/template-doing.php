@@ -1424,7 +1424,7 @@ img {
                         <h3 id="countdowns"style="display:none"></h3>
                     </div>
                     <div class="name-zone btn-group dropup">
-                        <button type="button" class="btn-person" id="user-button" data-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-user"></i> Tester</button>
+                        <button type="button" class="btn-person" id="user-button" data-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-user"></i> <?= $current_username ?></button>
                         <div class="dropdown-menu usermap" style=""></div>
                     </div>
                                 
