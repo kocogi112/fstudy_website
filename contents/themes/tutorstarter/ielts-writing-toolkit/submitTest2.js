@@ -26,8 +26,12 @@ function updateWordCount(index) {
 // bat dau cham diem
 let testSubmitted = false;
 
-
 function preSubmitTest() {
+    if (!checkValidSubmit()) {
+        return; // Ngăn chặn việc nộp bài nếu có lỗi
+    }
+    //submitTest();
+
     Swal.fire({
         title: "Đang nộp bài thi",
         html: "Vui lòng đợi trong giây lát.",
@@ -37,15 +41,43 @@ function preSubmitTest() {
         willOpen: () => {
             Swal.showLoading();
         },
-        didOpen: () => {
-            // Ensure the submission happens here
-            submitTest();
-        },
         didClose: () => {
             Swal.hideLoading();
-            ResultInput(); // Handle the result input after submission
+            ResultInput(); // Xử lý kết quả sau khi nộp bài
         }
     });
+}
+
+
+function checkValidSubmit() {
+    let underWordLimit = [];
+    const questions = document.getElementsByClassName("questions");
+
+    for (let i = 0; i < questions.length; i++) {
+        const textarea = document.getElementById(`question-${i}-input`);
+        if (!textarea) continue;
+
+        const wordCount = textarea.value.trim().split(/\s+/).filter(word => word.length > 0).length;
+
+        if (wordCount < 100) {
+            underWordLimit.push(`Câu hỏi ${i + 1} của bạn dưới 100 từ, vui lòng bổ sung.`);
+        }
+    }
+
+    if (underWordLimit.length > 0) {
+        Swal.fire({
+            title: "Cảnh báo!",
+            html: underWordLimit.join("<br>"),
+            icon: "warning",
+            confirmButtonText: "OK"
+        });
+        return false;
+    }
+    else{
+        submitTest();
+    }
+
+    return true;
 }
 
 

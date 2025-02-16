@@ -707,6 +707,9 @@ html {
     color: white;
     border: 1px solid #0073e6;
 }
+.wp-dark-mode-active .tooltip {
+    background-color: #343b47 !important;
+}
 
 
 .tooltip {

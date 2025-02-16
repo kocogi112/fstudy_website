@@ -144,6 +144,7 @@ if ($result_test->num_rows > 0) {
 
 
 
+
 echo '
 <script>
 const rawTranscript = [
@@ -361,8 +362,7 @@ body {
 
 #content1
 {
-  height: 550px;
-  border-radius: 4%;
+  height: 100%;
   border: 1px solid #ddd;
   box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.2);
   margin: auto;
@@ -371,6 +371,7 @@ body {
   display: flex;
   flex-direction: row;
 }
+
 
 .left-side, .right-side {
   width: 100%;
@@ -499,7 +500,7 @@ body {
 }
 
 @media (max-width: 768px) {
-    #content {
+    #content1 {
         flex-direction: column;
     }
     .left-side .right-side {
@@ -955,32 +956,130 @@ border: 3px solid transparent;
 #video-container {
   position: relative;
 }
+
+
+#test-prepare {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: fixed; /* Giữ loader cố định giữa màn hình */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Căn giữa theo cả chiều ngang và dọc */
+    height: 200px;
+    z-index: 1001; /* Đảm bảo loader ở trên các phần tử khác */
+}
+/* HTML: <div class="loader"></div> */
+.loader {
+  width: 70px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 8px solid #514b82;
+  animation: l20-1 0.8s infinite linear alternate, l20-2 1.6s infinite linear;
+}
+
+.start_test {
+  appearance: none;
+  background-color: #2ea44f;
+  border: 1px solid rgba(27, 31, 35, .15);
+  border-radius: 6px;
+  box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: -apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 20px;
+  padding: 6px 16px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.start_test:focus:not(:focus-visible):not(.focus-visible) {
+  box-shadow: none;
+  outline: none;
+}
+.icon {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+}
+
+.start_test:hover {
+  background-color: #2c974b;
+}
+
+.start_test:focus {
+  box-shadow: rgba(46, 164, 79, .4) 0 0 0 3px;
+  outline: none;
+}
+
+.start_test:disabled {
+  background-color: #94d3a2;
+  border-color: rgba(27, 31, 35, .1);
+  color: rgba(255, 255, 255, .8);
+  cursor: default;
+}
+
+.start_test:active {
+  background-color: #298e46;
+  box-shadow: rgba(20, 70, 32, .2) 0 1px 0 inset;
+}
+
+
 </style>
 </head>
-<body>
+<body onload = "main()">
 
 
    
 
 <div class="container1">
-    <div id = "before-content">
-        <div class = "bf-content-setting-class" id = "bf-content-setting">
-
-        
+    <div id = "test-prepare">
+        <div class="loader"></div>
+        <h3>Your test will begin shortly</h3>
+        <div id = "checkpoint" class = "checkpoint">
+                <?php
+                    if($premium_test == "True"){
+                        echo "<script >console.log('Thông báo. Bạn còn {$foundUser['time_left']} lượt làm bài. success ');</script>";
+                        echo " <p style = 'color:green'> Bạn còn {$foundUser['time_left']} lượt làm bài này <svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='#7ed321' stroke-width='2' stroke-linecap='round' stroke-linejoin='arcs'><path d='M22 11.08V12a10 10 0 1 1-5.93-9.14'></path><polyline points='22 4 12 14.01 9 11.01'></polyline></svg> </p> ";
+                        echo "<script>console.log('This is premium test');</script>";
+                    }
+                    else{
+                        echo "<script>console.log('This is free test');</script>"; 
+                    }
+                        ?>
+        </div>    
+        <div id = "quick-instruction">
+            <i>Quick Instruction:<br>
+            - If you find any errors from test (image,display,text,...), please let us know by clicking icon <i class="fa-solid fa-bug"></i><br> 
+            - Incon <i class="fa-solid fa-circle-info"></i> will give you a guide tour, in which you can understand the structure of test, include test's type, formation and how to answer questions<br>
+            - All these two icons are at the right-above side of test.
+        </i>
 
         </div>
+        <div style="display: none;" id="date" style="visibility:hidden;"></div>
+        <div style="display: none;" id="title-test"><?php echo esc_html($testname);?></div>
+        <div  style="display: none;"  id="id_test"  style="visibility:hidden;"><?php echo esc_html($custom_number);?></div>
+        <button  style="display: none;" class ="start_test" id="start_test"  onclick = "pregetStart()">Start test</button>
+        <i id = "welcome" style = "display:none">Click Start Test button to start the test now. Good luck</i>
+
+
     </div>
    
 
 
     <div id="content1">
-    <div id ="intro" style="text-align: center;">
-          <h3> <?php echo $testname; ?></h3>
-          <p>This speech/ conversation has been collected from <?php echo $type_test; ?></p>
-            <p id = 'number-sentences'>Number of sentence: </p>
-            <p>Guidelines: </p>
-            <button onclick ="pregetStart()" class="button-1">Start Now</button>
-        </div>
+   
 
         <div id = 'left-side' class="left-side">
         <div id = "checkpoint" class = "checkpoint">
@@ -1079,6 +1178,24 @@ endif; ?>
       }
     });
   });
+
+
+  function main(){
+    console.log("Passed Main");
+    
+    
+    setTimeout(function(){
+        console.log("Show Test!");
+        document.getElementById("start_test").style.display="block";
+        
+        document.getElementById("welcome").style.display="block";
+
+    }, 1000);
+    
+}
+
+
+
   function pregetStart()
 {
     if(premium_test == "False"){
@@ -1118,11 +1235,12 @@ getStart();
 
 
 function getStart() {     
-  updateTranscript();
-    document.getElementById("intro").style.display = "none";
+    document.getElementById("test-prepare").style.display = "none";
     document.getElementById("start-dictation").style.display = "block";
     document.getElementById("left-side").style.display = "block";
     document.getElementById("right-side").style.display = "block";
+
+    updateTranscript();
 
     navigateTranscript(0);
 }

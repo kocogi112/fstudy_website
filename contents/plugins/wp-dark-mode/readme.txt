@@ -4,7 +4,7 @@ Tags: dark, dark mode, night mode, dark theme, accessibility
 Requires at least: 5.0
 Tested up to: 6.7
 Requires PHP: 5.6
-Stable tag: 5.2.4
+Stable tag: 5.2.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -88,6 +88,17 @@ Check what popular WordPress expert Matt (WPress Doctor) thinks about WP Dark Mo
 WP Dark Mode works flawlessly across all operating systems including Windows, Android, iOS, and macOS. No additional setups are required. This dark mode plugin intelligently detects device preferences and dynamically delivers a handcrafted, expert-designed dark theme experience for your readers. A quick and easy step to add a dark mode toggle to your website to toggle between dark and light mode anytime you want.
 
 Just activate dark mode on your device, and browse the website to experience a magically transformed dark mode of your website. WP Dark Mode supports all major operating systems including iOS, Android, macOS, or Windows 10. WordPress dark mode is now super easy!
+
+
+😍 WHAT OUR CUSTOMERS SAY ABOUT **WP DARK MODE**!
+
+``Best dark mode plugin currently available!``
+
+> *I’ve always been a busy fan of dark mode and have tried diff plugins over the years including WP Dark Mode, Darklups, Dracula Dark Mode, DarkMySite, Darklooks, and bla blah. I started using WP Dark Mode back in 2021 and really loved how it worked on my site. I even tried custom code snippets – it was really fun!
+But in mid 2023, I switched to Dracula because of its color compatibility. However, after WP Dark Mode’s recent updates and revamp, I decided to give it another try – and I’ve fallen in love with it all over again! The latest version really takes things up a notch and works perfectly with my site. Good work WP Dark Mode team.*
+
+-by @sharukhrakin
+
 
 === 🔥 More Awesome Plugins ===
 If you like WP Dark Mode, then consider checking out our other awesome projects:
@@ -178,6 +189,14 @@ Yes, You can toggle the dark mode/ light mode by keyboard shortcut `(Ctrl + Alt 
 7. Dark Mode color presets
 
 == Changelog == 
+
+= 5.2.6 – 12 FEB 2025 =
+* **Fix:** Resolved issue where UTM links were not working on the upgrade button
+
+= 5.2.5 – 29 JAN 2025 =
+* **Fix:** Switch not rendering on Divi theme.
+* **Fix:** Math formula not displaying with MathJax plugin.
+* **Fix:** 'Frontend Enabled' is not being disabled.
 
 = 5.2.4 – 2 JAN 2025 =
 * **Fix:** Responsive images are not replacing.

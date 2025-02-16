@@ -87,6 +87,22 @@ trait Header_Components {
 .group-btn button:hover {
     background-color: #005bb5;
 }
+.darkmode-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.darkmode-toggle span {
+    font-size: 16px;
+    line-height: 1;
+}
+
+/* Chỉnh kích thước toggle */
+.darkmode-toggle .wp-dark-mode-switch {
+    transform: scale(0.8); /* Điều chỉnh kích thước, chỉnh số 0.8 tùy ý */
+}
+
 
 
 		</style>
@@ -151,6 +167,18 @@ trait Header_Components {
 							echo $menu_list_item;
 						}
 						?>
+						<div class="dark-mode">
+							<div class="darkmode-toggle">
+								<span>Darkmode</span> 
+								<?php echo do_shortcode('[wp_dark_mode style="10"]'); ?>
+							</div>
+						</div>
+
+
+
+
+
+
 					</ul>
 				</div>
 			<?php else : ?>

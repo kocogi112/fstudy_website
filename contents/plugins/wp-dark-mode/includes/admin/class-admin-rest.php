@@ -170,7 +170,7 @@ if ( ! class_exists( __NAMESPACE__ . 'REST' ) ) {
 
 			foreach ( $option_keys as $key => $value ) {
 				if ( $request->has_param( $key ) ) {
-					$this->set_option( $key, $request->get_param( $key ) );
+					$this->set_option( $key, $request->get_param( $key ), true );
 					$updates[ $key ] = $request->get_param( $key );
 				}
 			}

@@ -101,8 +101,6 @@ if ( ! class_exists( __NAMESPACE__ . 'Triggers' ) ) {
 				case 'default_light':
 					return false;
 
-					break;
-
 				// Time based.
 				case 'time':
 					// Checks if Dark Mode is enabled based on time.
@@ -110,16 +108,12 @@ if ( ! class_exists( __NAMESPACE__ . 'Triggers' ) ) {
 
 					return $is_time_based_dark_mode;
 
-					break;
-
 				// Sunset based.
 				case 'sunset':
 					// Checks if Dark Mode is enabled based on sunset.
 					$is_sunset_based_dark_mode = apply_filters( 'wp_dark_mode_is_sunset_based_dark_mode', false );
 
 					return $is_sunset_based_dark_mode;
-
-					break;
 
 				// Device based.
 				case 'device':

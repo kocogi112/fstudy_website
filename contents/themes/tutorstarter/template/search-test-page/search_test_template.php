@@ -185,7 +185,7 @@ $query = new WP_Query($args);
         if ($current_post_type === 'digitalsat') {
             $table_res_name = 'save_user_result_digital_sat';
             $check_column = 'resulttest'; // Cột cần kiểm tra
-        } elseif ($current_post_type === 'ieltsreadingtests') {
+        } elseif ($current_post_type === 'ieltsreadingtest') {
             $table_res_name = 'save_user_result_ielts_reading';
             $check_column = 'overallband'; // Cột cần kiểm tra
         }

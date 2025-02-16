@@ -216,7 +216,7 @@ if ( ! class_exists( __NAMESPACE__ . 'Install' ) ) {
 					$links,
 					sprintf(
 						'<a href="%s" target="_blank" style="%s">%s</a>',
-						'https://wpdarkmode.com/pricing/?utm_source=plugin&utm_medium=link&utm_campaign=wp-dark-mode',
+						'https://go.wppool.dev/LaSV',
 						'color: #25b363;',
 						__( 'Upgrade now', 'wp-dark-mode' )
 					)

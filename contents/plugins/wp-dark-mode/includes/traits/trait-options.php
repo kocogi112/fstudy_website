@@ -43,7 +43,7 @@ if ( ! trait_exists( __NAMESPACE__ . 'Options' ) ) {
 
 			foreach ( $this->get_default_options() as $item => $subitems ) {
 				foreach ( $subitems as $subitem => $value ) {
-					$defaults[ $item . '_' . $subitem ] = $value['default'];
+					$defaults[ wp_sprintf( '%s_%s', $item, $subitem ) ] = $value['default'];
 				}
 			}
 
@@ -74,7 +74,7 @@ if ( ! trait_exists( __NAMESPACE__ . 'Options' ) ) {
 				foreach ( $option_group as $option_name => $option ) {
 					$name  = $option_group_name . '_' . $option_name;
 
-					$value = get_option( 'wp_dark_mode_' . $name, $option['default'] );
+					$value = get_option( wp_sprintf( 'wp_dark_mode_%s', $name ), $option['default'] );
 
 					$type = isset( $option['type'] ) ? $option['type'] : 'mixed';
 
@@ -89,7 +89,7 @@ if ( ! trait_exists( __NAMESPACE__ . 'Options' ) ) {
 
 						case 'array':
 							if ( ! is_array( $value ) ) {
-								$value = array();
+								$value = [];
 							}
 
 							$wp_dark_mode_options[ $name ] = (array) $value;
@@ -128,7 +128,7 @@ if ( ! trait_exists( __NAMESPACE__ . 'Options' ) ) {
 				return $options[ $name ];
 			}
 
-			$option = get_option( 'wp_dark_mode_' . $name, $default );
+			$option = get_option( wp_sprintf( 'wp_dark_mode_%s', $name ), $default );
 			return $option;
 		}
 
@@ -140,8 +140,14 @@ if ( ! trait_exists( __NAMESPACE__ . 'Options' ) ) {
 		 * @param mixed  $value Option value.
 		 * @return bool
 		 */
-		final public function set_option( $option, $value = null ) {
-			$set = update_option( 'wp_dark_mode_' . $option, $value );
+		final public function set_option( $option, $value = null, $force = false ) {
+			if ( $force ) {
+				delete_option( wp_sprintf( 'wp_dark_mode_%s', $option ) );
+				$set = add_option( wp_sprintf( 'wp_dark_mode_%s', $option ), $value );
+			} else {
+				$set = update_option( wp_sprintf( 'wp_dark_mode_%s', $option ), $value );
+			}
+
 			return $set;
 		}
 
@@ -153,7 +159,7 @@ if ( ! trait_exists( __NAMESPACE__ . 'Options' ) ) {
 		 * @return bool
 		 */
 		final public function delete_option( $option ) {
-			$delete = delete_option( 'wp_dark_mode_' . $option );
+			$delete = delete_option( wp_sprintf( 'wp_dark_mode_%s', $option ) );
 			return $delete;
 		}
 
@@ -165,9 +171,9 @@ if ( ! trait_exists( __NAMESPACE__ . 'Options' ) ) {
 		 * @return mixed
 		 */
 		final public function get_transient( $name, $default = null ) {
-			$value = get_transient( 'wp_dark_mode_' . $name );
+			$value = get_transient( wp_sprintf( 'wp_dark_mode_%s', $name ) );
 
-			if ( is_null( $value ) ) {
+			if ( null === $value ) {
 				return $default;
 			}
 
@@ -184,7 +190,7 @@ if ( ! trait_exists( __NAMESPACE__ . 'Options' ) ) {
 		 * @return bool
 		 */
 		final public function set_transient( $name, $value, $expiration = 0 ) {
-			return set_transient( 'wp_dark_mode_' . $name, $value, $expiration );
+			return set_transient( wp_sprintf( 'wp_dark_mode_%s', $name ), $value, $expiration );
 		}
 
 		/**
@@ -195,7 +201,7 @@ if ( ! trait_exists( __NAMESPACE__ . 'Options' ) ) {
 		 * @return bool
 		 */
 		final public function delete_transient( $name ) {
-			return delete_transient( 'wp_dark_mode_' . $name );
+			return delete_transient( wp_sprintf( 'wp_dark_mode_%s', $name ) );
 		}
 
 		/**

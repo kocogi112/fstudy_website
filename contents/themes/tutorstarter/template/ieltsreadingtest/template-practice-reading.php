@@ -28,10 +28,44 @@ if (is_user_logged_in()) {
     if (!empty($results)) {
         // Assuming you want the first result's id_test
         $custom_number = intval($results[0]->idtest);
+        $userAnswers = $results[0]->useranswer;
+        $questions = explode('Question:', $userAnswers); // Split by "Question:"
 
+        $groupedQuestionsForRemark = []; // Initialize once
+
+        foreach ($questions as $questionData) {
+            if (trim($questionData) === '') continue;
+    
+            // Extract data for each question
+            preg_match('/(\d+), Part: (\d+), User Answer: (.*?)(?=Question:|$)/', $questionData, $matches);
+    
+            if (count($matches) === 4) {
+                $questionNumber = $matches[1]; // Question number
+                $partNumber = $matches[2];     // Part number
+                $userAnswer = trim($matches[3]); // User's answer
+    
+                $groupedQuestions[$partNumber][] = [
+                    'questionNumber' => $questionNumber,
+                    'userAnswer' => $userAnswer,
+                ];
+                $groupedQuestionsForRemark[] = [
+                    'questionNumber' => $questionNumber,
+                    'userAnswer' => $userAnswer,
+                ];
+            }
+        }
+
+        $encodedGroupedQuestions = json_encode($groupedQuestionsForRemark, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+
+        echo '<script type="text/javascript">
+            // Chuyển dữ liệu PHP thành JSON và gán cho biến JavaScript
+            var groupedQuestions = ' . $encodedGroupedQuestions . ';
+            let correctAnswerList = []; // Danh sách chứa đáp án đúng
+
+            </script>';
     }
 
-    echo "<script>console.log('Custom Number doing template: " . esc_js($custom_number) . "');</script>";
+    echo "<script>    console.log('Custom Number doing template: " . esc_js($custom_number) . "');</script>";
 
 
    
@@ -520,7 +554,25 @@ html {
     font-size: 12px;
     border: 1px solid #EAECEF;
 }
+.checkbox-answered {
+    background-color: #e6f7ff; /* Màu nền xanh nhạt */
+    border-color: #1890ff;    /* Viền xanh đậm */
+    color: #1890ff;           /* Chữ màu xanh */
+}
+.checkbox-marked {
+    background-color: yellow !important;
+}
+.checkbox-correct-answer{
+    background-color: #e6f7ff; /* Màu nền xanh nhạt */
+    border-color:rgb(81, 173, 153);    /* Viền xanh đậm */
+    color:rgb(18, 218, 94);           /* Chữ màu xanh */
+}
+.checkbox-incorrect-answer{
 
+    background-color: #e53b2f;
+    border-color: rgb(70 135 195);
+    color: rgb(33 18 19);
+}
 .number-question {
     border-radius: 50%; 
     background-color: #e8f2ff;
@@ -536,9 +588,6 @@ html {
     background-color: yellow !important;
 }
 
-.checkbox-marked {
-    background-color: yellow !important;
-}
 
 
 
@@ -547,13 +596,8 @@ html {
     border: 2px solid #ffcc00; /* Viền ngoài sáng màu vàng */
     border-radius: 5px; /* Bo tròn góc */
     padding: 5px; /* Tạo khoảng cách giữa chữ và viền */
-    background-color: #f9f6e8; /* Thêm nền nhạt */
+    /*background-color: #f9f6e8; /* Thêm nền nhạt */
     transition: all 0.3s ease; /* Hiệu ứng mượt */
-}
-.checkbox-answered {
-    background-color: #e6f7ff; /* Màu nền xanh nhạt */
-    border-color: #1890ff;    /* Viền xanh đậm */
-    color: #1890ff;           /* Chữ màu xanh */
 }
 
 
@@ -959,7 +1003,7 @@ html {
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://smtpjs.com/v3/smtp.js"></script>
-    <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/script_reading_practice_3.js"></script>
+    <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/script_reading_practice_4.js"></script>
     <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/highlight-text.js"></script>
 
 </body>

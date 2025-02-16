@@ -1174,6 +1174,9 @@ body.dark-mode {
 /* CSS */
 
 
+.wp-dark-mode-active .tooltip {
+    background-color: #343b47 !important;
+}
 
 
 .tooltip {

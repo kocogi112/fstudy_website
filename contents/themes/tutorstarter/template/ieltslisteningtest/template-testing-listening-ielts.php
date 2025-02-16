@@ -721,6 +721,10 @@ tr:nth-child(even) {
 img{
     max-width: 100%;
 }
+.wp-dark-mode-active .tooltip {
+    background-color: #343b47 !important;
+}
+
 
 .tooltip {
     position: relative;

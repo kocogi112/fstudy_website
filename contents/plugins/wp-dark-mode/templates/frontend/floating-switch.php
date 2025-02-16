@@ -63,15 +63,15 @@ if ( 'left' === $aligned ) {
 }
 
 // Display classes.
-if ( ! $args['display']['desktop'] ) {
+if ( ! empty( $args['display'] ) && ! empty( $args['display']['desktop'] ) && ! $args['display']['desktop'] ) {
 	$classes .= ' wp-dark-mode-hide-desktop';
 }
 
-if ( ! $args['display']['tablet'] ) {
+if ( ! empty( $args['display'] ) && ! empty( $args['display']['tablet'] ) && ! $args['display']['tablet'] ) {
 	$classes .= ' wp-dark-mode-hide-tablet';
 }
 
-if ( ! $args['display']['mobile'] ) {
+if ( ! empty( $args['display'] ) && ! empty( $args['display']['mobile'] ) && ! $args['display']['mobile'] ) {
 	$classes .= ' wp-dark-mode-hide-mobile';
 }
 

@@ -41,6 +41,9 @@ function rememberQuestion(i) {
 
 function loadPart(partIndex) {
     
+    
+
+
 
     const part = quizData.part[partIndex];
 
@@ -112,13 +115,15 @@ function loadPart(partIndex) {
                         <p><b>Correct Answer:</b> ${correctAnswers.length > 0 ? correctAnswers.join(', ') : "Not available"}</p>
                     `;
 
+                    
+
                     const checkbox = answerOption.querySelector('input');
                     checkbox.addEventListener('change', (event) => {
                         const isAnswered = event.target.checked; // true nếu chọn, false nếu bỏ chọn
 
                         saveUserAnswer(partIndex, groupIndex, questionIndex, answerIndex, event.target.checked);
                         checkboxCurrent(currentQuestionNumber); // Log số câu vừa hoàn thành
-                        updateAnsweredCheckbox(currentQuestionNumber, isAnswered);
+                      //  updateAnsweredCheckbox(currentQuestionNumber, isAnswered);
 
                     });
 
@@ -129,6 +134,7 @@ function loadPart(partIndex) {
 
                     questionElement.appendChild(answerOption);
                 });
+                
 
                 currentQuestionNumber += answerChoiceCount;
             }
@@ -211,7 +217,7 @@ function loadPart(partIndex) {
 
                         checkboxCurrent(currentIndexQuestion + boxIndex);          
                         saveCompletionAnswer(partIndex, groupIndex, questionIndex, boxIndex, event.target.value);
-                        updateAnsweredCheckbox(currentIndexQuestion + boxIndex, isAnswered);
+                      //  updateAnsweredCheckbox(currentIndexQuestion + boxIndex, isAnswered);
 
                     });
         
@@ -288,7 +294,7 @@ function loadPart(partIndex) {
                         const isAnswered = Array.from(allAnswers).some(input => input.checked); // Kiểm tra có radio nào được chọn
                         checkboxCurrent(currentIndexQuestion);
                         saveUserAnswer(partIndex, groupIndex, questionIndex, answerIndex, event.target.value);
-                        updateAnsweredCheckbox(currentIndexQuestion, isAnswered);
+                       // updateAnsweredCheckbox(currentIndexQuestion, isAnswered);
                     });
             
                     // Restore the saved answer if it exists
@@ -487,7 +493,11 @@ quizData.part.forEach((part, index) => {
     
     // Lấy số câu bắt đầu cho phần này
     const startingQuestionNumber = getStartingQuestionNumber(index);
-    
+    console.log("Tôi bảo này", groupedQuestions);
+    console.log(part.part_number - 1)
+    loadCorrectAnswer(part.part_number - 1);
+    console.log("Bảo gì ?", correctAnswerList)
+
     // Tính số câu hỏi của phần này
     const totalQuestions = getTotalQuestions(index);
 
@@ -546,6 +556,32 @@ quizData.part.forEach((part, index) => {
     partNavigation.appendChild(button);
 });
 
+// Hàm kiểm tra và gán class cho câu hỏi
+function updateQuestionStyles() {
+    groupedQuestions.forEach((userAnswerObj) => {
+        const questionNumber = userAnswerObj.questionNumber;
+        const userAnswer = userAnswerObj.userAnswer.trim().toLowerCase();
+        
+        // Tìm câu trả lời đúng
+        const correctAnswerObj = correctAnswerList.find(item => item.questionNumber === questionNumber);
+        
+        if (correctAnswerObj) {
+            let correctAnswers = correctAnswerObj.correctAnswer.toLowerCase().split(" or ").map(ans => ans.trim());
+
+            // Kiểm tra nếu userAnswer có trong danh sách correctAnswers
+            const isCorrect = correctAnswers.includes(userAnswer);
+
+            const span = document.getElementById(`question-checkbox-${questionNumber}`);
+            if (span) {
+                span.classList.remove('checkbox-correct-answer', 'checkbox-incorrect-answer');
+                span.classList.add(isCorrect ? 'checkbox-correct-answer' : 'checkbox-incorrect-answer');
+            }
+        }
+    });
+}
+
+// Gọi hàm sau khi dữ liệu được load
+updateQuestionStyles();
 
 
 
@@ -928,6 +964,52 @@ function logUserAnswers(partIndex) {
     
    
 
+}
+
+function loadCorrectAnswer(partIndex) {
+    const part = quizData.part[partIndex];
+    let currentQuestionNumber = getStartingQuestionNumber(partIndex);
+
+    part.group_question.forEach((group) => {
+        group.questions.forEach((question) => {
+            let questionNumber;
+            let correctAnswer;
+
+            if (group.type_group_question === "multi-select") {
+                const answerChoiceCount = parseInt(question.number_answer_choice) || 1;
+                questionNumber = `${currentQuestionNumber}-${currentQuestionNumber + answerChoiceCount - 1}`;
+                correctAnswer = question.answers
+                    .filter(answer => answer[1] === true)
+                    .map(answer => answer[0]);
+
+                if (correctAnswer.length === 1) correctAnswer = correctAnswer[0];
+                correctAnswerList.push({ questionNumber: String(questionNumber), correctAnswer });
+
+                currentQuestionNumber += answerChoiceCount;
+            } 
+            else if (group.type_group_question === "completion") {
+                question.box_answers.forEach((boxAnswer, boxIndex) => {
+                    questionNumber = String(currentQuestionNumber + boxIndex);
+                    correctAnswer = boxAnswer.answer || "Not available";
+
+                    if (Array.isArray(correctAnswer)) correctAnswer = correctAnswer.join(" or ");
+                    correctAnswerList.push({ questionNumber, correctAnswer });
+                });
+
+                currentQuestionNumber += question.box_answers.length;
+            } 
+            else if (group.type_group_question === "multiple-choice") {
+                questionNumber = String(currentQuestionNumber);
+                const correctAnswerIndex = question.answers.findIndex(answer => answer[1] === true);
+                correctAnswer = correctAnswerIndex !== -1 ? question.answers[correctAnswerIndex][0] : "Not available";
+
+                correctAnswerList.push({ questionNumber, correctAnswer });
+                currentQuestionNumber++;
+            }
+        });
+    });
+
+    return correctAnswerList;
 }
 
 
