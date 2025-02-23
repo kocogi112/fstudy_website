@@ -120,11 +120,14 @@ if (window.MathJax) {
 
              
 <h1>Digital Practice SAT Questions Database - Math</h1>
+<a href = "https://editor.codecogs.com/">Link to MathJax Tool editor: https://editor.codecogs.com/</a>
+
 <p>math1-math29: Circles</p>
 <p>math30-math108: Equivalent expressions</p>
 <p>math109-math118: Evaluating statistical claims Observational studies and experiments</p>
 <p>math119-math138: Inference from sample statistics and margin of error</p>
 <p>math139-math203: Linear Equation in One Variable</p>
+<p>math204-math281: Linear Equation in Two Variables</p>
 
 <!-- Filter form -->
 <form method="GET" action="">

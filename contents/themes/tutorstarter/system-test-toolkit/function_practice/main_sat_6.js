@@ -233,7 +233,7 @@ Setting </span></button>
 Resume </span></button>
 
 <button class="button-10" id="submit-button" onclick='PreSubmit()'>Submit Test</button>
-</div></div>`;
+</div></div><div id="time-personalize-div"></div>`;
         for (let i = 0; i < quizData.questions.length; i++) {
             
             const question = quizData.questions[i];

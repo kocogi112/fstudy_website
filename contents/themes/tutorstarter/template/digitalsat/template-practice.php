@@ -727,7 +727,9 @@ if (window.MathJax) {
 
 }
 
-
+#time-personalize-div{
+    display:none;
+}
 .quiz-section {
                display: flex;
                flex-direction: row;
@@ -1588,17 +1590,11 @@ img {
                         <img class="small-button" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/icon-small-button/guide2.png" height="30px" width="30px" id="guide-button"></img>
         
                         <img class="small-button" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/icon-small-button/draft2.png" height="30px" width="30px" id="draft-button"></img>
-                 
-                 
-                      
-                 
-                        <img class="small-button" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/icon-small-button/translate2.png" height="30px" width="30px" id="translate-button"></img>
-        
-                        <!--<img class="small-button" onclick="openColorPopup()" src="icon-small-button/color.png" height="30px" width="30px" id="colors-button"></img> -->
-                 
-                 
+                        <img class="small-button" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/icon-small-button/translate2.png" height="30px" width="30px" id="translate-button"></img>                 
                         <img id = "change-mode-button"class="small-button" onclick="DarkMode()" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/icon-small-button/dark-mode.png" height="30px" width="30px" ></img>
-                        
+                        <img id = "change-mode-button"class="small-button" onclick="reloadTest()" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/reload.png" height="30px" width="30px" ></img>
+                        <img id = "change-mode-button"class="small-button" onclick="timePersonalize()" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/sandclock.png" height="30px" width="30px" ></img>
+
                       </div>
                    
                 </div>
@@ -1836,9 +1832,35 @@ function showPrevQuestion() {
     if (currentQuestionIndex > 0) {
         currentQuestionIndex--;
         showQuestion(currentQuestionIndex);
+        startTimerForQuestion(currentQuestionIndex); // Bắt đầu lại bộ đếm thời gian
 
     }
 }
+
+function timePersonalize() {
+  var x = document.getElementById("time-personalize-div");
+  if (x.style.display === "block") {
+    x.style.display = "none";
+  } else {
+    x.style.display = "block";
+  }
+}
+let timerInterval;
+let secondsElapsed = 0;
+
+function startTimerForQuestion(currentQuestionIndex) {
+    clearInterval(timerInterval); // Dừng bộ đếm hiện tại nếu có
+    secondsElapsed = 0; // Reset thời gian về 0
+    document.getElementById("time-personalize-div").innerText = `Specific Time: ${secondsElapsed} s - This feature will not be available in real test`;
+
+    timerInterval = setInterval(() => {
+        secondsElapsed++;
+        document.getElementById("time-personalize-div").innerText = `Specific Time: ${secondsElapsed} s - This feature will not be available in real test`;
+    }, 1000);
+}
+
+
+
 
 function showNextQuestion() {
     countTimeSpecific(currentQuestionIndex);
@@ -1846,6 +1868,8 @@ function showNextQuestion() {
     if (currentQuestionIndex < quizData.questions.length - 1) {
         currentQuestionIndex++;
         showQuestion(currentQuestionIndex);
+        startTimerForQuestion(currentQuestionIndex); // Bắt đầu lại bộ đếm thời gian
+
     }
 }
 
@@ -2040,7 +2064,7 @@ function purple_highlight(spanId) {
         </script>
 
 <!--<script type="text/javascript" src="function/alert_leave_page.js"></script> -->
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function_practice/main_sat_5.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function_practice/main_sat_6.js"></script>
 
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function_practice/translate.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function_practice/zoom-text.js"></script>
@@ -2057,7 +2081,7 @@ function purple_highlight(spanId) {
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function_practice/format-time-1.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function_practice/draft-popup.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function_practice/color-background.js"></script>
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function_practice/start-digital-sat-Test-1.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function_practice/start-digital-sat-Test-2.js"></script>
 <!-- <script type="text/javascript" src="function_practice/quick-view-answer.js"></script> -->
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function_practice/checkbox_and_remember.js"></script>
 

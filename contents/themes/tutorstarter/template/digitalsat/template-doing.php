@@ -20,8 +20,9 @@ if (is_user_logged_in()) {
     $current_user = wp_get_current_user();
     $current_username = $current_user->user_login;
     $username = $current_username;
+    $current_user_id = $current_user->ID;
 
-    
+
     //$custom_number = get_post_meta($post_id, "_digitalsat_custom_number", true);
     $custom_number =intval(get_query_var('id_test'));
     // Database credentials
@@ -147,6 +148,12 @@ if ($result->num_rows > 0) {
 
         echo "<script>console.log('Token: $token, Token Use History: $token_use_history, Mày tên: $current_username');</script>";
        
+        echo '<script>
+            var currentUsername = "' . $current_username . '";
+            var currentUserid = "' . $current_user_id . '";
+            console.log("Current Username: " + currentUsername);
+            console.log("Current User ID: " + currentUserid);
+        </script>';
 
     } else {
         echo "Lỗi đề thi";
@@ -850,7 +857,9 @@ img {
 }
 
 
-
+#time-personalize-div{
+    display:none;
+}
 .start_test {
   appearance: none;
   background-color: #2ea44f;
@@ -1361,7 +1370,9 @@ img {
                  
                         <img id = "change-mode-button"class="small-button" onclick="DarkMode()" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/icon-small-button/dark-mode.png" height="30px" width="30px" ></img>
                         <img id = "change-mode-button"class="small-button" onclick="reloadTest()" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/reload.png" height="30px" width="30px" ></img>
+                        <img id = "change-mode-button"class="small-button" onclick="timePersonalize()" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/sandclock.png" height="30px" width="30px" ></img>
 
+                        
                       </div>
                    
                 </div>
@@ -1744,9 +1755,32 @@ function showPrevQuestion() {
     if (currentQuestionIndex > 0) {
         currentQuestionIndex--;
         showQuestion(currentQuestionIndex);
+        startTimerForQuestion(currentQuestionIndex); // Bắt đầu lại bộ đếm thời gian
 
     }
 }
+function timePersonalize() {
+  var x = document.getElementById("time-personalize-div");
+  if (x.style.display === "block") {
+    x.style.display = "none";
+  } else {
+    x.style.display = "block";
+  }
+}
+let timerInterval;
+let secondsElapsed = 0;
+
+function startTimerForQuestion(currentQuestionIndex) {
+    clearInterval(timerInterval); // Dừng bộ đếm hiện tại nếu có
+    secondsElapsed = 0; // Reset thời gian về 0
+    document.getElementById("time-personalize-div").innerText = `Specific Time: ${secondsElapsed} s - This feature will not be available in real test`;
+
+    timerInterval = setInterval(() => {
+        secondsElapsed++;
+        document.getElementById("time-personalize-div").innerText = `Specific Time: ${secondsElapsed} s - This feature will not be available in real test`;
+    }, 1000);
+}
+
 
 function showNextQuestion() {
     countTimeSpecific(currentQuestionIndex);
@@ -1754,6 +1788,8 @@ function showNextQuestion() {
     if (currentQuestionIndex < quizData.questions.length - 1) {
         currentQuestionIndex++;
         showQuestion(currentQuestionIndex);
+        startTimerForQuestion(currentQuestionIndex); // Bắt đầu lại bộ đếm thời gian
+
     }
 }
 
@@ -1968,7 +2004,7 @@ function purple_highlight(spanId) {
         </script>
 
 <!--<script type="text/javascript" src="function/alert_leave_page.js"></script> -->
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/main_sat_5.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/main_sat_6.js"></script>
 
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/translate.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/zoom-text.js"></script>
@@ -1980,12 +2016,12 @@ function purple_highlight(spanId) {
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/submit_answer_4.js"></script>
 <!--<script type="module" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/check_dev_tool.js"></script>
     -->
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/highlight_text_3.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/highlight_text_4.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/fullscreen.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/format-time-1.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/draft-popup.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/color-background.js"></script>
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/start-digital-sat-Test-1.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/start-digital-sat-Test-2.js"></script>
 <!-- <script type="text/javascript" src="function/quick-view-answer.js"></script> -->
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/checkbox_and_remember.js"></script>
 

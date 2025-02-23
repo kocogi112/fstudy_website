@@ -179,9 +179,12 @@ if ( 'trash' === $active_tab && current_user_can( 'administrator' ) ) {
 								<span class="a-to-z-sort-icon tutor-icon-ordering-a-z"></span>
 							</th>
 							<th width="13%">
+								<?php esc_html_e( 'ID Course', 'tutor' ); ?>
+							</th>
+							<th width="10%">
 								<?php esc_html_e( 'Categories', 'tutor' ); ?>
 							</th>
-							<th width="13%">
+							<th width="10%">
 								<?php esc_html_e( 'Author', 'tutor' ); ?>
 							</th>
 							<th width="10%">
@@ -275,6 +278,10 @@ if ( 'trash' === $active_tab && current_user_can( 'administrator' ) ) {
 												</div>
 											</div>
 										</div>
+									</td>
+
+									<td>
+										<?php echo esc_html( $post->ID ); ?>
 									</td>
 
 									<td>

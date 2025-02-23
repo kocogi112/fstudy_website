@@ -1,0 +1,16 @@
+2025-02-18T17:48:22+00:00 Uncaught TypeError: Cannot access offset of type string on string in C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code:2510
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\wp-includes\rest-api\class-wp-rest-server.php(1292): save_or_update_notation(Object(WP_REST_Request))
+#1 C:\xampp\htdocs\wordpress\wp-includes\rest-api\class-wp-rest-server.php(1125): WP_REST_Server->respond_to_request(Object(WP_REST_Request), '/api/v1/save-no...', Array, NULL)
+#2 C:\xampp\htdocs\wordpress\wp-includes\rest-api\class-wp-rest-server.php(439): WP_REST_Server->dispatch(Object(WP_REST_Request))
+#3 C:\xampp\htdocs\wordpress\wp-includes\rest-api.php(449): WP_REST_Server->serve_request('/api/v1/save-no...')
+#4 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): rest_api_loaded(Object(WP))
+#5 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters('', Array)
+#6 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(565): WP_Hook->do_action(Array)
+#7 C:\xampp\htdocs\wordpress\wp-includes\class-wp.php(418): do_action_ref_array('parse_request', Array)
+#8 C:\xampp\htdocs\wordpress\wp-includes\class-wp.php(813): WP->parse_request('')
+#9 C:\xampp\htdocs\wordpress\wp-includes\functions.php(1336): WP->main('')
+#10 C:\xampp\htdocs\wordpress\wp-blog-header.php(16): wp()
+#11 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#12 {main}
+  thrown

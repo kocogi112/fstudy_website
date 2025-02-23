@@ -24,6 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Gọi các hàm xử lý dữ liệu
         $grammarCheck = checkGrammarAndSpelling($answer);
+        $ai_route_stats = prepareAIRoute();
+        $ai_response = fetchAIResponse($question, $answer, $part);
+        $finaloverall = finalOveralBand();
         $wordFrequency = getWordFrequency($answer);
         $standardCheck = CheckStandard($answer);
         $linkingWordsCheck = checkLinkingWords($answer, 'linkingWords');
@@ -31,17 +34,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Trả về dữ liệu đã nhận và kết quả phân tích
         echo json_encode([
             'status' => 'success',
-            'question' => $question,
-            'answer' => $answer,
-            'sample' => $sample,
-            'part' => $part,
+            'question' => $question, /*For dev - not show in live */
+            'answer' => $answer, /*For dev - not show in live */
+            'sample' => $sample, /*For dev - not show in live */
+            'part' => $part, /*For dev - not show in live */
+            'ai_route_stats' => $ai_route_stats, /*For dev - not show in live */
             'idquestion' => $idquestion,
-            'analysis' => [
+            'ai_response' => $ai_response, /*For dev - not show in live */
+            'analysis' => [ /*For dev - not show in live */
                 'grammarCheck' => $grammarCheck,
                 'wordFrequency' => $wordFrequency,
                 'standardCheck' => $standardCheck,
                 'linkingWordsCheck' => $linkingWordsCheck
-            ]
+            ],
+
+            'band' => $finaloverall,
+            'detail_recommendation' => [
+                'ta_tr' => 'ta_tr_recommendation',
+                'cc' => 'cc_recommendation',
+                'lr' => 'lr_recommendation',
+                'gra' => 'gra_recommendation'
+            ],
+            'improvement' => 'To improve this, you should .....',
+            'suggestion' => 'This will show show sentence/words need to be replaced, and will show the reason (Use AI to do this)',
+            'top_weak_point' => 'You need to improve... In order that you should do our practice to enhance that !'
+
         ]);
     } else {
         echo json_encode(['status' => 'error', 'message' => 'Missing required fields']);
@@ -51,6 +68,105 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 
+
+function prepareAIRoute() {
+    $site_url = get_site_url();
+    $api_url = $site_url . '/wp-json/api/v1/extract_current_and_prepare_ai_route';
+
+    $api_response = file_get_contents($api_url);
+    
+    if ($api_response === false) {
+        return ['error' => 'Failed to fetch AI route'];
+    }
+    
+    $api_data = json_decode($api_response, true);
+    
+    if (!isset($api_data['now_end_point'], $api_data['api_info']['api_endpoint_url'])) {
+        return ['error' => 'Invalid AI route response'];
+    }
+    
+    return $api_data; // Trả về API route data
+}
+
+
+$ai_response_data = null; // Biến toàn cục để cache response
+
+function fetchAIResponse($question, $answer, $part) {
+    global $ai_response_data;
+    
+    if ($ai_response_data !== null) {
+        return $ai_response_data;
+    }
+
+    $ai_route_stats = prepareAIRoute();
+    if (isset($ai_route_stats['error'])) {
+        return ['error' => 'Failed to prepare AI route'];
+    }
+
+    $api_endpoint_url = $ai_route_stats['api_info']['api_endpoint_url'] ?? '';
+    $api_key = $ai_route_stats['api_info']['api_key'] ?? '';
+
+    if (!$api_endpoint_url) {
+        return ['error' => 'API endpoint URL is missing'];
+    }
+
+    $post_data = json_encode([
+        'question' => $question,
+        'part' => $part,
+        'answer' => $answer
+    ]);
+
+    $options = [
+        'http' => [
+            'header'  => "Content-Type: application/json\r\n" .
+                         "Authorization: Bearer $api_key\r\n",
+            'method'  => 'POST',
+            'content' => $post_data
+        ]
+    ];
+
+    $context  = stream_context_create($options);
+    $ai_response = file_get_contents($api_endpoint_url, false, $context);
+
+    $ai_response_data = $ai_response !== false ? json_decode($ai_response, true) : ['error' => 'Failed to fetch AI response'];
+    return $ai_response_data;
+}
+
+
+function finalOveralBand() {
+    global $ai_response_data;
+
+    if (!isset($ai_response_data['choices'][0]['message']['content'])) {
+        return ['error' => 'Invalid AI response'];
+    }
+
+    $content = $ai_response_data['choices'][0]['message']['content'];
+
+    preg_match('/"Task_Achievement":\s*([\d\.]+)/', $content, $ta);
+    preg_match('/"Coherence_and_Cohesion":\s*([\d\.]+)/', $content, $cc);
+    preg_match('/"Lexical_Resource":\s*([\d\.]+)/', $content, $lr);
+    preg_match('/"Grammatical_Range_and_Accuracy":\s*([\d\.]+)/', $content, $gra);
+
+    $ta_score  = isset($ta[1]) ? floatval($ta[1]) : null;
+    $cc_score  = isset($cc[1]) ? floatval($cc[1]) : null;
+    $lr_score  = isset($lr[1]) ? floatval($lr[1]) : null;
+    $gra_score = isset($gra[1]) ? floatval($gra[1]) : null;
+
+    if (is_null($ta_score) || is_null($cc_score) || is_null($lr_score) || is_null($gra_score)) {
+        return ['error' => 'Missing score values'];
+    }
+
+    // Tính tổng và làm tròn .5 hoặc .0
+    $average = round((($ta_score + $cc_score + $lr_score + $gra_score) / 4) * 2) / 2;
+
+    return [
+        'ta'  => $ta_score,
+        'cc'  => $cc_score,
+        'lr'  => $lr_score,
+        'gra' => $gra_score,
+        'overallband' => $average
+    ];
+}
 
 
 

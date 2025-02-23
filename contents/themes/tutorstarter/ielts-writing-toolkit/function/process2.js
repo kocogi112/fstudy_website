@@ -312,22 +312,31 @@ async function processEssay(i) {
 */
 
 
-    console.log("url process",url_end_point);
+    /*console.log("url process",url_end_point);
     console.log(all_time_use);
     console.log("Type gate", type_gate);
     console.log(`Today use for ${now_end_point}`,today_use);
     console.log("Now end point use: ", now_end_point);
-    console.log("Next end point for update: ", next_end_point_for_update);
+    console.log("Next end point for update: ", next_end_point_for_update);*/
     // Gửi yêu cầu POST đến endpoint của WordPress
-    fetch(url_end_point, {
+
+    /*fetch(url_end_point, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({ question: currentQuestion, answer: userEssay, part: currentPart})
 
-    })
+    })*/
+    
+    fetch(`${siteUrl}/api/public/test/v1/ielts/writing/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ question: currentQuestion, answer: userEssay, part: currentPart, sample: sampleEssay, idquestion: currentIDQuestion})
 
+    })
 
     .then(response => response.json())
     .then(data => {
@@ -338,3 +347,4 @@ async function processEssay(i) {
     });
 
 }
+

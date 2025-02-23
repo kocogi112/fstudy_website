@@ -111,5 +111,7 @@ function startTest() {
 
     showQuestion(currentQuestionIndex);
     countTimeSpecific(currentQuestionIndex);
+    startTimerForQuestion(currentQuestionIndex);
+
 
 }

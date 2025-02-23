@@ -14,7 +14,8 @@ if (is_user_logged_in()) {
     $username = $current_username;
     // Lấy giá trị custom number từ custom field
     $custom_number = intval(get_query_var('id_test'));
-   
+    $current_user_id = $current_user->ID;
+
     //$custom_number = get_post_meta($post_id, '_ieltsreadingtest_custom_number', true);
     // Thông tin kết nối databasef
     $servername = "localhost";
@@ -123,7 +124,12 @@ if ($result_test->num_rows > 0) {
         $token_use_history = $token_data['token_use_history'];
 
         echo "<script>console.log('Token: $token, Token Use History: $token_use_history, Mày tên: $current_username');</script>";
-       
+        echo '<script>
+            var currentUsername = "' . $current_username . '";
+            var currentUserid = "' . $current_user_id . '";
+            console.log("Current Username: " + currentUsername);
+            console.log("Current User ID: " + currentUserid);
+        </script>';
 
     } else {
         echo "Lỗi đề thi";
@@ -1061,7 +1067,7 @@ html {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://smtpjs.com/v3/smtp.js"></script>
     <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/script_reading_2.js"></script>
-    <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/highlight-text.js"></script>
+    <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/highlight-text-1.js"></script>
 
 </body>
 <script>

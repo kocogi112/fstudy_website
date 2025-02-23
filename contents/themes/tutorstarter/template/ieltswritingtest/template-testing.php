@@ -238,7 +238,7 @@ console.log("Bài thi: ", quizData);
 </script>';
 
 
-
+/*
 // Truy vấn dữ liệu từ bảng order_and_prompt_api_list
 $sql3 = "SELECT list_name_endpoint_order, last_use_end_point 
           FROM order_and_prompt_api_list 
@@ -359,6 +359,9 @@ if ($now_end_point) {
 }
 
 // Close the database connection
+
+*/
+
 
 // Close the database connection
 $conn->close();
@@ -1826,7 +1829,7 @@ The given table compares different means of transportation in terms of the annua
 
 
     <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/full_overall_chart/full_band_chart.js"></script>
-    <script  src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/process.js"></script>
+    <script  src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/process2.js"></script>
     
 
 

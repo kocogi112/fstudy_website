@@ -123,10 +123,10 @@ function addToNotation(spanId) {
                 Swal.fire("Lưu thành công!", "Từ và định nghĩa đã được lưu.", "success");
             }
         }
-
+        resultId++;
         async function saveNotation(word, definition, source, id_test, test_type) {
             const saveTime = new Date().toISOString().split('T')[0]; // Chỉ lấy phần ngày
-            await fetch(`${siteUrl}/wp-admin/admin-ajax.php`, {
+            await fetch(`${siteUrl}/wp-json/api/v1/save-notation`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded"
@@ -137,7 +137,10 @@ function addToNotation(spanId) {
                     meaning_or_explanation: definition,
                     save_time: saveTime,
                     is_source: source,
+                    username: currentUsername,
+                    user_id: currentUserid,
                     id_test: id_test,
+                    id_note: resultId,
                     test_type: test_type,
                 })
             });
