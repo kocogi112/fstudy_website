@@ -43,7 +43,6 @@ function preSubmitTest() {
         },
         didClose: () => {
             Swal.hideLoading();
-            ResultInput(); // Xử lý kết quả sau khi nộp bài
         }
     });
 }
@@ -915,6 +914,9 @@ function displayQuestion(index) {
 
 function ResultInput() {
     console.log("Result Input")
+    
+
+    
     // Copy the content to the form fields
    // var contentToCopy1 = document.getElementById("overall-band-form").textContent;
     var contentToCopy2 = document.getElementById("date-div").textContent;
@@ -956,6 +958,7 @@ function ResultInput() {
 
     
     document.getElementById("task1userform").value = contentToCopy3;
+
 
     document.getElementById("task2userform").value = contentToCopy4;
     document.getElementById("task1summaryuserform").value = contentToCopy5;

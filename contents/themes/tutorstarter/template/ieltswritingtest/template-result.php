@@ -103,28 +103,13 @@ get_header();
         }, $questions);
         
             // Display results
-            foreach ($results as $result) {
-              /*  echo '<h2>Digital SAT Test Report</h2> <button>Share this test</button>';
-                echo '<p>Username: ' . esc_html($result->username) . '</p>';
-                echo '<p>Ngày làm đề: ' . esc_html($result->dateform) . '</p>';
-                echo '<p>Tên đề thi: ' . esc_html($result->testname) . '</p>';
-                echo '<p>Thời gian làm bài: ' . esc_html($result->timeSpent) . '</p>';
-                echo '<p>ID data: ' . esc_html($result->testsavenumber) . '</p>';
-                echo '<p>Band Score: ' . esc_html($result->band_score) . '</p>';
-                echo '<p>Band Score Expand: ' . esc_html($result->band_score_expand) . '</p>';
-                echo '<p>User Essay Task 1: ' . wp_kses_post($result->task1userform) . '</p>';
-                echo '<p>User Essay Task 2: ' . wp_kses_post($result->task2userform) . '</p>';
-
-                
-                if ($review) {
-                    echo '<p>ID Test: ' . esc_html($review->id_test) . '</p>';
-                    echo '<p>Type Test: ' . esc_html($review->test_type) . '</p>';
-                } else {
-                    echo '<p>Type Test: N/A</p>';
-                    echo '<p>Resource: N/A</p>';
-                }*/ 
+        foreach ($results as $result) {
+             
         $task1_data = null;
         $task2_data = null;
+
+        
+
 
         // Loop through all question IDs in the questions array
         foreach ($questions as $question_id) {
@@ -548,8 +533,8 @@ get_header();
             </div>
         </div>
     </div>
-    <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/process_result.js"></script> 
-    <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/submit_result.js"></script> 
+   <!-- <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/process_result.js"></script> 
+    <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/submit_result.js"></script>  -->
 
     <script> 
     
@@ -616,6 +601,80 @@ const dataTask1Essay = <?php echo json_encode(json_decode($result->task1detailsc
 const dataTask2Essay = <?php echo json_encode(json_decode($result->task2detailscommentform, true), JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG); ?>;
 
 
+
+
+
+    // Decode và parse JSON từ PHP
+    const decodeUserEssay = decodeHTML('<?php echo esc_js(wp_kses_post($result->user_essay)); ?>');
+    const decodeUserEssayOverallAndSuggestion = decodeHTML('<?php echo esc_js(wp_kses_post($result->user_band_score_and_suggestion)); ?>');
+    console.log("Raw JSON decodeUserEssayOverallAndSuggestion:", decodeUserEssayOverallAndSuggestion);
+
+    let userEssayData = {};
+    let userEssayOverallData = {};
+
+    try {
+        userEssayData = JSON.parse(decodeUserEssay); // Chuyển JSON thành object
+        userEssayOverallData = JSON.parse(decodeUserEssayOverallAndSuggestion);
+    } catch (error) {
+        console.error("Lỗi parse JSON:", error);
+    }
+
+    // Lấy nội dung dựa vào key bắt đầu bằng '1' hoặc '2'
+    let task1Essay = "";
+    let task2Essay = "";
+
+    let overallbandTask1 = "";
+    let overallbandTask2 = "";
+    let scoreTATask1;
+    let scoreTATask2;
+    let scoreCCTask1;
+    let scoreCCTask2;
+    let scoreGraTask1;
+    let scoreGraTask2;
+    let scoreLrTask1;
+    let scoreLrTask2;
+
+    let commentTATask1;
+    let commentTATask2;
+    let commentCCTask1;
+    let commentCCTask2;
+    let commentGraTask1;
+    let commentGraTask2;
+    let commentLrTask1;
+    let commentLrTask2;
+
+
+    for (let key in userEssayData) {
+        if (key.startsWith("1")) {
+            task1Essay = userEssayData[key];
+
+            overallbandTask1 = userEssayOverallData[key].band.overallband;
+            scoreTATask1 = userEssayOverallData[key].band.ta;
+            scoreCCTask1 = userEssayOverallData[key].band.cc;
+            scoreGraTask1 = userEssayOverallData[key].band.gra;
+            scoreLrTask1 = userEssayOverallData[key].band.lr;
+
+            
+        } else if (key.startsWith("2")) {
+            task2Essay = userEssayData[key];
+            overallbandTask2 = userEssayOverallData[key].band.overallband;
+            scoreTATask2 = userEssayOverallData[key].band.ta;
+            scoreCCTask2 = userEssayOverallData[key].band.cc;
+            scoreGraTask2 = userEssayOverallData[key].band.gra;
+            scoreLrTask2 = userEssayOverallData[key].band.lr;
+
+
+        }
+    }
+
+    // Debug kết quả
+   /* console.log("Task 1 User Essay:", task1Essay);
+    console.log("Task 2 User Essay:", task2Essay);
+
+    console.log("Task 1 User Overall Band:", overallbandTask1);
+    console.log("Task 2 User Overall Band:", overallbandTask2);*/
+
+
 /*console.log("Datee semt ", dataTask1Essay); // To check the structure
 console.log(dataTask1Essay.unchange); // Check if this is undefined
 */
@@ -627,7 +686,6 @@ const doc = parser.parseFromString(decodedTask1BreakdownForm, 'text/html');
 const doc2 = parser.parseFromString(decodedTask2BreakdownForm, 'text/html');
 const doc3 = parser.parseFromString(decodedTask1Summary, 'text/html');
 const doc4 = parser.parseFromString(decodedTask2Summary, 'text/html');
-
 
 // Find the element by its ID
 const taskAchievementScoreTask1 = doc.getElementById('task_achievement_score_task_1');
@@ -755,12 +813,13 @@ const DescriptionEssayTask2 = DescriptionEssayTask2Value ? DescriptionEssayTask2
     const coherenceAndCohesionTask1 = `${coherenceAndCohesionValueTask1}`;
     const lexicalResourceTask1 = `${lexicalResourceValueTask1}`;
     const grammaticalRangeAndAccuracyTask1 = `${grammaticalRangeAndAccuracyValueTask1}`;
+  
 
 
     const task1Sample = <?php echo json_encode($task1_data['sample_writing']); ?>;
     const task2Sample = <?php echo json_encode($task2_data['sample_writing']); ?>;
-    const task1UserEssay = <?php echo wp_json_encode($result->task1userform); ?>;
-    const task2UserEssay = <?php echo wp_json_encode($result->task2userform); ?>;
+    const task1UserEssay = task1Essay;
+    const task2UserEssay = task2Essay;
     
 
     // Keep track of the currently active task
@@ -793,11 +852,12 @@ const tasks = {
     task1: {
         description: task1Description,
         wordCount: WordCountTask1Final,
-        band_score: bandScoreTask1,
-        task_achievement_score: taskAchievementTask1,
-        coherence_and_cohesion_score: coherenceAndCohesionTask1,
-        lexical_resource_score: lexicalResourceTask1,
-        grammatical_range_and_accuracy_score: grammaticalRangeAndAccuracyTask1,
+        band_score: overallbandTask1,
+        task_achievement_score: scoreTATask1,
+        coherence_and_cohesion_score: scoreCCTask1,
+        lexical_resource_score: scoreLrTask1,
+        grammatical_range_and_accuracy_score: scoreGraTask1,
+
         generalSidebar: generalSidebarContentTask1,
         //detailSidebar: `oked ${detailsCommentTask1}`,
         band_score_expand: '',
@@ -813,21 +873,17 @@ const tasks = {
             "Bình luận 2: Số liệu cần rõ ràng hơn.",
             "Bình luận 3: Nên thêm ví dụ cụ thể."
         ],
-        imageLink: "<?php echo esc_url($task1_data['image_link']); ?>", // Add image link for task 1
-        unchange: {
-            wordCount: dataTask1Essay.unchange.wordCount,
-            uniqueWords:  dataTask1Essay.unchange.uniqueWords,
-        }
+        imageLink: "<?php echo esc_url($task1_data['image_link']); ?>" // Add image link for task 1
     }, 
     
                
     task2: {
         description: task2Description,
-        band_score: bandScoreTask2,
-        task_achievement_score: taskAchievementTask2,
-        coherence_and_cohesion_score: coherenceAndCohesionTask2,
-        lexical_resource_score: lexicalResourceTask2,
-        grammatical_range_and_accuracy_score: grammaticalRangeAndAccuracyTask2,
+        band_score: overallbandTask2,
+        task_achievement_score: scoreTATask2,
+        coherence_and_cohesion_score: scoreCCTask2,
+        lexical_resource_score: scoreLrTask2,
+        grammatical_range_and_accuracy_score: scoreGraTask2,
 
         wordCount: WordCountTask2Final,
         generalSidebar: generalSidebarContentTask2,
@@ -849,7 +905,7 @@ const tasks = {
        
     }
 };
-processEssay();
+//processEssay();
 console.log(tasks)
 // Function to set sidebar content based on the task and selected type (general/details)
 function setSidebarContent(task, type) {

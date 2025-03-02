@@ -176,54 +176,58 @@ get_header(); // Gọi phần đầu trang (header.php)
 
 // Fetch Task 1 questions based on question_choose
 if (!empty($question_choose)) {
-    // Ensure $question_choose is an array before using count()
-
-// Create placeholders for SQL query
-
-
     $placeholders = implode(',', array_fill(0, count($question_choose), '?'));
+
+    // Query Task 1
     $sql1 = "SELECT id_test, task, question_type, question_content, image_link, sample_writing, important_add 
               FROM ielts_writing_task_1_question WHERE id_test IN ($placeholders)";
     $stmt1 = $conn->prepare($sql1);
-    $stmt1->bind_param(str_repeat("i", count($question_choose)), ...$question_choose); // Bind as integers
+    $stmt1->bind_param(str_repeat("i", count($question_choose)), ...$question_choose);
     $stmt1->execute();
     $result1 = $stmt1->get_result();
 
+    $id_task_1 = []; // Lưu id_test của Task 1
     while ($row = $result1->fetch_assoc()) {
+        $id_task_1[] = $row['id_test'];
         $questions[] = [
             "question" => $row['question_content'],
             "part" => $row['task'],
             "sample_essay" => $row['sample_writing'],
             "image" => $row['image_link'],
-            "id_question" => $row['id_test'], // Use id_test for id_question
-
+            "id_question" => $row['id_test'],
+            "question_type" => $row['question_type'],
         ];
     }
 
-    // Fetch Task 2 questions based on question_choose
+    // Query Task 2
     $sql2 = "SELECT id_test, task, topic, question_type, question_content, sample_writing, important_add 
               FROM ielts_writing_task_2_question WHERE id_test IN ($placeholders)";
     $stmt2 = $conn->prepare($sql2);
-    $stmt2->bind_param(str_repeat("i", count($question_choose)), ...$question_choose); // Bind as integers
+    $stmt2->bind_param(str_repeat("i", count($question_choose)), ...$question_choose);
     $stmt2->execute();
     $result2 = $stmt2->get_result();
 
+    $id_task_2 = []; // Lưu id_test của Task 2
     while ($row = $result2->fetch_assoc()) {
+        $id_task_2[] = $row['id_test'];
         $questions[] = [
             "question" => $row['question_content'],
             "part" => $row['task'],
             "sample_essay" => $row['sample_writing'],
-            "id_question" => $row['id_test'], // Use id_test for id_question
+            "id_question" => $row['id_test'],
             "topic" => $row['topic'],
-
+            "question_type" => $row['question_type'],
             "image" => '',
         ];
-
-        // Capture the topic (assuming the same topic for all rows)
-       
-            
     }
+
+    // Echo ra script JS
+    echo "<script>
+            var id_task_1 = " . json_encode($id_task_1) . ";
+            var id_task_2 = " . json_encode($id_task_2) . ";
+          </script>";
 }
+
 
 // Output the quizData as JavaScript
 echo '<script type="text/javascript">
@@ -1048,29 +1052,29 @@ $conn->close();
                         <span id="correctanswer_error" class="text-danger"></span>  
                     </div>
 
-                    <div class = "form-group"   >
+                    <div style = "display:none" class = "form-group"   >
                         <textarea type="text"  id="task1userform" name="task1userform" placeholder="User Task 1"  class="form-control form_data" ></textarea>
                         <span id="correctanswer_error" class="text-danger"></span>  
                     </div>
-                    <div class = "form-group"   >
+                    <div style = "display:none"  class = "form-group"   >
                         <textarea type="text"  id="task2userform" name="task2userform" placeholder="User Task 2"  class="form-control form_data" ></textarea>
                         <span id="correctanswer_error" class="text-danger"></span>  
                     </div>
 
-                    <div class = "form-group"   >
+                    <div style = "display:none" class = "form-group"   >
                         <textarea type="text"  id="task1summaryuserform" name="task1summaryuserform" placeholder="Summary User Task 1"  class="form-control form_data" ></textarea>
                         <span id="correctanswer_error" class="text-danger"></span>  
                     </div>
 
-                    <div class = "form-group"   >
+                    <div style = "display:none" class = "form-group"   >
                         <textarea type="text"  id="task2summaryuserform" name="task2summaryuserform" placeholder="Summary User Task 2"  class="form-control form_data" ></textarea>
                         <span id="correctanswer_error" class="text-danger"></span>  
                     </div>
-                    <div class = "form-group"   >
+                    <div style = "display:none" class = "form-group"   >
                         <textarea type="text"  id="task1breakdownform" name="task1breakdownform" placeholder="User Breakdown Task 1"  class="form-control form_data" ></textarea>
                         <span id="correctanswer_error" class="text-danger"></span>  
                     </div>
-                    <div class = "form-group"   >
+                    <div style = "display:none"  class = "form-group"   >
                         <textarea type="text"  id="task2breakdownform" name="task2breakdownform" placeholder="User Breakdown Task 2"  class="form-control form_data" ></textarea>
                         <span id="correctanswer_error" class="text-danger"></span>  
                     </div>
@@ -1091,6 +1095,23 @@ $conn->close();
                         <textarea type="text"  id="task2detailscommentform" name="task2detailscommentform" placeholder="User Breakdown Task 2"  class="form-control form_data" ></textarea>
                         <span id="correctanswer_error" class="text-danger"></span>  
                     </div>
+
+
+
+                <!--New Add 1/3/2025-->
+                    <div class = "form-group"   >
+                        <textarea type="text"  id="user_essay" name="user_essay" placeholder="User Essay Save JSON"  class="form-control form_data" ></textarea>
+                        <span id="user_essay_error" class="text-danger"></span>  
+                    </div>
+
+                    <div class = "form-group"   >
+                        <textarea type="text"  id="user_band_score_and_suggestion" name="user_band_score_and_suggestion" placeholder="User Band Score and Recommendation"  class="form-control form_data" ></textarea>
+                        <span id="correctanswer_error" class="text-danger"></span>  
+                    </div>
+
+                    
+
+                <!--New Add 1/3/2025-->
 
                     <div class = "form-group"   >
                         <textarea type="text"  id="testsavenumber" name="testsavenumber" placeholder="testsavenumber"  class="form-control form_data" ></textarea>
@@ -1829,7 +1850,7 @@ The given table compares different means of transportation in terms of the annua
 
 
     <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/full_overall_chart/full_band_chart.js"></script>
-    <script  src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/process2.js"></script>
+    <script  src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/process4.js"></script>
     
 
 
@@ -1839,7 +1860,7 @@ The given table compares different means of transportation in terms of the annua
     <script  src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/right_bar_feature/change-mode.js"></script>
 
 
-  <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/submitTest2.js"></script>
+  <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/submitTest4.js"></script>
 
 
 

@@ -131,6 +131,8 @@ $result = $conn->query($sql);
         <th>Time (minutes)</th>
         <th>Test Type</th>
         <th>Question Choose</th>
+        <th>Specific Module Fll Test</th>
+
         <th>Tag</th>
         <th>Book</th>
         <th>Token Need (per 1 test/time)</th>
@@ -158,6 +160,19 @@ $result = $conn->query($sql);
                     $important_view_more = '';
                 }
 
+                $important_words_2 = explode(',', $row['full_test_specific_module']);
+                if (count($important_words_2) > 3) {
+                    $important_display_2 = implode(',', array_slice($important_words_2, 0, 3)) . '...';
+                    $important_safe_2 = htmlspecialchars(json_encode($row['full_test_specific_module']), ENT_QUOTES);
+                    $important_view_more_2 = "<button class='btn btn-link' onclick='showFullContent2(\"Specific Question Choose\", $important_safe_2)'>View More</button>";
+
+                
+                } else {
+                    $important_display_2 = $row['full_test_specific_module'];
+                    $important_view_more_2 = '';
+                }
+
+
                 echo "<tr id='row_{$row['number']}'>
                         <td>{$row['number']}</td>
                         <td>
@@ -169,7 +184,10 @@ $result = $conn->query($sql);
                         <td>{$row['number_question']}</td>
                         <td>{$row['time']}</td>
                         <td>{$row['test_type']}</td>
-                        <td>{$important_display} $important_view_more</td>          
+                        <td>{$important_display} $important_view_more</td>   
+                        <td>{$important_display_2} $important_view_more_2</td>   
+
+       
                         <td>{$row['tag']}</td>
                         <td>{$row['book']}</td>
                         <td>{$row['token_need']}</td>
@@ -255,6 +273,33 @@ $result = $conn->query($sql);
                     Question Choice: 
                     <p style = "color: red">Sử dụng lệnh verbal: __ - __ để thêm nhanh(Áp dụng với dãy liên tiếp) hoặc math: __ - __ Chấp nhận mỗi dòng 1 lệnh <br>Ví dụ:<br>verbal: 1 - 10 <br>math: 1 - 10 sẽ thêm verbal1, verbal2,... verbal10, math1,math2,...math10. </p>
                     <textarea id="edit_question_choose" name="question_choose" class="form-control" required></textarea><br>
+
+                    <h4>Full Test Specific Module</h4>
+                        <input type="hidden" id="edit_full_test_specific_module_input" name="full_test_specific_module">
+                        
+                        Module 1 - Reading And Writing<br>
+                        <input type="number" id="edit_time_0" placeholder="Time for Reading and Writing Module 1"><br>
+                        <input type="number" id="edit_start_0" placeholder="Start Module 1 (RW)"><br>
+                        <input type="number" id="edit_end_0" placeholder="End Module 1 (RW)"><br>
+                        
+                        Module 2 - Reading And Writing<br>
+                        <input type="number" id="edit_time_1" placeholder="Time for Reading and Writing Module 2"><br>
+                        <input type="number" id="edit_start_1" placeholder="Start Module 2 (RW)"><br>
+                        <input type="number" id="edit_end_1" placeholder="End Module 2 (RW)"><br>
+                        
+                        Module 1 - Math<br>
+                        <input type="number" id="edit_time_2" placeholder="Time for Math Module 1"><br>
+                        <input type="number" id="edit_start_2" placeholder="Start Module 1 (Math)"><br>
+                        <input type="number" id="edit_end_2" placeholder="End Module 1 (Math)"><br>
+                        
+                        Module 2 - Math<br>
+                        <input type="number" id="edit_time_3" placeholder="Time for Math Module 2"><br>
+                        <input type="number" id="edit_start_3" placeholder="Start Module 2 (Math)"><br>
+                        <input type="number" id="edit_end_3" placeholder="End Module 2 (Math)"><br>
+
+
+
+
                     Tag: <textarea id="edit_tag" name="tag" class="form-control"></textarea><br>
                    
                     Book:<select id="edit_book" name="book" class="form-control" required>
@@ -302,6 +347,32 @@ $result = $conn->query($sql);
                     <p style = "color: red">Sử dụng lệnh verbal: __ - __ để thêm nhanh(Áp dụng với dãy liên tiếp) hoặc math: __ - __ Chấp nhận mỗi dòng 1 lệnh <br>Ví dụ:<br>verbal: 1 - 10 <br>math: 1 - 10 sẽ thêm verbal1, verbal2,... verbal10, math1,math2,...math10. </p>
 
                     <textarea id="add_question_choose" name="question_choose" class="form-control" required></textarea><br>
+                    <h4>Full Test Specific Module</h4>
+                        <input type="hidden" id="add_full_test_specific_module_input" name="full_test_specific_module">
+                        Module 1 - Reading And <br>
+                        <input type="number" id="add_time_0" placeholder="Time for Reading and Writing Module 1"><br>
+                        <input type="number" id="add_start_0" placeholder="Start Module 1 (RW)"><br>
+                        <input type="number" id="add_end_0" placeholder="End Module 1 (RW)"><br>
+                        
+                        Module 2 - Reading And Writing<br>
+                        <input type="number" id="add_time_1" placeholder="Time for Reading and Writing Module 2"><br>
+                        <input type="number" id="add_start_1" placeholder="Start Module 2 (RW)"><br>
+                        <input type="number" id="add_end_1" placeholder="End Module 2 (RW)"><br>
+                        
+                        Module 1 - Math<br>
+                        <input type="number" id="add_time_2" placeholder="Time for Math Module 1"><br>
+                        <input type="number" id="add_start_2" placeholder="Start Module 1 (Math)"><br>
+                        <input type="number" id="add_end_2" placeholder="End Module 1 (Math)"><br>
+                        
+                        Module 2 - <br>
+                        <input type="number" id="add_time_3" placeholder="Time for Math Module 2"><br>
+                        <input type="number" id="add_start_3" placeholder="Start Module 2 (Math)"><br>
+                        <input type="number" id="add_end_3" placeholder="End Module 2 (Math)"><br>
+
+
+
+
+
                     Tag: <textarea id="add_tag" name="tag" class="form-control"></textarea><br>
                     Book:<select id="add_book" name="book" class="form-control" required>
                             <option value="">Select a Book</option>
@@ -361,6 +432,83 @@ $result = $conn->query($sql);
 
 <!-- jQuery and JavaScript for AJAX -->
 <script>
+
+function toggleFullTestSpecificModule() {
+    var typeTest = document.getElementById('type_test').value;
+    var moduleDiv = document.getElementById('full_test_specific_module');
+    
+    if (typeTest === 'full_test') {
+        moduleDiv.style.display = 'block';
+    } else {
+        moduleDiv.style.display = 'none';
+    }
+}
+
+document.getElementById('type_test').addEventListener('change', toggleFullTestSpecificModule);
+
+toggleFullTestSpecificModule(); // Gọi khi trang tải để kiểm tra trạng thái ban đầu
+
+
+
+function saveFullTestSpecificModule(isEdit = false) {
+    const modules = [
+        { name: "Module 1 Reading and Writing", key: "rw_module_1" },
+        { name: "Module 2 Reading and Writing", key: "rw_module_2" },
+        { name: "Module 1 Math", key: "math_module_1" },
+        { name: "Module 2 Math", key: "math_module_2" }
+    ];
+
+    const moduleNameMapping = {
+        "rw_module_1": "Section 1: Reading And Writing",
+        "rw_module_2": "Section 2: Reading And Writing",
+        "math_module_1": "Section 1: Math",
+        "math_module_2": "Section 2: Math"
+    };
+
+    let fullTestSpecificModule = {};
+
+    modules.forEach((module, index) => {
+        let time = document.getElementById(`${isEdit ? "edit" : "add"}_time_${index}`)?.value;
+        let startValue = document.getElementById(`${isEdit ? "edit" : "add"}_start_${index}`)?.value;
+        let endValue = document.getElementById(`${isEdit ? "edit" : "add"}_end_${index}`)?.value;
+
+        if (!startValue && !endValue) return;
+
+        let start = parseInt(startValue);
+        let end = parseInt(endValue);
+
+        if (!time || isNaN(start) || isNaN(end) || start > end) {
+            alert(`Vui lòng nhập đúng dữ liệu cho ${module.name}`);
+            return;
+        }
+
+        let prefix = module.key.includes("rw_module_") ? "verbal" : "math";
+        let questionParticular = [];
+        for (let i = start; i <= end; i++) {
+            questionParticular.push(`${prefix}${i}`);
+        }
+
+        let newKey = moduleNameMapping[module.key]; // Chuyển key sang dạng mong muốn
+        fullTestSpecificModule[newKey] = { time, question_particular: questionParticular };
+    });
+
+    const jsonString = JSON.stringify(fullTestSpecificModule);
+    let targetInput = document.getElementById(`${isEdit ? "edit" : "add"}_full_test_specific_module_input`);
+
+    if (targetInput) {
+        targetInput.value = jsonString;
+    } else {
+        console.error(`Không tìm thấy input hidden ${isEdit ? "edit" : "add"}_full_test_specific_module_input`);
+    }
+
+    console.log("Saved JSON:", jsonString);
+}
+
+
+
+
+
+
 // Open the edit modal and populate it with data
 function openEditModal(number) {
     $.ajax({
@@ -376,6 +524,7 @@ function openEditModal(number) {
 
             $('#edit_time').val(data.time);
             $('#edit_time_allow').val(data.time_allow);
+            $('#edit_full_test_specific_module').val(data.full_test_specific_module);
 
             $('#edit_test_type').val(data.test_type);
             $('#edit_question_choose').val(data.question_choose);
@@ -384,35 +533,59 @@ function openEditModal(number) {
             $('#edit_token_need').val(data.token_need);
             $('#edit_role_access').val(data.role_access);
             $('#editModal').modal('show');
+
+
+            $('#edit_time_0').val(data.full_test_specific_module.rw_module_1.time);
+            $('#edit_start_0').val(data.full_test_specific_module.rw_module_1.question_particular[0].replace(/\D/g, ''));
+            $('#edit_end_0').val(data.full_test_specific_module.rw_module_1.question_particular.slice(-1)[0].replace(/\D/g, ''));
+
+            $('#edit_time_1').val(data.full_test_specific_module.rw_module_2.time);
+            $('#edit_start_1').val(data.full_test_specific_module.rw_module_2.question_particular[0].replace(/\D/g, ''));
+            $('#edit_end_1').val(data.full_test_specific_module.rw_module_2.question_particular.slice(-1)[0].replace(/\D/g, ''));
+
+            $('#edit_time_2').val(data.full_test_specific_module.math_module_1.time);
+            $('#edit_start_2').val(data.full_test_specific_module.math_module_1.question_particular[0].replace(/\D/g, ''));
+            $('#edit_end_2').val(data.full_test_specific_module.math_module_1.question_particular.slice(-1)[0].replace(/\D/g, ''));
+
+            $('#edit_time_3').val(data.full_test_specific_module.math_module_2.time);
+            $('#edit_start_3').val(data.full_test_specific_module.math_module_2.question_particular[0].replace(/\D/g, ''));
+            $('#edit_end_3').val(data.full_test_specific_module.math_module_2.question_particular.slice(-1)[0].replace(/\D/g, ''));
+
         }
     });
 }
 
 // Save the edited data
 function saveEdit() {
+    saveFullTestSpecificModule(true); // Lưu JSON vào input trước khi submit
     $.ajax({
         url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/digitalsat/test-list/update_question.php',
         type: 'POST',
         data: $('#editForm').serialize(),
         success: function(response) {
-            location.reload(); // Reload the page to reflect changes
+            location.reload();
         }
     });
 }
-
 function openAddModal() {
     $('#addForm')[0].reset(); // Clear form data
+    $('#add_time_0, #add_time_1, #add_time_2, #add_time_3').val('');  
+    $('#add_start_0, #add_start_1, #add_start_2, #add_start_3').val('');
+    $('#add_end_0, #add_end_1, #add_end_2, #add_end_3').val('');
+    
     $('#addModal').modal('show'); // Show the modal
 }
 
+
 // Save the new question
 function saveNew() {
+    saveFullTestSpecificModule(false); // Lưu JSON vào input trước khi submit
     $.ajax({
         url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/digitalsat/test-list/add_question.php',
         type: 'POST',
         data: $('#addForm').serialize(),
         success: function(response) {
-            location.reload(); // Reload to show the new record
+            location.reload(); 
         }
     });
 }
@@ -441,6 +614,16 @@ function showFullContent(title, content) {
     $('#viewMoreModal').modal('show');
 }
 
+function showFullContent2(title, content) {
+    // Set the title of the modal
+    $('#viewMoreTitle').text(title);
+
+    // Set the content with HTML allowed
+    $('#viewMoreContent').html(content);
+
+    // Show the modal
+    $('#viewMoreModal').modal('show');
+}
 
 </script>
 

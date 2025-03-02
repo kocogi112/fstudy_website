@@ -76,7 +76,7 @@ if (is_user_logged_in()) {
     </script>";
 
     // Query to fetch test details
-    $sql = "SELECT testname, time, test_type, question_choose, tag, number_question, token_need, role_access, permissive_management, time_allow 
+    $sql = "SELECT testname, time, test_type, question_choose, tag, number_question, token_need, role_access, permissive_management, time_allow, full_test_specific_module
         FROM digital_sat_test_list 
         WHERE id_test = ?";
 
@@ -236,6 +236,27 @@ if ($result->num_rows > 0) {
             trim($data["question_choose"])
         );
         $questions = explode(",", $question_choose_cleaned);
+        
+        
+        $full_test_specific_module = json_decode($data["full_test_specific_module"], true);
+
+        $question_category_map = [];
+
+        if (!empty($data["full_test_specific_module"])) { // Kiểm tra nếu tồn tại
+            $full_test_specific_module = json_decode($data["full_test_specific_module"], true);
+        
+            if (is_array($full_test_specific_module)) { // Đảm bảo JSON được giải mã thành mảng
+                foreach ($full_test_specific_module as $module => $details) {
+                    foreach ($details["question_particular"] as $question_id) {
+                        $question_category_map[$question_id] = $module ?: ""; // Nếu module không có, đặt thành ""
+                    }
+                }
+            }
+        }
+
+        
+        
+        
         $first = true;
 
         foreach ($questions as $question_id) {
@@ -266,7 +287,8 @@ if ($result->num_rows > 0) {
                     echo "'image': " .
                         json_encode($question_data["image_link"]) .
                         ",";
-                    echo "'question_category': '',";
+                    echo "'question_category': " . json_encode($question_category_map[$question_data["id_question"]] ?? 'Practice Test') . ",";
+
                     echo "'id_question': " .
                         json_encode($question_data["id_question"]) .
                         ",";
@@ -445,7 +467,7 @@ if ($result->num_rows > 0) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title></title>
-    <link rel="stylesheet" href="/wordpress/contents/themes/tutorstarter/system-test-toolkit/style/style_9.css">
+    <link rel="stylesheet" href="/wordpress/contents/themes/tutorstarter/system-test-toolkit/style/style_10.css">
     <style type="text/css">
 
 
@@ -1105,14 +1127,12 @@ img {
                     <!-- If user want to practice, you can choose this, otherwise  just click button to start test without change time limit-->
 
                     <h2>Bạn có thể luyện tập bằng cách chọn thời gian làm bài. Nếu không chọn thời gian sẽ mặc định  </h2>
+                    
                    
 
 
                 </div>
-                <div id = "current_module_container" >
-                    <h3 id = "current_module" style="display: none;"></h3>
-
-                </div>
+                
             
   <!-- Đổi giao diện bài thi 
   <button id="change_appearance" style="display: none;">Đổi giao diện</button>-->
@@ -1951,6 +1971,7 @@ if (current_module_element) { // Check if element exists
 }
 
 
+
 document.addEventListener("DOMContentLoaded", function () {
     // Listen for the custom event to submit the form
     document.addEventListener("submitForm", function () {
@@ -2004,7 +2025,7 @@ function purple_highlight(spanId) {
         </script>
 
 <!--<script type="text/javascript" src="function/alert_leave_page.js"></script> -->
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/main_sat_6.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/main_sat_9.js"></script>
 
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/translate.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/zoom-text.js"></script>

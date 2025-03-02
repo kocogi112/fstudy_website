@@ -142,9 +142,11 @@ $result = $conn->query($sql);
                         <td>{$row['number']}</td>
                         <td>{$row['last_use_end_point']}</td>
                         <td>{$row['list_name_endpoint_order']}</td>
-                        <td>{$row['prompt_ielts_writing']}</td>
-                        <td>{$row['prompt_conversation_ai']}</td>
-                      
+                        
+                        <td>" . nl2br($row['prompt_ielts_writing']) . "</td>
+                        <td>" . nl2br($row['prompt_conversation_ai']) . "</td>
+
+
 
                         <td>
                             <button class='btn btn-primary btn-sm' onclick='openEditModal({$row['number']})'>Edit</button>

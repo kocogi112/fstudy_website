@@ -18,6 +18,7 @@ $book = wp_kses_post($_POST['book']);
 $token_need = wp_unslash($_POST['token_need']);
 $role_access = wp_unslash($_POST['role_access']);
 $time_allow = wp_unslash($_POST['time_allow']);
+$full_test_specific_module = wp_unslash($_POST['full_test_specific_module']);
 
 
     // Check and process question_choose for specific patterns
@@ -58,6 +59,7 @@ $data = array(
     'token_need' => $token_need,
     'role_access' => $role_access,
     'time_allow' => $time_allow,
+    'full_test_specific_module' => $full_test_specific_module,
 
 );
 

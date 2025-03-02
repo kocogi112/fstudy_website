@@ -107,7 +107,11 @@ $result = $conn->query($sql);
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
 
-                <h1>Digital Practice SAT Questions Database - VERBAL (Reading - Writing) only</h1>
+           
+
+
+<h1>Digital Practice SAT Questions Database - VERBAL (Reading - Writing) only</h1>
+Practice:
 <p>Verbal100 - Verbal206: Boundaries</p>
 <p>Verbal207 - Verbal272: Central ideas and detail</p>
 <p>Verbal273 - Verbal376: Form, Structure and Sense</p>
@@ -117,6 +121,13 @@ $result = $conn->query($sql);
 <p>Verbal624 - verbal695: Text Structure and Purpose</p>
 <p>Verbal696 - verbal781: Transition</p>
 <p>Verbal782 - verbal884: Rhetorical Analysis</p>
+<p>Verbal885 - verbal1035: Command of Evidence	</p>
+
+Full test:
+<p>Verbal1036 - : Practice Test 1 - (verbal(verbal1036-verbal1100): M1: verbal1036-verbal1067; M2: verbal1068-verbal1100)</p>
+<p>Verbal1101 - : Practice Test 2 - (verbal(verbal1101-verbal1166): M1: verbal1101-verbal1133; M2: verbal1134-verbal1166)</p>
+<p>Verbal1167 - : Practice Test 3 - (verbal(verbal1167-verbal1232): M1: verbal1167-verbal1199; M2: verbal1200-verbal1232)</p>
+
 
 <!-- Filter form -->
 <form method="GET" action="">
@@ -288,7 +299,8 @@ $result = $conn->query($sql);
                         <option value="answer_4">Answer D</option>
 
                     </select><br>
-                    explanation: <textarea  id="edit_explanation" name="explanation" class="form-control"   required></textarea><br>
+                   <!-- explanation: <textarea  id="edit_explanation" name="explanation" class="form-control"   required></textarea><br> -->
+                    Explanation: <input  id="edit_explanation" name="explanation" class="form-control"   required><br>
                     image_link: <input type="text" id="edit_image_link" name="image_link" class="form-control"  ></input><br>
 
                     Phân loại câu hỏi:
@@ -351,7 +363,8 @@ $result = $conn->query($sql);
                         <option value="answer_4">Answer D</option>
 
                     </select><br>                   
-                    explanation: <textarea id="add_explanation" name="explanation" class="form-control"   required></textarea><br>
+                    <!--explanation: <textarea id="add_explanation" name="explanation" class="form-control"   required></textarea><br> -->
+                    Explanation: <input id="add_explanation" name="explanation" class="form-control"   required><br>
                     image_link: <input type="text" id="add_image_link" name="image_link" class="form-control"  ></input><br>
                     Phân loại câu hỏi:
                     <select id="add_category" name="category" class="form-control" required>
@@ -467,11 +480,11 @@ function saveEdit() {
     questionContent = questionContent.replace(/Text 1/g, '<b>Text 1</b>');
     questionContent = questionContent.replace(/Text 2/g, '<b>Text 2</b>');
 
-    // Remove prefixes 'A. ', 'B. ', 'C. ', 'D. ' from answer fields
-    $('#edit_answer_1').val($('#edit_answer_1').val().replace(/^A\. /, '').trim());
-    $('#edit_answer_2').val($('#edit_answer_2').val().replace(/^B\. /, '').trim());
-    $('#edit_answer_3').val($('#edit_answer_3').val().replace(/^C\. /, '').trim());
-    $('#edit_answer_4').val($('#edit_answer_4').val().replace(/^D\. /, '').trim());
+    // Remove prefixes 'A. ', 'B. ', 'C. ', 'D. ' and 'A) ', 'B) ', 'C) ', 'D) '
+    $('#edit_answer_1').val($('#edit_answer_1').val().replace(/^(A\. |A\))/, '').trim());
+    $('#edit_answer_2').val($('#edit_answer_2').val().replace(/^(B\. |B\))/, '').trim());
+    $('#edit_answer_3').val($('#edit_answer_3').val().replace(/^(C\. |C\))/, '').trim());
+    $('#edit_answer_4').val($('#edit_answer_4').val().replace(/^(D\. |D\))/, '').trim());
 
     // Apply formatting
     $('#edit_question_content').val(formatTextWithLineBreaks(questionContent));

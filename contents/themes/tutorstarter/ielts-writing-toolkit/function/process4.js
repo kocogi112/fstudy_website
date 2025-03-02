@@ -1,16 +1,14 @@
+let essayResponses = {}; // Lưu tất cả final_analysis theo ID câu hỏi
+let essayAnswers = {};   // Lưu answer của user
+
+
 async function processEssay(i) {
     let userEssay = document.getElementById(`question-${i}-input`).value;
-    const sentences = userEssay.split(/[.!?]\s+/);
-    let sampleEssay = quizData.questions[i].sample_essay;
-    sampleEssay = sampleEssay.replace(/<br>/g, '\n');
-
-    let currentQuestion = quizData.questions[i].question;
-    let currentPart = quizData.questions[i].part;
+    let sampleEssay = quizData.questions[i].sample_essay.replace(/<br>/g, '\n');
     let currentIDQuestion = quizData.questions[i].id_question;
 
-    console.log("Processing essay...");
-
-    /*try {
+    console.log(`Processing essay for ID: ${currentIDQuestion}`);
+     /*try {
         
         const response = await fetch('http://localhost:3000/check-answer', {
             
@@ -328,23 +326,40 @@ async function processEssay(i) {
         body: JSON.stringify({ question: currentQuestion, answer: userEssay, part: currentPart})
 
     })*/
-    
-    fetch(`${siteUrl}/api/public/test/v1/ielts/writing/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ question: currentQuestion, answer: userEssay, part: currentPart, sample: sampleEssay, idquestion: currentIDQuestion})
 
-    })
+    try {
+        let response = await fetch(`${siteUrl}/api/public/test/v1/ielts/writing/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                question: quizData.questions[i].question,
+                answer: userEssay,
+                part: quizData.questions[i].part,
+                sample: sampleEssay,
+                idquestion: currentIDQuestion,
+                type: quizData.questions[i].question_type
+            })
+        });
 
-    .then(response => response.json())
-    .then(data => {
-        // Hiển thị kết quả từ API
-    })
-    .catch(error => {
+        let data = await response.json();
+
+        if (data.final_analysis) {
+            // Cập nhật dữ liệu nhưng không ghi đè các ID trước đó
+            essayResponses[currentIDQuestion] = data.final_analysis;
+            console.log("Updated responses:", essayResponses);
+
+            // Hiển thị dữ liệu cập nhật
+            document.getElementById("user_band_score_and_suggestion").value = JSON.stringify(essayResponses);
+            ResultInput(); 
+        }
+        if (data.answer) {
+            // Cập nhật answer theo ID câu hỏi
+            essayAnswers[currentIDQuestion] = data.answer;
+            console.log("Updated answers:", essayAnswers);
+            document.getElementById("user_essay").value = JSON.stringify(essayAnswers);
+        }
+        
+    } catch (error) {
         console.error('Error:', error);
-    });
-
+    }
 }
-

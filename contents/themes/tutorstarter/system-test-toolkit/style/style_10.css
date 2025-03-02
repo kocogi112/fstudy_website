@@ -296,20 +296,30 @@ body {
 
 /* Left navigation group */
 /* Left navigation group */
+/* Left navigation group */
 .left-group {
     flex: 1; /* Flex-grow to take up available space */
     display: flex; /* Align left elements horizontally */
     align-items: center; /* Center them vertically */
 }
 
+/* Center navigation group */
+.center-group {
+    flex: 1; /* Flex-grow to take up available space */
+    display: flex; /* Align center elements horizontally */
+    align-items: center; /* Center them vertically */
+    justify-content: center; /* Align content to the center */
+}
+
 /* Right navigation group */
 .right-group {
-    flex: 1; /* Flex-grow to take up available space */
     display: flex; /* Align right elements horizontally */
     align-items: center; /* Center them vertically */
     justify-content: flex-end; /* Align content to the right */
-
 }
+
+
+
 .navi-button{
     flex: 1; /* Flex-grow to take up available space */
     display: flex; /* Align right elements horizontally */

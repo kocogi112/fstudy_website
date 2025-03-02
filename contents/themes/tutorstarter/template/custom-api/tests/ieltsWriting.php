@@ -21,12 +21,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sample = $input['sample'];
         $part = $input['part'];
         $idquestion = $input['idquestion'];
+        $essay_type = $input['type'];
 
         // Gọi các hàm xử lý dữ liệu
         $grammarCheck = checkGrammarAndSpelling($answer);
         $ai_route_stats = prepareAIRoute();
         $ai_response = fetchAIResponse($question, $answer, $part);
         $finaloverall = finalOveralBand();
+        $finalcomment = finalComment();
+        $finalSuggestion = finalImprovementSuggestion();
+        $finalImprovement_Suggest_words = finalSuggestionWordAndPhrase();
+        $finalTopWeak = finalTopWeakPoint();
+        $finalOverviewEssay = finaloverViewEssay($answer, $essay_type);
+
         $wordFrequency = getWordFrequency($answer);
         $standardCheck = CheckStandard($answer);
         $linkingWordsCheck = checkLinkingWords($answer, 'linkingWords');
@@ -35,29 +42,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode([
             'status' => 'success',
             'question' => $question, /*For dev - not show in live */
-            'answer' => $answer, /*For dev - not show in live */
+            'answer' => $answer, 
             'sample' => $sample, /*For dev - not show in live */
             'part' => $part, /*For dev - not show in live */
             'ai_route_stats' => $ai_route_stats, /*For dev - not show in live */
             'idquestion' => $idquestion,
             'ai_response' => $ai_response, /*For dev - not show in live */
-            'analysis' => [ /*For dev - not show in live */
-                'grammarCheck' => $grammarCheck,
-                'wordFrequency' => $wordFrequency,
-                'standardCheck' => $standardCheck,
-                'linkingWordsCheck' => $linkingWordsCheck
-            ],
 
-            'band' => $finaloverall,
-            'detail_recommendation' => [
-                'ta_tr' => 'ta_tr_recommendation',
-                'cc' => 'cc_recommendation',
-                'lr' => 'lr_recommendation',
-                'gra' => 'gra_recommendation'
-            ],
-            'improvement' => 'To improve this, you should .....',
-            'suggestion' => 'This will show show sentence/words need to be replaced, and will show the reason (Use AI to do this)',
-            'top_weak_point' => 'You need to improve... In order that you should do our practice to enhance that !'
+            'final_analysis' => [
+                'analysis' => [
+                    'grammarCheck' => $grammarCheck,
+                    'wordFrequency' => $wordFrequency,
+                    'standardCheck' => $standardCheck,
+                    'linkingWordsCheck' => $linkingWordsCheck
+                ],
+                'overview_essay' => $finalOverviewEssay,
+                'band' => $finaloverall,
+                'detail_recommendation' => $finalcomment,
+                'improvement_words' => $finalImprovement_Suggest_words,
+                'suggestion' => $finalSuggestion,
+                'top_weak_point' => $finalTopWeak
+            ]
 
         ]);
     } else {
@@ -168,7 +173,111 @@ function finalOveralBand() {
     ];
 }
 
+function finalTopWeakPoint() {
+    $scores = finalOveralBand();
 
+    if (isset($scores['error'])) {
+        return $scores; // Trả về lỗi nếu có
+    }
+
+    // Danh sách tiêu chí với điểm
+    $criteria = [
+        'Task Achievement'                => $scores['ta'],
+        'Coherence and Cohesion'          => $scores['cc'],
+        'Lexical Resource'                => $scores['lr'],
+        'Grammatical Range and Accuracy'  => $scores['gra']
+    ];
+
+    // Tìm tiêu chí có điểm thấp nhất
+    $min_score = min($criteria);
+    $weakest_areas = array_keys($criteria, $min_score);
+
+    // Ghép các phần yếu thành chuỗi
+    $weakest_text = implode(', ', $weakest_areas);
+
+    return [
+        'weakest_score' => $min_score,
+        'message' => "Bạn đang kém nhất ở phần: $weakest_text"
+    ];
+}
+
+
+function finalComment() {
+    global $ai_response_data;
+
+    if (!isset($ai_response_data['choices'][0]['message']['content'])) {
+        return ['error' => 'Invalid AI response'];
+    }
+
+    $content = $ai_response_data['choices'][0]['message']['content'];
+
+    // Dùng regex để lấy các comment của từng tiêu chí
+    preg_match('/"task_response_comment":\s*"([^"]+)"/', $content, $ta_comment);
+    preg_match('/"coherence_and_cohesion_comment":\s*"([^"]+)"/', $content, $cc_comment);
+    preg_match('/"lexical_resource_comment":\s*"([^"]+)"/', $content, $lr_comment);
+    preg_match('/"grammatical_range_and_accuracy_comment":\s*"([^"]+)"/', $content, $gra_comment);
+
+    // Kiểm tra nếu có thiếu comment nào thì báo lỗi
+    if (!isset($ta_comment[1]) || !isset($cc_comment[1]) || !isset($lr_comment[1]) || !isset($gra_comment[1])) {
+        return ['error' => 'Missing comment values'];
+    }
+
+    return [
+        'ta_tr' => $ta_comment[1],
+        'cc' => $cc_comment[1],
+        'lr' => $lr_comment[1],
+        'gra' => $gra_comment[1]
+    ];
+}
+function finalImprovementSuggestion() {
+    global $ai_response_data;
+
+    if (!isset($ai_response_data['choices'][0]['message']['content'])) {
+        return ['error' => 'Invalid AI response'];
+    }
+
+    $content = $ai_response_data['choices'][0]['message']['content'];
+
+    preg_match('/"improvement_suggestions":\s*"([^"]+)"/', $content, $improvement);
+
+    if (!isset($improvement[1])) {
+        return ['error' => 'Missing improvement suggestions'];
+    }
+
+    return ['improvement_suggestions' => $improvement[1]];
+}
+
+function finalSuggestionWordAndPhrase() {
+    global $ai_response_data;
+
+    if (!isset($ai_response_data['choices'][0]['message']['content'])) {
+        return ['error' => 'Invalid AI response'];
+    }
+
+    $content = $ai_response_data['choices'][0]['message']['content'];
+
+    preg_match('/"suggested_words_or_phrases":\s*(\[[^\]]+\])/', $content, $suggestions);
+
+    if (!isset($suggestions[1])) {
+        return ['error' => 'Missing suggested words or phrases'];
+    }
+
+    return json_decode($suggestions[1], true);
+}
+
+
+function finaloverViewEssay($answer, $essay_type) {
+    $word_count = str_word_count($answer);
+    $sentence_count = preg_match_all('/[.!?]/', $answer, $matches);
+    $paragraph_count = substr_count($answer, "\n") + 1; // Đếm số dòng xuống
+
+    return [
+        "word_count" => $word_count,
+        "sentence_count" => $sentence_count,
+        "paragraph_count" => $paragraph_count,
+        "essay_type" => $essay_type
+    ];
+}
 
 
 // Các hàm xử lý logic chính (chuyển từ code Node.js)

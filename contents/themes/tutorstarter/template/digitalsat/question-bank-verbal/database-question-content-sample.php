@@ -70,6 +70,7 @@ $result = $conn->query($sql);
 <body>
 
 <h1>Digital Practice SAT Questions Database - VERBAL (Reading - Writing) only</h1>
+Practice:
 <p>Verbal100 - Verbal206: Boundaries</p>
 <p>Verbal207 - Verbal272: Central ideas and detail</p>
 <p>Verbal273 - Verbal376: Form, Structure and Sense</p>
@@ -79,6 +80,10 @@ $result = $conn->query($sql);
 <p>Verbal624 - verbal695: Text Structure and Purpose</p>
 <p>Verbal696 - verbal781: Transition</p>
 <p>Verbal782 - verbal884: Rhetorical Analysis</p>
+<p>Verbal885 - verbal1035: Command of Evidence	</p>
+
+Full test:
+<p>Verbal1036 - : Practice Test 1 - (verbal: M1: verbal1036-verbal1067)</p>
 
 <!-- Filter form -->
 <form method="GET" action="">
