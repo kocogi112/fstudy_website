@@ -1,6 +1,6 @@
 let essayResponses = {}; // Lưu tất cả final_analysis theo ID câu hỏi
 let essayAnswers = {};   // Lưu answer của user
-
+let scoreOverallAndBand = {}; // Lưu điểm số tổng kết
 
 async function processEssay(i) {
     let userEssay = document.getElementById(`question-${i}-input`).value;
@@ -327,6 +327,7 @@ async function processEssay(i) {
 
     })*/
 
+
     try {
         let response = await fetch(`${siteUrl}/api/public/test/v1/ielts/writing/`, {
             method: 'POST',
@@ -350,8 +351,9 @@ async function processEssay(i) {
 
             // Hiển thị dữ liệu cập nhật
             document.getElementById("user_band_score_and_suggestion").value = JSON.stringify(essayResponses);
-            ResultInput(); 
+            calculateOverallBand(); // Gọi hàm tính toán điểm
         }
+
         if (data.answer) {
             // Cập nhật answer theo ID câu hỏi
             essayAnswers[currentIDQuestion] = data.answer;
@@ -361,5 +363,70 @@ async function processEssay(i) {
         
     } catch (error) {
         console.error('Error:', error);
+    }
+}
+function calculateOverallBand() {
+    let task1 = null;
+    let task2 = null;
+
+    // Duyệt qua các câu hỏi đã xử lý
+    Object.keys(essayResponses).forEach(id => {
+        let bandScore = parseFloat(essayResponses[id].band.overallband); // Lấy overallband của câu hỏi
+        if (id.startsWith("1")) { // Task 1 có ID bắt đầu bằng "1"
+            task1 = { overallband: bandScore, id: id };
+        } else if (id.startsWith("2")) { // Task 2 có ID bắt đầu bằng "2"
+            task2 = { overallband: bandScore, id: id };
+        }
+    });
+
+    // Tính overallScore
+    let overallScore = 0;
+    if (task1 && task2) {
+        overallScore = (task1.overallband + task2.overallband * 2) / 3;
+    } else if (task1) {
+        overallScore = task1.overallband;
+    } else if (task2) {
+        overallScore = task2.overallband;
+    }
+
+    // Làm tròn overallScore theo quy tắc .0 hoặc .5
+    overallScore = roundToNearestHalf(overallScore);
+
+    // Tạo JSON kết quả
+    if (task1 && task2) {
+        scoreOverallAndBand = {
+            overall_score: overallScore,
+            task_1: task1,
+            task_2: task2
+        };
+    } else if (task1) {
+        scoreOverallAndBand = {
+            overall_score: overallScore,
+            task_1: task1
+        };
+    } else if (task2) {
+        scoreOverallAndBand = {
+            overall_score: overallScore,
+            task_2: task2
+        };
+    }
+
+    console.log("Final Score Data:", scoreOverallAndBand);
+    document.getElementById("band-score-expand-form").value = JSON.stringify(scoreOverallAndBand);
+    document.getElementById("band-score-form").value = overallScore; // Gán overallScore vào input
+    ResultInput();
+}
+
+// Hàm làm tròn số về .0 hoặc .5
+function roundToNearestHalf(score) {
+    const floor = Math.floor(score); // Phần nguyên
+    const decimal = score - floor; // Phần thập phân
+
+    if (decimal < 0.25) {
+        return floor; // Làm tròn xuống .0
+    } else if (decimal >= 0.25 && decimal < 0.75) {
+        return floor + 0.5; // Làm tròn lên .5
+    } else {
+        return floor + 1; // Làm tròn lên .0 của số nguyên tiếp theo
     }
 }

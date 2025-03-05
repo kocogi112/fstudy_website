@@ -1044,7 +1044,7 @@ $conn->close();
                     </div>
                     
                     <div class = "form-group"   >
-                        <input type="text"  id="band-score-form" name="band-score-form" placeholder="Band Score Overall"  class="form-control form_data" />
+                        <textarea type="text"  id="band-score-form" name="band-score-form" placeholder="Band Score Overall"  class="form-control form_data" ></textarea>
                         <span id="correctanswer_error" class="text-danger"></span>  
                     </div>
                     <div class = "form-group"   >
@@ -1850,7 +1850,7 @@ The given table compares different means of transportation in terms of the annua
 
 
     <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/full_overall_chart/full_band_chart.js"></script>
-    <script  src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/process4.js"></script>
+    <script  src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/process7.js"></script>
     
 
 
@@ -1860,7 +1860,7 @@ The given table compares different means of transportation in terms of the annua
     <script  src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/right_bar_feature/change-mode.js"></script>
 
 
-  <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/submitTest4.js"></script>
+  <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/submitTest5.js"></script>
 
 
 

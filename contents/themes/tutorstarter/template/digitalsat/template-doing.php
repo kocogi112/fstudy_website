@@ -221,7 +221,7 @@ if ($result->num_rows > 0) {
         echo "    'number_questions': " . intval($data["number_question"]) . ",";
         echo "    'category_test': " . json_encode($data["tag"]) . ",";
         echo "    'id_test': " . json_encode($data["tag"] . "_003") . ",";
-        echo "    'restart_question_number_for_each_question_category': 'Yes',";
+        echo "    'restart_question_number_for_each_question_catagory': 'Yes',";
         echo "    'data_added_1': '',";
         echo "    'data_added_2': '',";
         echo "    'data_added_3': '',";
@@ -443,6 +443,7 @@ if ($result->num_rows > 0) {
                     MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
 
             });
+            console.log("Fetch Test: ",quizData);
     </script>';
     
 
@@ -468,7 +469,8 @@ if ($result->num_rows > 0) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title></title>
     <link rel="stylesheet" href="/wordpress/contents/themes/tutorstarter/system-test-toolkit/style/style_10.css">
-    <style type="text/css">
+
+<style type="text/css">
 
 
 #time-remaining-container {
@@ -508,10 +510,15 @@ if ($result->num_rows > 0) {
 }
 
 
-.quiz-section {
+           .quiz-section {
                display: flex;
                flex-direction: row;
            }
+           .review-page{
+                height: 100%;
+                display: flex;
+                flex-direction: row;
+            }
            .question-side, .answer-side {
                width: 50%;
                padding: 10px;
@@ -521,6 +528,11 @@ if ($result->num_rows > 0) {
                .quiz-section {
                    flex-direction: column;
                }
+               .review-page{
+                    height: 100%;
+                    flex-direction: column;
+
+                }
                .question-side, .answer-side {
                    width: 100%;
                }
@@ -1028,6 +1040,49 @@ img {
 .fail {
     color: red;
 }
+.section-pageview {
+    margin-top: 24px;
+    display: flex
+;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.ctrl-pageview {
+    background-color: #fff;
+    border: 1px solid #324dc7;
+    color: #324dc7;
+    width: 200px;
+}
+.ctrl-btn {
+    padding: 2px 23px;
+    /* border-block-color: #324dc7; */
+    height: 46px;
+    /* width: 86px; */
+    font-size: 1rem;
+    border-radius: 23px;
+    border: 1px solid #2f72dc;
+    box-sizing: border-box;
+    display: flex
+;
+    align-items: center;
+    justify-content: center;
+    color: #324dc7;
+    font-weight: 700;
+    cursor: initial;
+    user-select: none;
+    opacity: 1;
+    cursor: pointer;
+    pointer-events: all;
+}
+#name-module-checkbox{
+    justify-content: center;
+    text-align: center;
+}
+
    </style>
 
 </head>
@@ -1205,7 +1260,8 @@ img {
   
          
                 <div  id="quiz-container" ></div>
-              
+                
+
                <span style="display:none" id="devtools-status">Checking...</span>
 
             </div>
@@ -1254,17 +1310,14 @@ img {
        
 
 
-                <span class="close-checkbox" onclick="closeCheckboxPopup()">&times;</span>
-                <b style="color: rgb(248, 23, 23);">Bạn có thể chuyển câu hỏi nhanh bằng cách ấn vào các câu tương ứng</b>
+                <span style = "float: right" class="close-checkbox" onclick="closeCheckboxPopup()">&times;</span>
 
-                <div class="icon-detail">
-		                <div class="single-detail"><i class="fa-regular fa-flag"></i><span>Current</span></div>
-                        <div class="single-detail"><div class="dashed-square"></div><span>Unanswered</span></div> 
-                        <div class="single-detail"><i class="fa-solid fa-bookmark" style="color: #c33228;"></i><span>For Review</span></div>
-                    </div>
+                
 
 
                 <div id="checkboxes-container" class = "checkboxes-container" ></div>
+                <div id = "review-page-container"></div>
+
                 <p style="text-align: center; justify-content: center; display: none;">Chú thích</p>
 
                 
@@ -1770,7 +1823,6 @@ let questionTimes = {}; // Đối tượng lưu trữ tổng thời gian của m
 
 let checkBoxBtn = document.getElementById("checkbox-button");
 function showPrevQuestion() {
-    countTimeSpecific(currentQuestionIndex);
 
     if (currentQuestionIndex > 0) {
         currentQuestionIndex--;
@@ -1803,7 +1855,6 @@ function startTimerForQuestion(currentQuestionIndex) {
 
 
 function showNextQuestion() {
-    countTimeSpecific(currentQuestionIndex);
 
     if (currentQuestionIndex < quizData.questions.length - 1) {
         currentQuestionIndex++;
@@ -1917,7 +1968,15 @@ function dragElement(elmnt) {
     document.onmousemove = null;
   }
 }
+let current_module_element;
+var moduleText;
+let currentModuleText;
+
+
 function showQuestion(index) {
+    closeReviewPage();
+    countTimeSpecific(currentQuestionIndex);
+
     const questions = document.getElementsByClassName("questions");
     checkBoxBtn.innerHTML = `
         <div class="ctn-checkbox"> 
@@ -1927,49 +1986,111 @@ function showQuestion(index) {
             </svg>
         </div>`;
 
-
-    // giao diện 2
+    // Giao diện 2
     document.getElementById('change_appearane_2').addEventListener('click', function() {
         for (let i = 0; i < questions.length; i++) {
             questions[i].style.display = "block";
         }
     });
+    
+    current_module_element = document.getElementById("current_module");
 
-
-
-
-
+    // Ẩn tất cả các câu hỏi
     for (let i = 0; i < questions.length; i++) {
         questions[i].style.display = "none";
     }
-    var current_module_element = document.getElementById("current_module");
 
-if (current_module_element) { // Check if element exists
-    var current_module_text = current_module_element.innerText; // Get current text
+    if (current_module_element) {
+        // Lấy module hiện tại
+        let currentModuleText = current_module_element.textContent.trim();
+        console.log("Before update: ", currentModuleText);
 
-    if (!current_module_text || current_module_text === 'undefined') { // Check for undefined or empty text
-        current_module_text = ''; // Set to empty if undefined
+        // Lấy module của câu hỏi hiện tại
+        let questionCategory = quizData.questions[index] && quizData.questions[index].question_category 
+            ? quizData.questions[index].question_category 
+            : '';
+
+        // Cập nhật module hiện tại nếu khác với module cũ
+        if (currentModuleText !== questionCategory) {
+            current_module_element.innerText = ` ${questionCategory}`;
+
+            setTimeout(() => {
+                currentModuleText = current_module_element.textContent.trim();
+                console.log("After update: ", currentModuleText);
+
+                // Chỉ cập nhật review-page nếu module thay đổi
+                updateReviewPage(currentModuleText);
+                showCheckboxesForCategory(currentModuleText); // Hiển thị checkboxes cho category
+            }, 0);
+        } else {
+            // Nếu module không thay đổi, chỉ hiển thị checkboxes
+            showCheckboxesForCategory(currentModuleText);
+        }
     }
-
-    // Safely get the question_category if it exists
-    var questionCategory = quizData.questions[index] && quizData.questions[index].question_category 
-        ? quizData.questions[index].question_category 
-        : '';
-
-    // Update the text content
-    current_module_text = ` ${questionCategory}`;
-    current_module_element.innerText = current_module_text;
-}
-
-
-
 
     questions[index].style.display = "block";
 
-    document.getElementById("prev-button").style.display = index === 0 ? "none" : "inline-block";
-    document.getElementById("next-button").style.display = index === questions.length - 1 ? "none" : "inline-block";
+    // Kiểm tra xem đây có phải là câu hỏi đầu tiên của module không
+    const isFirstQuestionInCategory = isFirstQuestionOfCategory(index);
+    if (isFirstQuestionInCategory) {
+        document.getElementById("prev-button").style.display = "none"; // Ẩn nút "Quay lại"
+        document.getElementById("prev-button").onclick = null; // Vô hiệu hóa chức năng "Quay lại"
+    } else {
+        document.getElementById("prev-button").style.display = "inline-block"; // Hiện nút "Quay lại"
+        document.getElementById("prev-button").onclick = () => showQuestion(index - 1); // Bật chức năng "Quay lại"
+    }
+
+    // Kiểm tra xem đây có phải là câu hỏi cuối cùng của question_category không
+    const isLastQuestionInCategory = isLastQuestionOfCategory(index);
+    if (isLastQuestionInCategory) {
+        document.getElementById("next-button").textContent = "Review";
+        document.getElementById("next-button").onclick = showReviewPage;
+    } else {
+        document.getElementById("next-button").textContent = "Next";
+        document.getElementById("next-button").onclick = () => showQuestion(index + 1);
+    }
+
+    //document.getElementById("next-button").style.display = index === questions.length - 1 ? "none" : "inline-block";
+    if(index === questions.length - 1){
+        document.getElementById("next-button").textContent = "Submit";
+
+    }
+    document.getElementById("next-button").style.display  = "inline-block";
+
 }
 
+// Hàm kiểm tra xem câu hỏi có phải là đầu tiên của question_category không
+function isFirstQuestionOfCategory(index) {
+    const currentCategory = quizData.questions[index].question_category;
+    for (let i = index - 1; i >= 0; i--) {
+        if (quizData.questions[i].question_category === currentCategory) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// Hàm kiểm tra xem câu hỏi có phải là cuối cùng của question_category không
+function isLastQuestionOfCategory(index) {
+    const currentCategory = quizData.questions[index].question_category;
+    for (let i = index + 1; i < quizData.questions.length; i++) {
+        if (quizData.questions[i].question_category === currentCategory) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// Hàm kiểm tra xem câu hỏi có phải là cuối cùng của question_category không
+function isLastQuestionOfCategory(index) {
+    const currentCategory = quizData.questions[index].question_category;
+    for (let i = index + 1; i < quizData.questions.length; i++) {
+        if (quizData.questions[i].question_category === currentCategory) {
+            return false;
+        }
+    }
+    return true;
+}
 
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -1992,9 +2113,14 @@ for (let i = 0; i < quizData.questions.length; i++) {
             console.log("Current question: ",i)   
             currentModule = quizData.questions[6].question_category;
         } */
+
+
+//var current_module_element;
+
+
 function ChangeQuestion(questionNumber)
         {
-        
+            closeReviewPage();
             console.log("Test change question by clicking checkbox"+ questionNumber );
 
             if (currentQuestionIndex < quizData.questions.length - 1) {
@@ -2025,7 +2151,7 @@ function purple_highlight(spanId) {
         </script>
 
 <!--<script type="text/javascript" src="function/alert_leave_page.js"></script> -->
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/main_sat_9.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/main_sat_13.js"></script>
 
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/translate.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/zoom-text.js"></script>
@@ -2034,7 +2160,7 @@ function purple_highlight(spanId) {
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/report-error.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/note-sidebar.js"></script>
 
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/submit_answer_4.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/submit_answer_5.js"></script>
 <!--<script type="module" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/check_dev_tool.js"></script>
     -->
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/highlight_text_4.js"></script>
@@ -2042,7 +2168,7 @@ function purple_highlight(spanId) {
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/format-time-1.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/draft-popup.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/color-background.js"></script>
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/start-digital-sat-Test-2.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/start-digital-sat-Test-4.js"></script>
 <!-- <script type="text/javascript" src="function/quick-view-answer.js"></script> -->
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/checkbox_and_remember.js"></script>
 

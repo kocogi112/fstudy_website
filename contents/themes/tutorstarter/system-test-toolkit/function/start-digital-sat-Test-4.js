@@ -99,7 +99,8 @@ function startTest() {
     document.getElementById("start-test").style.display = 'none';
     document.getElementById("basic-info").style.display = 'none';
     document.getElementById("quiz-container").style.display = 'block';
-    document.getElementById("submit-button").style.display = 'block';
+   /* document.getElementById("review-container").style.display = 'block';*/
+
     document.getElementById("current_module").style.display = "block";
     var explain_zone = document.getElementsByClassName("explain-zone");
     for (var i = 0; i < explain_zone.length; i++)

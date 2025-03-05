@@ -17,7 +17,6 @@ function submitButton() {
     ChangeQuestion(1);
     showTotalTime();
 
-    document.getElementById("submit-button").style.display = 'none';
     var explain_zone = document.getElementsByClassName("explain-zone")
 
     var timeUsed = quizData.duration - countdownValue;

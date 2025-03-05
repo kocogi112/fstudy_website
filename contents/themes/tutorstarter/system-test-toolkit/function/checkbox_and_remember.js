@@ -97,8 +97,13 @@ let countUnFinishQuestion = 0;
 // Function to update the checkbox status and real-time table
 function updateCheckboxStatus(questionNumber) {
     var checkboxContainer = document.getElementById('checkbox-container-' + questionNumber);
+    var checkboxContainer2 = document.getElementById('checkbox-container-2-' + questionNumber);
 
     if (!checkboxContainer) {
+        console.error('Checkbox container not found for question number:', questionNumber);
+        return;
+    }
+    if (!checkboxContainer2) {
         console.error('Checkbox container not found for question number:', questionNumber);
         return;
     }
@@ -145,8 +150,11 @@ function updateCheckboxStatus(questionNumber) {
     // Update checkbox container class based on completion status
     if (isCompleted) {
         checkboxContainer.classList.add('answered');
+        checkboxContainer2.classList.add('answered');
     } else {
         checkboxContainer.classList.remove('answered');
+        checkboxContainer2.classList.remove('answered');
+
     }
 
     // Update the real-time table
@@ -287,6 +295,7 @@ function rememberQuestion(i) {
    
 
     var checkboxContainer = document.getElementById('checkbox-container-' + i);
+
     var bookmarkQuestionElement = document.getElementById("bookmark-question-" + i);
 
     if (!bookmarkQuestionElement) {
@@ -309,4 +318,5 @@ function rememberQuestion(i) {
         //bookmarkQuestionElement.style.backgroundColor = 'yellow';
         bookmarkQuestionElement.src = '/wordpress/contents/themes/tutorstarter/system-test-toolkit/bookmark_filled.png';
     }
+
 }

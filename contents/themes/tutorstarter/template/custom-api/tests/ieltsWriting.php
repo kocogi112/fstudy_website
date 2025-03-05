@@ -32,11 +32,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $finalSuggestion = finalImprovementSuggestion();
         $finalImprovement_Suggest_words = finalSuggestionWordAndPhrase();
         $finalTopWeak = finalTopWeakPoint();
-        $finalOverviewEssay = finaloverViewEssay($answer, $essay_type);
+        $finalOverviewEssay = finaloverViewEssay($answer, $essay_type, $linkingWords);
 
         $wordFrequency = getWordFrequency($answer);
         $standardCheck = CheckStandard($answer);
-        $linkingWordsCheck = checkLinkingWords($answer, 'linkingWords');
+        $linkingWordsCheck = checkLinkingWords($answer, $linkingWords);
 
         // Trả về dữ liệu đã nhận và kết quả phân tích
         echo json_encode([
@@ -265,17 +265,31 @@ function finalSuggestionWordAndPhrase() {
     return json_decode($suggestions[1], true);
 }
 
-
-function finaloverViewEssay($answer, $essay_type) {
+function finaloverViewEssay($answer, $essay_type, $linkingWords) {
     $word_count = str_word_count($answer);
     $sentence_count = preg_match_all('/[.!?]/', $answer, $matches);
     $paragraph_count = substr_count($answer, "\n") + 1; // Đếm số dòng xuống
+
+    // Kiểm tra Linking Words
+    $linkingWordsData = checkLinkingWords($answer, $linkingWords);
+
+    // Kiểm tra Lỗi Ngữ Pháp & Chính Tả
+    $grammarAndSpellingData = checkGrammarAndSpelling($answer);
+
+    // Tính tần suất từ
+    $wordFrequency = getWordFrequency($answer);
 
     return [
         "word_count" => $word_count,
         "sentence_count" => $sentence_count,
         "paragraph_count" => $paragraph_count,
-        "essay_type" => $essay_type
+        "essay_type" => $essay_type,
+        "linkingWordsCount" => $linkingWordsData['linkingWordsCount'],
+        "uniqueLinkingWords" => $linkingWordsData['uniqueLinkingWords'],
+        "foundLinkingWords" => $linkingWordsData['foundLinkingWords'],
+        "total_errors_count" => $grammarAndSpellingData['total_errors_count'], // Thêm số lỗi tổng cộng
+        "grammar_suggestions" => $grammarAndSpellingData['suggestions'], // Danh sách lỗi & gợi ý sửa
+        "word_frequency" => $wordFrequency // Thêm tần suất từ
     ];
 }
 
@@ -382,7 +396,7 @@ function checkVocabularyRange($answer, $wordList) {
 
 
 
-const linkingWords = [
+$linkingWords = [
   "furthermore", "additionally", "in addition to", "also", "moreover", "and", 
   "as well as", "during", "while", "until", "before", "afterward", "in the end",
   "at the same time", "meanwhile", "subsequently", "simultaneously", "firstly",
@@ -392,7 +406,9 @@ const linkingWords = [
   "therefore", "thus", "consequently", "for this reason", "so", "hence"
 ];
 
-function checkLinkingWords($answer, $linkingWords) {
+function checkLinkingWords($answer) {
+    global $linkingWords; // Gọi biến toàn cục
+
     $linkingWordsCount = 0;
     $uniqueLinkingWords = [];
     $foundLinkingWords = [];

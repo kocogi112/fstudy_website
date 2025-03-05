@@ -295,7 +295,9 @@ get_header();
         }
 
         
-        
+        .need_replace{
+            color: red;
+        }
 
         /* Content Section (Left Column) */
         .content {
@@ -438,6 +440,19 @@ get_header();
   box-shadow: inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2), 0px 0.5px 1.5px rgba(54, 122, 246, 0.25), 0px 0px 0px 3.5px rgba(58, 108, 217, 0.5);
   outline: 0;
 }
+.improvement-box {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.improvement-box p {
+    margin: 5px 0;
+}
+
 
     </style>
 </head>
@@ -494,6 +509,7 @@ get_header();
                 <div class="tab-content" id="suggestions">
                     <p id="suggestionsContent"></p>
                 </div>
+                <div id = "someElement" ></div>
             </div>
 
             <div class="right-column">
@@ -525,8 +541,10 @@ get_header();
 
                 <!-- Sidebar Section -->
                     <div class="sidebar-buttons">
-                        <button class ="btn-sidebar active" id ="general-sidebar"><i class="fa-solid fa-circle" style="color: #74C0FC;"></i>General Comment</button>
+                        <button class ="btn-sidebar active" id ="general-sidebar"><i class="fa-solid fa-circle" style="color: #74C0FC;"></i>Overview</button>
                         <button class ="btn-sidebar" id ="details-sidebar"> <i class="fa-solid fa-circle" style="color: #B197FC;"></i> Detail Comment</button>
+                        <button class ="btn-sidebar" id ="suggestion-sidebar"> <i class="fa-solid fa-circle" style="color: #B197FC;"></i> Suggestion</button>
+
                     </div>
                 <div class="sidebar" id="sidebarContent"></div>
 
@@ -535,7 +553,7 @@ get_header();
     </div>
    <!-- <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/process_result.js"></script> 
     <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/submit_result.js"></script>  -->
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script> 
     
 
@@ -623,6 +641,16 @@ const dataTask2Essay = <?php echo json_encode(json_decode($result->task2detailsc
     let task1Essay = "";
     let task2Essay = "";
 
+    let task1WordCount;
+    let task2WordCount;
+    let task1SentenceCount;
+    let task2SentenceCount;
+    let typeOfTask1 = "";
+    let typeOfTask2 = "";
+    let task1ParagraphCount;
+    let task2ParagraphCount;
+
+
     let overallbandTask1 = "";
     let overallbandTask2 = "";
     let scoreTATask1;
@@ -643,6 +671,13 @@ const dataTask2Essay = <?php echo json_encode(json_decode($result->task2detailsc
     let commentLrTask1;
     let commentLrTask2;
 
+    let suggestImprovementTask1;
+    let suggestImprovementTask2;
+
+    
+    
+
+
 
     for (let key in userEssayData) {
         if (key.startsWith("1")) {
@@ -654,6 +689,24 @@ const dataTask2Essay = <?php echo json_encode(json_decode($result->task2detailsc
             scoreGraTask1 = userEssayOverallData[key].band.gra;
             scoreLrTask1 = userEssayOverallData[key].band.lr;
 
+            task1WordCount = userEssayOverallData[key].overview_essay.word_count;
+            typeOfTask1 = userEssayOverallData[key].overview_essay.essay_type;
+            task1SentenceCount = userEssayOverallData[key].overview_essay.sentence_count;
+            task1ParagraphCount = userEssayOverallData[key].overview_essay.paragraph_count;
+            task1GrammarErrorCount = userEssayOverallData[key].overview_essay.total_errors_count;
+            task1LinkingWordCount = userEssayOverallData[key].overview_essay.foundLinkingWords;
+
+
+            commentTATask1 = userEssayOverallData[key].detail_recommendation.ta_tr;
+            commentCCTask1 = userEssayOverallData[key].detail_recommendation.cc;
+            commentGraTask1 = userEssayOverallData[key].detail_recommendation.gra;
+            commentLrTask1 = userEssayOverallData[key].detail_recommendation.lr;
+
+            suggestReplaceTask1 = userEssayOverallData[key].improvement_words;
+
+
+            suggestImprovementTask1 = userEssayOverallData[key].suggestion.improvement_suggestions;
+
             
         } else if (key.startsWith("2")) {
             task2Essay = userEssayData[key];
@@ -663,10 +716,72 @@ const dataTask2Essay = <?php echo json_encode(json_decode($result->task2detailsc
             scoreGraTask2 = userEssayOverallData[key].band.gra;
             scoreLrTask2 = userEssayOverallData[key].band.lr;
 
+            task2WordCount = userEssayOverallData[key].overview_essay.word_count;
+            typeOfTask2 = userEssayOverallData[key].overview_essay.essay_type;
+            task2SentenceCount = userEssayOverallData[key].overview_essay.sentence_count;
+            task2ParagraphCount = userEssayOverallData[key].overview_essay.paragraph_count;
+            task2GrammarErrorCount = userEssayOverallData[key].overview_essay.total_errors_count;
+            task2LinkingWordCount = userEssayOverallData[key].overview_essay.foundLinkingWords;
+
+
+            commentTATask2 = userEssayOverallData[key].detail_recommendation.ta_tr;
+            commentCCTask2 = userEssayOverallData[key].detail_recommendation.cc;
+            commentGraTask2 = userEssayOverallData[key].detail_recommendation.gra;
+            commentLrTask2 = userEssayOverallData[key].detail_recommendation.lr;
+
+
+            suggestReplaceTask2 = userEssayOverallData[key].improvement_words;
+
+            suggestImprovementTask2 = userEssayOverallData[key].suggestion.improvement_suggestions;
 
         }
     }
 
+    function generateImprovementHTML(improvementData) {
+    if (!Array.isArray(improvementData)) {
+        console.error("improvementData is not an array:", improvementData);
+        return "<p style='color: red;'>Không có dữ liệu cải thiện.</p>";
+    }
+
+    return improvementData.map((item, index) => `
+        <div id="box-improve-${index}" style="border: 1px solid #ccc; border-radius: 8px; padding: 12px; margin-bottom: 10px; background-color: #f9f9f9; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);">
+            <p><strong>Original:</strong> ${item.original}</p>
+            <p><strong>Suggestion:</strong> ${item.suggestion}</p>
+            <p><strong>Reason:</strong> ${item.reason}</p>
+        </div>
+    `).join("");
+}
+
+// Kiểm tra dữ liệu có phải mảng không, nếu không thì lấy .improvement_words
+if (suggestReplaceTask1 && !Array.isArray(suggestReplaceTask1)) {
+    suggestReplaceTask1 = suggestReplaceTask1.improvement_words || [];
+}
+if (suggestReplaceTask2 && !Array.isArray(suggestReplaceTask2)) {
+    suggestReplaceTask2 = suggestReplaceTask2.improvement_words || [];
+}
+
+// Gán HTML vào replaceRecommendBarTask1 & replaceRecommendBarTask2
+replaceRecommendBarTask1 = generateImprovementHTML(suggestReplaceTask1);
+replaceRecommendBarTask2 = generateImprovementHTML(suggestReplaceTask2);
+
+function applyReplacements(essay, suggestions) {
+    if (!suggestions || !Array.isArray(suggestions)) return essay; // Kiểm tra nếu suggestions không hợp lệ
+
+    suggestions.forEach((item, index) => {
+        let regex = new RegExp(item.original, "g");
+        essay = essay.replace(regex, `
+            <span class="need_replace" id="replace_text_${index}" style="text-decoration: line-through;">${item.original}</span>
+            <span class="replaced_text" id="replace_${index}" style="color: green; font-weight: bold; margin-left: 5px;">${item.suggestion}</span>
+        `);
+    });
+
+    return essay;
+}
+
+let EssayUpdatedTask1 = applyReplacements(task1Essay, suggestReplaceTask1 ?? []);
+let EssayUpdatedTask2 = applyReplacements(task2Essay, suggestReplaceTask2 ?? []);
+
+   
     // Debug kết quả
    /* console.log("Task 1 User Essay:", task1Essay);
     console.log("Task 2 User Essay:", task2Essay);
@@ -678,6 +793,94 @@ const dataTask2Essay = <?php echo json_encode(json_decode($result->task2detailsc
 /*console.log("Datee semt ", dataTask1Essay); // To check the structure
 console.log(dataTask1Essay.unchange); // Check if this is undefined
 */
+let detailsCommentTask1 =``;
+let detailsCommentTask2 =``;
+
+detailsCommentTask1 = `
+        <h3 style="color:red">Analysis your test</h3>
+        <h4>Task Achievement (TA): ${scoreTATask1}</h4>
+        <h5 style="font-weight:bold">Completeness</h5>
+            - ${task_achievement1_1_comment}<br>
+            - ${task_achievement1_2_comment}<br>
+        <h5 style="font-weight:bold">Accuracy</h5>
+            - ${task_achievement1_3_comment}<br>
+        <h5 style="font-weight:bold">Feedback</h5>
+            - ${commentTATask1}<br>
+
+        
+        <h4>Coherence and Cohesion (CC): ${scoreCCTask1}</h4>
+        <h5 style="font-weight:bold">Logical Organization</h5>
+            - ${coherenceandcohesion1_1_comment}<br>
+        <h5 style="font-weight:bold">Paraphrasing</h5>
+            - ${coherenceandcohesion1_2_comment}<br>
+        <h5 style="font-weight:bold">Linking Words</h5>
+            - ${coherenceandcohesion1_3_comment}<br>
+        <h5 style="font-weight:bold">Feedback</h5>
+            - ${commentCCTask1}<br>
+    
+        <h4>Lexical Resource (LR): ${scoreLrTask1}</h4>
+        <h5 style="font-weight:bold">Vocabulary Range and Complexity</h5>
+            - ${lexical_resource1_1_comment}<br>
+            - ${lexical_resource1_2_comment}<br>
+        <h5 style="font-weight:bold">Feedback</h5>
+            - ${commentLrTask1}<br>
+        
+        <h4>Grammatical Range and Accuracy (GRA): ${scoreGraTask1}</h4>
+        <h5 style="font-weight:bold">Sentence Structure</h5>
+            - ${grammatical_range_and_accuracy1_1_comment}<br>
+        <h5 style="font-weight:bold">Grammar</h5>
+            - ${grammatical_range_and_accuracy1_2_comment}<br>
+        <h5 style="font-weight:bold">Feedback</h5>
+            - ${commentGraTask1}<br>
+
+            
+        <h4 style = "color:red">Suggest To Improve</h4>
+            -  ${suggestImprovementTask1}
+
+    `;
+
+
+
+    detailsCommentTask2 = `
+        <h3 style="color:red">Analysis your test</h3>
+        <h4>Task Achievement (TA): ${scoreTATask2}</h4>
+        <h5 style="font-weight:bold">Completeness</h5>
+            - ${task_achievement2_2_comment}<br>
+            - ${task_achievement2_2_comment}<br>
+        <h5 style="font-weight:bold">Accuracy</h5>
+            - ${task_achievement2_3_comment}<br>
+        <h5 style="font-weight:bold">Feedback</h5>
+            - ${commentTATask2}<br>
+
+        
+        <h4>Coherence and Cohesion (CC): ${scoreCCTask2}</h4>
+        <h5 style="font-weight:bold">Logical Organization</h5>
+            - ${coherenceandcohesion2_2_comment}<br>
+        <h5 style="font-weight:bold">Paraphrasing</h5>
+            - ${coherenceandcohesion2_2_comment}<br>
+        <h5 style="font-weight:bold">Linking Words</h5>
+            - ${coherenceandcohesion2_3_comment}<br>
+        <h5 style="font-weight:bold">Feedback</h5>
+            - ${commentCCTask2}<br>
+    
+        <h4>Lexical Resource (LR): ${scoreLrTask2}</h4>
+        <h5 style="font-weight:bold">Vocabulary Range and Complexity</h5>
+            - ${lexical_resource2_2_comment}<br>
+            - ${lexical_resource2_2_comment}<br>
+        <h5 style="font-weight:bold">Feedback</h5>
+            - ${commentLrTask2}<br>
+        
+        <h4>Grammatical Range and Accuracy (GRA): ${scoreGraTask2}</h4>
+        <h5 style="font-weight:bold">Sentence Structure</h5>
+            - ${grammatical_range_and_accuracy2_2_comment}<br>
+        <h5 style="font-weight:bold">Grammar</h5>
+            - ${grammatical_range_and_accuracy2_2_comment}<br>
+        <h5 style="font-weight:bold">Feedback</h5>
+            - ${commentGraTask2}<br>
+
+        <h4 style = "color:red">Suggest To Improve</h4>
+            -  ${suggestImprovementTask2}
+    `;
 
 
 // Create a DOMParser to parse the decoded HTML string
@@ -736,16 +939,16 @@ const TotalLinkingWordCountTask1Final = TotalLinkingWordCountTask1Value ? TotalL
 const RelationPointEssayAndQuestionTask1Final = RelationPointEssayAndQuestionTask1Value ? RelationPointEssayAndQuestionTask1Value.textContent : 'Not found';
 
 const generalSidebarContentTask1 = `
-Số từ: ${WordCountTask1Final}<br>
-Task: ${CurrentEssayTask1Final}<br> 
-Loại essay: ${TypeOfEssayTask1Final}<br>
-Số câu: ${ParagraphCountTask1Final}<br>
-Số lượng sai ngữ pháp/ từ vựng: ${NumberOfSpellingAndGrammarTask1Final}<br>
-Số linking Words: ${TotalLinkingWordCountTask1Final}<br>
+Số từ: ${task1WordCount}<br>
+Task: 1<br> 
+Loại essay: ${typeOfTask1}<br>
+Số câu: ${task1SentenceCount}<br>
+Số đoạn: ${task1ParagraphCount}<br>
+Số lượng sai ngữ pháp/ từ vựng: ${task1GrammarErrorCount}<br>
+Số linking Words: ${task1LinkingWordCount}<br>
 Độ mạch lạc: ${RelationPointEssayAndQuestionTask1Final}<br>
 
 `;
-
 
 
 const WordCountTask2Final = WordCountTask2Value ? WordCountTask2Value.textContent : 'Not found';
@@ -758,12 +961,13 @@ const RelationPointEssayAndQuestionTask2Final = RelationPointEssayAndQuestionTas
 
 
 const generalSidebarContentTask2 = `
-Số từ: ${WordCountTask2Final}<br>
-Task: ${CurrentEssayTask2Final}<br> 
-Loại essay: ${TypeOfEssayTask2Final}<br>
-Số câu: ${ParagraphCountTask2Final}<br>
-Số lượng sai ngữ pháp/ từ vựng: ${NumberOfSpellingAndGrammarTask2Final}<br>
-Số linking Words: ${TotalLinkingWordCountTask2Final}<br>
+Số từ: ${task2WordCount}<br>
+Task: 2<br> 
+Loại essay: ${typeOfTask2}<br>
+Số câu: ${task2SentenceCount}<br>
+Số đoạn: ${task2ParagraphCount}<br>
+Số lượng sai ngữ pháp/ từ vựng: ${task2GrammarErrorCount}<br>
+Số linking Words: ${task2LinkingWordCount}<br>
 Độ mạch lạc: ${RelationPointEssayAndQuestionTask2Final}<br>
 
 `;
@@ -798,12 +1002,174 @@ const DescriptionEssayTask2 = DescriptionEssayTask2Value ? DescriptionEssayTask2
     const IdQuestionTask2 = <?php echo json_encode($task2_data['id_test']); ?>;
 
 
-    const bandScoreOverall = "<?php echo esc_html($result->band_score); ?>";
-    const bandScoreExpandOverall =  "<?php echo esc_html($result->band_score_expand); ?>";
-    //const bandScoreTask1 =  "<?php echo esc_html($result->band_score); ?>";
-    const bandScoreTask1Expand = `${taskAchievementValueTask1}, ${coherenceAndCohesionValueTask1}, ${lexicalResourceValueTask1}, ${grammaticalRangeAndAccuracyValueTask1} `;
-    //const bandScoreTask2 =  "<?php echo esc_html($result->band_score); ?>";
-    const bandScoreTask2Expand = `${taskAchievementValueTask2}, ${coherenceAndCohesionValueTask2}, ${lexicalResourceValueTask2}, ${grammaticalRangeAndAccuracyValueTask2} `;
+    const bandScore = '<?php echo addslashes($result->band_score_expand); ?>';
+    const bandScoreData = JSON.parse(bandScore);
+
+    const bandScoreOverall = '<?php echo addslashes($result->band_score); ?>';
+
+    let bandScoreExpandOverall = "";
+
+    if (bandScoreData.task_1 && bandScoreData.task_2) {
+        bandScoreExpandOverall = `Task 1: ${bandScoreData.task_1.overallband}; Task 2: ${bandScoreData.task_2.overallband}`;
+    } else if (bandScoreData.task_1) {
+        bandScoreExpandOverall = `Task 1: ${bandScoreData.task_1.overallband}`;
+    } else if (bandScoreData.task_2) {
+        bandScoreExpandOverall = `Task 2: ${bandScoreData.task_2.overallband}`;
+    }
+
+
+// Tính trung bình các tiêu chí
+const avgTA = (scoreTATask1 + scoreTATask2) / 2;
+const avgCC = (scoreCCTask1 + scoreCCTask2) / 2;
+const avgGra = (scoreGraTask1 + scoreGraTask2) / 2;
+const avgLr = (scoreLrTask1 + scoreLrTask2) / 2;
+
+// Xác định tiêu chí tốt nhất và kém nhất
+const criteria = {
+    TA: avgTA,
+    CC: avgCC,
+    Gra: avgGra,
+    Lr: avgLr
+};
+const bestCriteria = Object.keys(criteria).reduce((a, b) => criteria[a] > criteria[b] ? a : b);
+const worstCriteria = Object.keys(criteria).reduce((a, b) => criteria[a] < criteria[b] ? a : b);
+
+// Hiển thị kết luận
+const conclusion = `
+    <p><strong>Kết luận:</strong></p>
+    <p>Bạn tốt nhất ở <strong>${bestCriteria}</strong> (${criteria[bestCriteria].toFixed(1)})</p>
+    <p>Bạn kém nhất ở <strong>${worstCriteria}</strong> (${criteria[worstCriteria].toFixed(1)})</p>
+`;
+
+// Tạo nội dung overallUserTest
+var overallUserTest = `
+    <p><strong>Band score overall:</strong> ${bandScoreOverall}</p>
+    <p><strong>Your overall Test:</strong></p>
+    <div>
+        <div>
+            <h2>Band Scores</h2>
+            <canvas id="bandScoreChart"></canvas>
+        </div>
+
+        <div>
+            <h2>Task 1 Scores</h2>
+            <canvas id="task1PieChart"></canvas>
+        </div>
+
+        <div>
+            <h2>Task 2 Scores</h2>
+            <canvas id="task2PieChart"></canvas>
+        </div>
+
+        <div>
+            <h2>Average Scores by Criteria</h2>
+            <canvas id="averageLineChart"></canvas>
+        </div>
+
+        <h3>Task 1</h3>
+        <p><strong>Overall Band:</strong> ${overallbandTask1}</p>
+        <p><strong>TA:</strong> ${scoreTATask1}</p>
+        <p><strong>CC:</strong> ${scoreCCTask1}</p>
+        <p><strong>Gra:</strong> ${scoreGraTask1}</p>
+        <p><strong>Lr:</strong> ${scoreLrTask1}</p>
+    </div>
+    <div>
+        <h3>Task 2</h3>
+        <p><strong>Overall Band:</strong> ${overallbandTask2}</p>
+        <p><strong>TA:</strong> ${scoreTATask2}</p>
+        <p><strong>CC:</strong> ${scoreCCTask2}</p>
+        <p><strong>Gra:</strong> ${scoreGraTask2}</p>
+        <p><strong>Lr:</strong> ${scoreLrTask2}</p>
+    </div>
+    ${conclusion}
+`;
+
+// Hiển thị overallUserTest (ví dụ: gán vào một phần tử khác)
+
+// Vẽ biểu đồ (sau khi overallUserTest được thêm vào DOM)
+function drawCharts() {
+    // Vẽ biểu đồ Band Scores (Bar Chart)
+    const bandScoreCtx = document.getElementById('bandScoreChart').getContext('2d');
+    new Chart(bandScoreCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Overall Band', 'Task 1', 'Task 2'],
+            datasets: [{
+                label: 'Band Scores',
+                data: [bandScoreOverall, overallbandTask1, overallbandTask2],
+                backgroundColor: ['#36a2eb', '#ff6384', '#4bc0c0'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 9.0
+                }
+            }
+        }
+    });
+
+    // Vẽ biểu đồ Task 1 (Pie Chart)
+    const task1PieCtx = document.getElementById('task1PieChart').getContext('2d');
+    new Chart(task1PieCtx, {
+        type: 'pie',
+        data: {
+            labels: ['TA', 'CC', 'Gra', 'Lr'],
+            datasets: [{
+                label: 'Task 1 Scores',
+                data: [scoreTATask1, scoreCCTask1, scoreGraTask1, scoreLrTask1],
+                backgroundColor: ['#ff6384', '#36a2eb', '#ffce56', '#4bc0c0'],
+                borderWidth: 1
+            }]
+        }
+    });
+
+    // Vẽ biểu đồ Task 2 (Pie Chart)
+    const task2PieCtx = document.getElementById('task2PieChart').getContext('2d');
+    new Chart(task2PieCtx, {
+        type: 'pie',
+        data: {
+            labels: ['TA', 'CC', 'Gra', 'Lr'],
+            datasets: [{
+                label: 'Task 2 Scores',
+                data: [scoreTATask2, scoreCCTask2, scoreGraTask2, scoreLrTask2],
+                backgroundColor: ['#ff6384', '#36a2eb', '#ffce56', '#4bc0c0'],
+                borderWidth: 1
+            }]
+        }
+    });
+
+    // Vẽ biểu đồ trung bình (Line Chart)
+    const averageLineCtx = document.getElementById('averageLineChart').getContext('2d');
+    new Chart(averageLineCtx, {
+        type: 'line',
+        data: {
+            labels: ['TA', 'CC', 'Gra', 'Lr'],
+            datasets: [{
+                label: 'Average Scores',
+                data: [avgTA, avgCC, avgGra, avgLr],
+                borderColor: '#36a2eb',
+                fill: false
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 9.0
+                }
+            }
+        }
+    });
+}
+
+// Gọi hàm vẽ biểu đồ sau khi overallUserTest được thêm vào DOM
+// Ví dụ: nếu bạn gán overallUserTest vào một phần tử khác, hãy gọi drawCharts() sau đó
+document.getElementById('someElement').innerHTML = overallUserTest;
+ drawCharts();
+
 
     const taskAchievementTask2 = `${taskAchievementValueTask2}`;
     const coherenceAndCohesionTask2 = `${coherenceAndCohesionValueTask2}`;
@@ -824,24 +1190,24 @@ const DescriptionEssayTask2 = DescriptionEssayTask2Value ? DescriptionEssayTask2
 
     // Keep track of the currently active task
 let currentTask = 'overall'; // Default task on page load
-let detailsCommentTask1 =``;
-let detailsCommentTask2 =``;
+
 
 const tasks = {
     overall: {
-        description: "this is overall content",
+        description: "",
         user_level:"",
         wordCount: "",
         description_level:"",
+        EssayUpdated: "",
         generalSidebar: "Overall general content here.",
         //detailSidebar: "",
         band_score: bandScoreOverall,
         band_score_expand: bandScoreExpandOverall,
-        youpass: "Overall Content",
-        original: "Overall Original",
-        sample: "Overall sample",
+        youpass: "",
+        original: "",
+        sample: "",
         id_question: IdQuestionTask2,
-        suggestions: "Overall suggestiong",
+        suggestions: "",
         sidebar: [
             "Bình luận 1: Overall 1",
             "Bình luận 2: Overall 2",
@@ -859,14 +1225,16 @@ const tasks = {
         grammatical_range_and_accuracy_score: scoreGraTask1,
 
         generalSidebar: generalSidebarContentTask1,
-        //detailSidebar: `oked ${detailsCommentTask1}`,
+        detailSidebar: `${detailsCommentTask1}`,
         band_score_expand: '',
+        EssayUpdated: EssayUpdatedTask1,
         user_level: userLevelTask1,
         description_level: DescriptionEssayTask1,
         youpass: "YouPass feedback for Task 1: Your analysis is clear and well-structured, but make sure to include more comparisons between countries.",
         original: task1UserEssay,
         sample: task1Sample,
         id_question: IdQuestionTask1,
+        replaceRecommendBar: replaceRecommendBarTask1,
         suggestions: "Suggestions for Task 1: Include more statistical data to strengthen your arguments.",
         sidebar: [
             "Bình luận 1: Cần cải thiện phần mở đầu.",
@@ -884,14 +1252,15 @@ const tasks = {
         coherence_and_cohesion_score: scoreCCTask2,
         lexical_resource_score: scoreLrTask2,
         grammatical_range_and_accuracy_score: scoreGraTask2,
+        replaceRecommendBar: replaceRecommendBarTask2,
 
         wordCount: WordCountTask2Final,
         generalSidebar: generalSidebarContentTask2,
-        //detailSidebar: detailsCommentTask2,
+        detailSidebar: `${detailsCommentTask2}`,
         user_level: userLevelTask2,
         description_level: DescriptionEssayTask2,
         band_score_expand: '',
-        youpass: "YouPass feedback for Task 2: Your argument is compelling, but it could be enhanced with more concrete examples.",
+        EssayUpdated: EssayUpdatedTask2,
         original: task2UserEssay,
         sample: task2Sample,
         id_question: IdQuestionTask2,
@@ -924,10 +1293,16 @@ function setSidebarContent(task, type) {
         activeSidebar = 'details-sidebar';  // Set active to details
 
     }
+    else if (type === 'suggestion') {
+        sidebarContent = taskData.replaceRecommendBar || '';  // Default to details sidebar content for the task
+        activeSidebar = 'suggestion-sidebar';  // Set active to details
+
+    }
 
     document.getElementById('sidebarContent').innerHTML = sidebarContent;
     document.getElementById('general-sidebar').classList.remove('active');
     document.getElementById('details-sidebar').classList.remove('active');
+    document.getElementById('suggestion-sidebar').classList.remove('active');
 
     // Add active class to the selected sidebar button
     document.getElementById(activeSidebar).classList.add('active');
@@ -936,10 +1311,12 @@ function setSidebarContent(task, type) {
 // Add event listeners for switching between General and Details Sidebar
 document.getElementById('general-sidebar').addEventListener('click', function() {
     setSidebarContent(currentTask, 'general');  // Show General Sidebar content for the current task
+  
 });
+document.getElementById('suggestion-sidebar').addEventListener('click', function() {
+    setSidebarContent(currentTask, 'suggestion');  // Show General Sidebar content for the current task
+    
 
-document.getElementById('details-sidebar').addEventListener('click', function() {
-    setSidebarContent(currentTask, 'details');  // Show Details Sidebar content for the current task
 });
 
 document.getElementById('details-sidebar').addEventListener('click', function() {
@@ -947,19 +1324,35 @@ document.getElementById('details-sidebar').addEventListener('click', function() 
 
     // Remove 'active' class from general button and add it to details button
     document.getElementById('general-sidebar').classList.remove('active');
+    document.getElementById('suggestion-sidebar').classList.remove('active');
+
     this.classList.add('active');
 });
 
 
-// Function to set active task and update content
+// Function // Hàm setActiveTask
 function setActiveTask(task) {
-    currentTask = task;  // Update the active task
-    
+    currentTask = task;  // Cập nhật task hiện tại
+    console.log(currentTask);
+
+    // Lấy phần tử someElement
+    const someElement = document.getElementById('someElement');
+
+    // Kiểm tra nếu task là 'overall'
+    if (task === 'overall') {
+        someElement.style.display = 'block'; // Hiển thị someElement
+    } else {
+        someElement.style.display = 'none'; // Ẩn someElement
+    }
+
+    // Cập nhật nội dung của task hiện tại
     const taskData = tasks[task];
+
+    
     
     // Update content sections for the active task
     document.getElementById('taskDescription').innerText = taskData.description;
-    document.getElementById('youpassContent').innerText = taskData.youpass;
+    document.getElementById('youpassContent').innerHTML = taskData.EssayUpdated;
     document.getElementById('originalContent').innerHTML = taskData.original;
     document.getElementById('sampleContent').innerHTML = taskData.sample;
     document.getElementById('suggestionsContent').innerText = taskData.suggestions;

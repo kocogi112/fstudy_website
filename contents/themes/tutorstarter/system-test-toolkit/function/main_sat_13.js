@@ -155,6 +155,56 @@ function getLabelLetter(index) {
     return letters[index] || '';
 }
 
+// Hàm để hiển thị checkboxes của category hiện tại và ẩn các category khác
+function showCheckboxesForCategory(category) {
+    console.log("currentCategory: oke", currentCategory)
+    // Ẩn tất cả các module
+    const allModules = document.querySelectorAll('[id^="module-"]');
+    const allModules2 = document.querySelectorAll('[id^="module-2-"]');
+
+    allModules.forEach(module => {
+        module.style.display = 'none';
+    });
+    allModules2.forEach(module2 => {
+        module2.style.display = 'none';
+    });
+    // Hiển thị module của category hiện tại
+    const currentModule = document.getElementById('module-' + category);
+    const currentModule2 = document.getElementById('module-2-' + category);
+
+    if (currentModule) {
+        currentModule.style.display = 'block';
+    }
+    if (currentModule2) {
+        currentModule2.style.display = 'block';
+    }
+}
+
+// Ví dụ sử dụng:
+const currentCategory = quizData.questions[currentQuestionIndex].question_category;
+
+function updateReviewPage(module_question) {
+    let contentCheckboxes2 = '';
+    contentCheckboxes2 += '<div id="module-2-' + module_question +'" >';
+    contentCheckboxes2 += '<div id="name-module-checkbox-2"><b>Current Module: ' + module_question + '</b></div>';
+    contentCheckboxes2 += '<div class="icon-detail">';
+    contentCheckboxes2 += '<div class="single-detail"><i class="fa-regular fa-flag"></i><span>Current</span></div>';
+    contentCheckboxes2 += '<div class="single-detail"><div class="dashed-square"></div><span>Unanswered</span></div>';
+    contentCheckboxes2 += '<div class="single-detail"><i class="fa-solid fa-bookmark" style="color: #c33228;"></i><span>For Review</span></div>';
+    contentCheckboxes2 += '</div>';
+    contentCheckboxes2 += '<div class="checkbox-module-name">';
+
+    for (let j = 0; j < quizData.questions.length; j++) {
+        if (quizData.questions[j].question_category === module_question) {
+            contentCheckboxes2 += '<div class="checkbox-container" onclick="ChangeQuestion(' + (j + 1) + ')" id="checkbox-container-2-' + (j + 1) + '">' + (j + 1) + '</div>';
+        }
+    }
+
+    contentCheckboxes2 += '</div></div>';
+
+    document.getElementById('review-content').innerHTML = contentCheckboxes2;
+}
+
 function main() {
     
    // document.getElementById("start-test").style.display  ='block';
@@ -185,6 +235,7 @@ function main() {
     document.getElementById("pass_percent").innerHTML = quizData.pass_percent + "%";
     document.getElementById("number-questions").innerHTML = quizData.number_questions + " question(s)";
     var checkboxesContainer = document.getElementById("checkboxes-container");
+    var reviewPageBtn = document.getElementById("review-page-container");
 
     
 
@@ -192,12 +243,19 @@ function main() {
 
 
 
-    var contentCheckboxes = "";
+    let contentCheckboxes = '';
+    let contentCheckboxes2 = '';
+
+    var openReviewPage = "";
+    
+
     let contentQuestions = "";
     let currentCategory = "";
-    let currentCheckboxCategory = "";
     let questionNumber = 1;
     let checkboxNumber = 1;
+
+
+
 
     // Create an array of promises to wait for all images to be encoded
     let encodingPromises = quizData.questions.map((question, index) => {
@@ -240,80 +298,109 @@ Setting </span></button>
 <button  id="right-main-button" onclick = 'openResumePopup()'>  <span class="icon-text-wrapper"><i class="fa-solid fa-hourglass-start"></i>
 Resume </span></button>
 
-<button class="button-10" id="submit-button" onclick='PreSubmit()'>Submit Test</button>
 </div></div><div id="time-personalize-div"></div>`;
 
 
-        for (let i = 0; i < quizData.questions.length; i++) {
-            
-            
-            const question = quizData.questions[i];
+for (let i = 0; i < quizData.questions.length; i++) {
+    const question = quizData.questions[i];
 
-            const category_question_type = question.type === 'completion' ? 'Điền vào chỗ trống' :
-                question.type === 'multiple-choice' ? 'Chọn 1 đáp án đúng' :
-                question.type === 'multi-select' ? 'Chọn nhiều đáp án đúng' : '';
+    const category_question_type = question.type === 'completion' ? 'Điền vào chỗ trống' :
+        question.type === 'multiple-choice' ? 'Chọn 1 đáp án đúng' :
+        question.type === 'multi-select' ? 'Chọn nhiều đáp án đúng' : '';
 
-                
+    const module_question = question.question_category || '';
 
+    if (quizData.restart_question_number_for_each_question_catagory == "Yes") {
+        if (currentCategory !== module_question) {
+            // Nếu có module cũ, đóng div của nó trước khi mở module mới
+            if (currentCategory !== "") {
+                contentCheckboxes += '</div></div>';
+            }
 
+            currentCategory = module_question;
+            questionNumber = 1;
+            checkboxNumber = 1;
+
+            // Mở div mới cho module
+            contentCheckboxes += '<div id="module-' + module_question + '" style="display: none;">'; // Ẩn module mặc định
+            contentCheckboxes += '<div id="name-module-checkbox"><b>Current Module: ' + module_question + '</b></div>';
+            contentCheckboxes += '<div class="icon-detail">';
+            contentCheckboxes += '<div class="single-detail"><i class="fa-regular fa-flag"></i><span>Current</span></div>';
+            contentCheckboxes += '<div class="single-detail"><div class="dashed-square"></div><span>Unanswered</span></div>';
+            contentCheckboxes += '<div class="single-detail"><i class="fa-solid fa-bookmark" style="color: #c33228;"></i><span>For Review</span></div>';
+            contentCheckboxes += '</div>'; // Đóng div icon-detail
+            contentCheckboxes += '<div class="checkbox-module-name">';
+        }
+
+        // Thêm checkbox vào module hiện tại
+        contentCheckboxes += '<div class="checkbox-container" onclick="ChangeQuestion(' + (i + 1) + ')" id="checkbox-container-' + (i + 1) + '">' + module_question + ' ' + checkboxNumber + '</div>';
+        checkboxNumber++;
+    } else {
+        questionNumber = i + 1;
+    }
+
+    // Khi kết thúc vòng lặp, đóng div cuối cùng
+    if (i === quizData.questions.length - 1) {
+        contentCheckboxes += '</div></div>'; // Đóng div của category cuối cùng
+    }
+}
+
+contentQuestions += `
+<div class="review-page" id="review-page" style="display: none; justify-content: center; text-align: center">
+    <p style="font-size: 30px">Check Your Work</p><br>
+    <p>On test day, you won't be able to move to next module until the time expires</p>
+    <div id="review-content"></div>
+    <div id="submit-review-content"></div>
+    <button class="btn-close-review" onclick="closeReviewPage()">Close Review</button>
+</div>
+`;
+
+for (let i = 0; i < quizData.questions.length; i++) {
+    const question = quizData.questions[i];
     
-                const module_question = question.question_category || '';
-                
-    
-                if (quizData.restart_question_number_for_each_question_catagory == "Yes") {
-                    if (currentCategory !== module_question) {
-                        currentCategory = module_question;
+    const category_question_type = question.type === 'completion' ? 'Điền vào chỗ trống' :
+        question.type === 'multiple-choice' ? 'Chọn 1 đáp án đúng' :
+        question.type === 'multi-select' ? 'Chọn nhiều đáp án đúng' : '';
 
-
-                        questionNumber = 1;
-                        // Đặt lại checkboxNumber khi module thay đổi
-                        checkboxNumber = 1;
-                       
-        
-                        // Thêm tên module vào trước checkbox khi thay đổi module
-                        if (currentCheckboxCategory !== module_question) {
-                            currentCheckboxCategory = module_question;
-
-                        
-
-                            contentCheckboxes += '<div class="checkbox-module-name">' + module_question;
-                            //contentQuestions += '<div class="module-intro">This is module ' + module_question + '</div>';
-
-        
-                        }
-                    }
-
-                    
-                } 
-                
-                else {
-                    questionNumber = i + 1;
-                    
-                }
-               
-                
-                
-
-
-           
+    const module_question = question.question_category || '';
 
                 // Set the updated text back to the element
             const answerBox = question.answer_box || [];
 
             let imageSrc = base64Images[i] || ''; // Get Base64 string for the current image
+
             
+            let contentCheckboxes2 = '';
+            contentCheckboxes2 += '<div id="module-2-' + module_question +'" style="display: none;">';
+            contentCheckboxes2 += '<div id="name-module-checkbox-2"><b>Current Module: ' + module_question + '</b></div>';
+            contentCheckboxes2 += '<div class="icon-detail">';
+            contentCheckboxes2 += '<div class="single-detail"><i class="fa-regular fa-flag"></i><span>Current</span></div>';
+            contentCheckboxes2 += '<div class="single-detail"><div class="dashed-square"></div><span>Unanswered</span></div>';
+            contentCheckboxes2 += '<div class="single-detail"><i class="fa-solid fa-bookmark" style="color: #c33228;"></i><span>For Review</span></div>';
+            contentCheckboxes2 += '</div>';
+            contentCheckboxes2 += '<div class="checkbox-module-name">';
 
+            for (let j = 0; j < quizData.questions.length; j++) {
+                if (quizData.questions[j].question_category === module_question) {
+                    contentCheckboxes2 += '<div class="checkbox-container" onclick="ChangeQuestion(' + (j + 1) + ')" id="checkbox-container-2-' + (j + 1) + '">' + (j + 1) + '</div>';
+                }
+            }
 
-            //'<h4>' + module_question + '</h4>' +
+            contentCheckboxes2 += '</div></div>';
+
+                
+                
+            
             contentQuestions += '<div class="questions" id="question-' + i + '" style="display:none">';
-            
-            
+
             contentQuestions +='<hr class="horizontal-line">'+
-    '<div class="quiz-section">' +  // Updated section wrapper
+    '     <div class="quiz-section">' +
        // Top horizontal line
     '<div class="question-answer-container">' +  // Container for questions and answers
         '<div class="question-side" id="remove_question_side">' +
          '<div class="answer-box-container">';
+
+
 
 answerBox.forEach(answer => {
     contentQuestions += `
@@ -321,7 +408,7 @@ answerBox.forEach(answer => {
     `;
 });
 
-    contentQuestions += '</div><p class="question">'+ ' Câu ' + questionNumber + '<span class="tex2jax_ignore">(ID: ' + question.id_question + ')</span>'+':'+
+    contentQuestions += '</div>       <p class="question">'+ ' Câu ' + questionNumber + '<span class="tex2jax_ignore">(ID: ' + question.id_question + ')- '+ question.question_category +'</span>'+':'+
 
     '<br>' +(imageSrc ? '<img width="100%" src="' + imageSrc + '" onclick="openModal(\'' + imageSrc + '\')">' : '') +  question.question +
     '</p></div>' +
@@ -330,11 +417,12 @@ answerBox.forEach(answer => {
     
     '<div class="answer-side"><div class="answer-list">';
 
-            contentCheckboxes += '<div class="checkbox-container" onclick="ChangeQuestion(' + (i + 1) + ')" id="checkbox-container-' + (i + 1) + '">' +
-                module_question + ' ' + checkboxNumber + '</div>';
+            
+            
+            openReviewPage = '<div class="section-pageview"> <button class="ctrl-btn ctrl-pageview" id="btn-review" onclick="showReviewPage()">Go to review page</button></div>';
                 
                 // Đoạn mã HTML để tích hợp nút removeChoiceImage
-                contentQuestions += '<div id="tag-report" style="position: relative;">' + '<div id ="questionNumberBox">'+ questionNumber+ '</div>'+
+            contentQuestions += '<div id="tag-report" style="position: relative;">' + '<div id ="questionNumberBox">'+ questionNumber+ '</div>'+
                 '<image id="bookmark-question-' + (i + 1) + '" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/bookmark_empty.png" class="bookmark-btn" onclick="rememberQuestion(' + (i + 1) + ')"></image>' +
                 ' Mark for review ' +
                 
@@ -425,21 +513,27 @@ answerBox.forEach(answer => {
             checkboxNumber++;
 
         }
+
+        document.getElementById('checkboxes-container').innerHTML = contentCheckboxes;
+
+
+
         contentQuestions += '</div></div>';  // Bottom horizontal line
 
-        contentCheckboxes += '</div>'; // Đóng div cho module cuối cùng
 
         document.getElementById("quiz-container").innerHTML = contentQuestions;
 
         document.getElementById("quiz-container").style.display = 'none';
-        document.getElementById("submit-button").style.display = 'none';
         document.getElementById("center-block").style.display = 'none';
         document.getElementById("title").style.display = 'none';
-        checkboxesContainer.innerHTML = contentCheckboxes;
+        //checkboxesContainer.innerHTML = contentCheckboxes;
+        reviewPageBtn.innerHTML = openReviewPage;
         
 
 
         addEventListenersToInputs();
+        
+        
     });
 
     
@@ -459,6 +553,89 @@ answerBox.forEach(answer => {
 
     }, 1000);
 }
+function showReviewPage() {
+    let quizSections = document.querySelectorAll(".quiz-section");
+    let reviewPage = document.querySelectorAll(".review-page");
+    document.getElementById("prev-button").disabled = true; // Disable nút
+    document.getElementById("next-button").disabled = true; // Disable nút
+
+    quizSections.forEach(section => {
+        section.style.display = "none";
+    });
+    reviewPage.forEach(section1 => {
+        section1.style.display = "block";
+    });
+
+    // Hiển thị contentCheckboxes2 của câu hỏi hiện tại
+    const currentQuestion = document.querySelector('.questions[style="display:block"]');
+    if (currentQuestion) {
+        const currentReviewPage = currentQuestion.querySelector('.review-page');
+        if (currentReviewPage) {
+            const currentModule = currentReviewPage.querySelector('[id^="module-2-"]');
+            if (currentModule) {
+                currentModule.style.display = "block";
+            }
+        }
+    }
+
+    // Tạo nút "Switch to next module" hoặc "Submit Test"
+    const currentModule = document.getElementById("current_module").textContent.trim();
+    const nextModule = getNextModule(currentModule);
+
+    const reviewContent = document.getElementById("submit-review-content");
+    reviewContent.innerHTML = `
+        <div style="text-align: center; margin-top: 20px;">
+            ${nextModule ? 
+                `<button id="switch-module-button" style="padding: 10px 20px; font-size: 16px;">Switch to next module</button>` :
+                `<button id="submit-test-button" style="padding: 10px 20px; font-size: 16px;">Submit Test</button>`
+            }
+        </div>
+    `;
+
+    if (nextModule) {
+        document.getElementById("switch-module-button").onclick = () => switchToNextModule(nextModule);
+    } else {
+        document.getElementById("submit-test-button").onclick = PreSubmit;
+    }
+}
+
+// Hàm lấy module tiếp theo
+function getNextModule(currentModule) {
+    const modules = [...new Set(quizData.questions.map(q => q.question_category))];
+    const currentIndex = modules.indexOf(currentModule);
+    return currentIndex < modules.length - 1 ? modules[currentIndex + 1] : null;
+}
+
+// Hàm chuyển sang module tiếp theo
+function switchToNextModule(nextModule) {
+    const firstQuestionOfNextModule = quizData.questions.findIndex(q => q.question_category === nextModule);
+    if (firstQuestionOfNextModule !== -1) {
+        showQuestion(firstQuestionOfNextModule);
+    }
+}
+
+// Hàm submit test
+function submitTest2() {
+    console.log("Submitted");
+}
+function closeReviewPage() {
+    //let reviewPage = document.getElementById("review-page-" + module_question);
+    let quizSections = document.querySelectorAll(".quiz-section");
+    let reviewPage = document.querySelectorAll(".review-page");
+    document.getElementById("prev-button").disabled = false; // Disable nút
+    document.getElementById("next-button").disabled = false; // Disable nút
+
+    /*if (reviewPage) {
+        reviewPage.style.display = "none";
+    }*/
+    quizSections.forEach(section => {
+        section.style.display = "block";
+    });
+    reviewPage.forEach(section1 => {
+        section1.style.display = "none";
+    });
+}
+
 
 function PreSubmit(){
 

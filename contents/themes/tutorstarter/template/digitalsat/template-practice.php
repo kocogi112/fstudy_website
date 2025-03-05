@@ -53,7 +53,7 @@ if ($conn->connect_error) {
 $id_test = $custom_number;
 
 // Prepare the SQL statement
-$sql = "SELECT testname, time, test_type, question_choose, tag, number_question, book, id_test FROM digital_sat_test_list WHERE id_test = ?";
+$sql = "SELECT testname, time, test_type, question_choose, tag, number_question, book, id_test, full_test_specific_module FROM digital_sat_test_list WHERE id_test = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id_test);
 $stmt->execute();
@@ -486,6 +486,22 @@ $new_skip_ans = 0;
         echo "    'data_added_4': '',";
         echo "    'data_added_5': '',";
         echo "    'questions': [";
+
+        $full_test_specific_module = json_decode($data["full_test_specific_module"], true);
+
+        $question_category_map = [];
+
+        if (!empty($data["full_test_specific_module"])) { // Kiểm tra nếu tồn tại
+            $full_test_specific_module = json_decode($data["full_test_specific_module"], true);
+        
+            if (is_array($full_test_specific_module)) { // Đảm bảo JSON được giải mã thành mảng
+                foreach ($full_test_specific_module as $module => $details) {
+                    foreach ($details["question_particular"] as $question_id) {
+                        $question_category_map[$question_id] = $module ?: ""; // Nếu module không có, đặt thành ""
+                    }
+                }
+            }
+        }
         $first = true;
 
         foreach ($incorrectOrSkippedQuestions as $question_redo_id){
@@ -516,7 +532,7 @@ $new_skip_ans = 0;
                     echo "'image': " .
                         json_encode($question_data_redo["image_link"]) .
                         ",";
-                    echo "'question_category': '',";
+                    echo "'question_category': " . json_encode($question_category_map[$question_data_redo["id_question"]] ?? 'Practice Test') . ",";
                     echo "'id_question': " .
                         json_encode($question_data_redo["id_question"]) .
                         ",";
@@ -688,8 +704,10 @@ if (window.MathJax) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title></title>
-    <link rel="stylesheet" href="/wordpress/contents/themes/tutorstarter/system-test-toolkit/style/style_9.css">
-    <style type="text/css">
+    <link rel="stylesheet" href="/wordpress/contents/themes/tutorstarter/system-test-toolkit/style/style_10.css">
+   
+<style type="text/css">
+
 
 #time-remaining-container {
     /*width: 100%;
@@ -727,9 +745,7 @@ if (window.MathJax) {
 
 }
 
-#time-personalize-div{
-    display:none;
-}
+
 .quiz-section {
                display: flex;
                flex-direction: row;
@@ -814,25 +830,8 @@ img {
               position: relative;
               cursor: pointer;
           }
-          .neutral {
-              border-color: #2d2f31 !important;
-          }
-          .true {
-              border-color: limegreen;
-          }
 
-          .false {
-              border-color: red;
-          }
-
-          .pass {
-              color: limegreen;
-          }
-
-          .fail {
-              color: red;
-          }
-
+         
 
           .answer-options label {
               top: 0;
@@ -1118,7 +1117,9 @@ img {
 }
 
 
-
+#time-personalize-div{
+    display:none;
+}
 .start_test {
   appearance: none;
   background-color: #2ea44f;
@@ -1247,9 +1248,25 @@ img {
     font-size: 19px;
     margin-right: 8px; /* Khoảng cách giữa text và svg */
 }
+.neutral {
+    border-color: #2d2f31 !important;
+}
+.true {
+    border-color: limegreen;
+}
 
+.false {
+    border-color: red;
+}
+
+.pass {
+    color: limegreen;
+}
+
+.fail {
+    color: red;
+}
    </style>
-
 </head>
 
 
@@ -1340,10 +1357,7 @@ img {
 
 
                 </div>
-                <div id = "current_module_container" >
-                    <h3 id = "current_module" style="display: none;"></h3>
-
-                </div>
+               
             
   <!-- Đổi giao diện bài thi 
   <button id="change_appearance" style="display: none;">Đổi giao diện</button>-->
@@ -2064,7 +2078,7 @@ function purple_highlight(spanId) {
         </script>
 
 <!--<script type="text/javascript" src="function/alert_leave_page.js"></script> -->
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function_practice/main_sat_6.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function_practice/main_sat_7.js"></script>
 
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function_practice/translate.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function_practice/zoom-text.js"></script>

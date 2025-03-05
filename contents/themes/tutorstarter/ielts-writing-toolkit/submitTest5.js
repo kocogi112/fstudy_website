@@ -933,7 +933,6 @@ function ResultInput() {
     var contentToCopy10 = document.getElementById("details-comment-task-2").innerHTML;*/
 
     var contentToCopy11 = document.getElementById("band-score").innerHTML;
-    var contentToCopy12 = document.getElementById("band-score-expand").innerHTML;
     var contentToCopy13 = document.getElementById("id_test").textContent;
     var contentToCopy14 = document.getElementById("title").textContent;
     var contentToCopy15 = document.getElementById("type_test").textContent;
@@ -970,9 +969,6 @@ function ResultInput() {
     /*document.getElementById("task1detailscommentform").value = contentToCopy9;
     document.getElementById("task2detailscommentform").value = contentToCopy10;*/
 
-    document.getElementById("band-score-form").value = contentToCopy11;
-    document.getElementById("band-score-expand-form").value = contentToCopy12;
-    
     document.getElementById("timedotest").value = contentToCopy16;
     document.getElementById("datasaveformtask1").value = contentToCopy17;
     document.getElementById("datasaveformtask2").value = contentToCopy18;
