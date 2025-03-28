@@ -26,10 +26,10 @@ if (is_user_logged_in()) {
     //$custom_number = get_post_meta($post_id, "_digitalsat_custom_number", true);
     $custom_number =intval(get_query_var('id_test'));
     // Database credentials
-    $servername = "localhost";
-    $username = "root";
-    $password = ""; // No password by default
-    $dbname = "wordpress";
+    $servername = DB_HOST;
+    $username = DB_USER;
+    $password = DB_PASSWORD;
+    $dbname = DB_NAME;
 
     // Create connection
     $conn = new mysqli($servername, $username, $password, $dbname);
@@ -58,8 +58,7 @@ if (is_user_logged_in()) {
     }
 
     // Create result_id
-    $result_id =
-        $hour . $minute . $second . $id_test . $user_id . $random_number;
+    $result_id = $hour . $minute . $second . $id_test . $user_id . $random_number;
         $site_url = get_site_url();
     echo "<script> 
         var resultId = '" .
@@ -281,9 +280,8 @@ if ($result->num_rows > 0) {
                     echo "'type': " .
                         json_encode($question_data["type_question"]) .
                         ",";
-                    echo "'question': " .
-                        json_encode($question_data["question_content"]) .
-                        ",";
+                    echo "\"question\": " . json_encode($question_data["question_content"]) . ",";
+
                     echo "'image': " .
                         json_encode($question_data["image_link"]) .
                         ",";
@@ -296,36 +294,13 @@ if ($result->num_rows > 0) {
                         json_encode($question_data["category"]) .
                         ",";
 
-                    echo "'answer': [";
-                    echo "['" .
-                        $question_data["answer_1"] .
-                        "', '" .
-                        ($question_data["correct_answer"] == "answer_1"
-                            ? "true"
-                            : "false") .
-                        "'],";
-                    echo "['" .
-                        $question_data["answer_2"] .
-                        "', '" .
-                        ($question_data["correct_answer"] == "answer_2"
-                            ? "true"
-                            : "false") .
-                        "'],";
-                    echo "['" .
-                        $question_data["answer_3"] .
-                        "', '" .
-                        ($question_data["correct_answer"] == "answer_3"
-                            ? "true"
-                            : "false") .
-                        "'],";
-                    echo "['" .
-                        $question_data["answer_4"] .
-                        "', '" .
-                        ($question_data["correct_answer"] == "answer_4"
-                            ? "true"
-                            : "false") .
-                        "']";
+                    echo "\"answer\": [";
+                    echo json_encode([$question_data["answer_1"], $question_data["correct_answer"] == "answer_1" ? "true" : "false"]) . ",";
+                    echo json_encode([$question_data["answer_2"], $question_data["correct_answer"] == "answer_2" ? "true" : "false"]) . ",";
+                    echo json_encode([$question_data["answer_3"], $question_data["correct_answer"] == "answer_3" ? "true" : "false"]) . ",";
+                    echo json_encode([$question_data["answer_4"], $question_data["correct_answer"] == "answer_4" ? "true" : "false"]);
                     echo "],";
+                        
                     echo "'explanation': " .
                         json_encode($question_data["explanation"]) .
                         ",";
@@ -468,7 +443,7 @@ if ($result->num_rows > 0) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title></title>
-    <link rel="stylesheet" href="/wordpress/contents/themes/tutorstarter/system-test-toolkit/style/style_10.css">
+    <link rel="stylesheet" href="/wordpress/contents/themes/tutorstarter/system-test-toolkit/style/style_11.css">
 
 <style type="text/css">
 
@@ -819,14 +794,7 @@ img {
   100%  {transform:scaleY(-1) rotate(-135deg)}
 }
 /* Flex container for left and right navigation */
-.navigation-group {
-    display: flex;           /* Use flexbox for layout */
-    justify-content: space-between; /* Distribute space between left and right */
-    align-items: center;     /* Vertically center items */
-    margin: 10px 0;          /* Add some margin above and below */
-    width: 100%;             /* Ensure full width */
-    height: 20px;
-}
+
 @media (max-width: 768px) {
     
     .navigation-group {
@@ -956,6 +924,28 @@ img {
     overflow: auto; 
     background-color: rgba(0,0,0,0.4); 
 }
+.navigation-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.left-group {
+    padding-left: 10px;
+}
+
+.center-group {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.right-group {
+    padding-right: 3px;
+    display: flex;
+    gap: 6px; /* Giãn cách giữa các nút */
+}
 
 /* Modal Content */
 .modal-content {
@@ -1066,8 +1056,7 @@ img {
     border-radius: 23px;
     border: 1px solid #2f72dc;
     box-sizing: border-box;
-    display: flex
-;
+    display: flex;
     align-items: center;
     justify-content: center;
     color: #324dc7;
@@ -1078,9 +1067,78 @@ img {
     cursor: pointer;
     pointer-events: all;
 }
+
+
+
+.close-review {
+    background-color: #fff;
+    border: 1px solid #324dc7;
+    color: #324dc7;
+    width: 200px;
+    padding: 2px 23px;
+    /* border-block-color: #324dc7; */
+    height: 46px;
+    /* width: 86px; */
+    font-size: 1rem;
+    border-radius: 23px;
+    border: 1px solid #2f72dc;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    cursor: initial;
+    user-select: none;
+    opacity: 1;
+    cursor: pointer;
+    pointer-events: all;
+}
+.next-module-review {
+    background-color: #3e98d5;
+    border: 1px solid #324dc7;
+    width: 200px;
+    padding: 2px 23px;
+    /* border-block-color: #324dc7; */
+    height: 46px;
+    /* width: 86px; */
+    font-size: 1rem;
+    border-radius: 23px;
+    border: 1px solid #2f72dc;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    cursor: initial;
+    user-select: none;
+    opacity: 1;
+    cursor: pointer;
+    pointer-events: all;
+}
 #name-module-checkbox{
     justify-content: center;
     text-align: center;
+}
+.contents{
+    width: 100%;
+    display: flex
+;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+.question-list{
+    column-gap: 35px;
+    row-gap: 25px;
+    display: flex;
+    flex-direction: row;
+    gap: 18px;
+    border: none;
+    border-top: solid #b2b2b2 1px;
+    width: 100%;
+    padding: 28px 10px 0;
+    flex-wrap: wrap;
+    box-sizing: border-box;
 }
 
    </style>
@@ -1515,8 +1573,8 @@ img {
                     <button class="quick-view-checkbox-button" id="checkbox-button"></button>
 
                     <div id ="navi-button" style="display: none;">
-                        <button class="button-navigate-test" id="prev-button" onclick="showPrevQuestion()">Quay lại</button>
-                        <button class="button-navigate-test" id="next-button" onclick="showNextQuestion()">Tiếp theo</button>
+                        <button class="button-navigate-test" id="prev-button" onclick="showPrevQuestion()">Previous</button>
+                        <button class="button-navigate-test" id="next-button" onclick="showNextQuestion()">Next</button>
                     </div>
                 </div>
 
@@ -2151,7 +2209,7 @@ function purple_highlight(spanId) {
         </script>
 
 <!--<script type="text/javascript" src="function/alert_leave_page.js"></script> -->
-<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/main_sat_13.js"></script>
+<script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/main_sat_14.js"></script>
 
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/translate.js"></script>
 <script type="text/javascript" src="/wordpress/contents/themes/tutorstarter/system-test-toolkit/function/zoom-text.js"></script>

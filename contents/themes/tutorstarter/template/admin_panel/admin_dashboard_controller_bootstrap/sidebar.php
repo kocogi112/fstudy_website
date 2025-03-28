@@ -1,6 +1,9 @@
 <?php
 define('MAIN_PATH', '/wordpress/contents/themes/tutorstarter/template/admin_panel/admin_dashboard_controller_bootstrap/');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/wordpress/wp-load.php');
+
 ?>
+
 <!-- Sidebar -->
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 

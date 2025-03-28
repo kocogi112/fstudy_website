@@ -10,11 +10,11 @@ $post_id = get_the_ID();
 //$custom_number = get_post_meta($post_id, '_ieltswritingtests_custom_number', true);
 global $wpdb; // Use global wpdb object to query the DB
 
-// Database credentials
-$servername = "localhost";
-$username = "root";
-$password = ""; // No password by default
-$dbname = "wordpress";
+  // Database credentials
+  $servername = DB_HOST;
+  $username = DB_USER;
+  $password = DB_PASSWORD;
+  $dbname = DB_NAME;
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);

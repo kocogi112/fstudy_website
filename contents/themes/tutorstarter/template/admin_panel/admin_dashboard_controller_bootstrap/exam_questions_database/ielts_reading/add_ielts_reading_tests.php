@@ -155,13 +155,19 @@ $result = $conn->query($sql);
                 // Split the question_choose and generate links for each question
                 $questions = explode(',', $row['question_choose']); // Tách các số trong question_choose
                 foreach ($questions as $index => $question) {
+                    $templatePartIndex = 'add_ielts_reading_part_' . ($index + 1) . '';
+
                     $templatePart = 'reading-part-' . ($index + 1) . '-database-template';
-                    echo "<a href='http://localhost/wordpress/contents/themes/tutorstarter/template/ieltsreadingtest/$templatePart/database-question-content-sample.php?id_part_filter=$question' target='_blank'>$question</a>";
+                    //echo "<a href='http://localhost/wordpress/contents/themes/tutorstarter/template/ieltsreadingtest/$templatePart/database-question-content-sample.php?id_part_filter=$question' target='_blank'>$question</a>";
+                    echo "<a href='http://localhost/wordpress/contents/themes/tutorstarter/template/admin_panel/admin_dashboard_controller_bootstrap/exam_questions_database/ielts_reading/$templatePartIndex.php?id_part_filter=$question' target='_blank'>$question</a>";
+
+                    
+                    
                     if ($index < count($questions) - 1) {
                         echo ", "; // Thêm dấu phẩy nếu chưa đến số cuối
                     }
                 }
-        
+                http://localhost/wordpress/contents/themes/tutorstarter/template/admin_panel/admin_dashboard_controller_bootstrap/exam_questions_database/ielts_reading/add_ielts_reading_part_1.php
                 echo "</td>
                         <td>{$row['tag']}</td>
                         <td>{$row['book']}</td>

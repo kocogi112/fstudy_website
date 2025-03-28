@@ -98,12 +98,12 @@ if (!empty($table_name)) {
   
     
 
-    if (in_array('Practice', $test_type_filter) && in_array('Full Length', $test_type_filter)) {
+    if (in_array('Practice', $test_type_filter) && in_array('Full Test', $test_type_filter)) {
         // Không cần điều kiện vì chấp nhận cả hai
     } elseif (in_array('Practice', $test_type_filter)) {
         $conditions[] = "test_type = 'Practice'";
-    } elseif (in_array('Full Length', $test_type_filter)) {
-        $conditions[] = "test_type = 'Full Length'";
+    } elseif (in_array('Full Test', $test_type_filter)) {
+        $conditions[] = "test_type = 'Full Test'";
     }
     
 
@@ -111,7 +111,7 @@ if (!empty($table_name)) {
     $where_clause = !empty($conditions) ? 'AND ' . implode(' AND ', $conditions) : '';
 
     $query = $wpdb->prepare(
-        "SELECT * FROM {$table_name} WHERE testname LIKE %s $where_clause LIMIT %d OFFSET %d",
+        "SELECT * FROM {$table_name} WHERE testname LIKE %s $where_clause ORDER BY testname ASC LIMIT %d OFFSET %d",
         ...$params
     );
 
@@ -148,7 +148,7 @@ if (!empty($table_name)) {
             <label><input type="checkbox" name="price[]" value="premium" <?php if (in_array('premium', $price_filter)) echo 'checked'; ?>> Premium</label>
 
             <label><input type="checkbox" name="test_type[]" value="Practice" <?php if (in_array('Practice', $test_type_filter)) echo 'checked'; ?>> Practice</label>
-            <label><input type="checkbox" name="test_type[]" value="Full Length" <?php if (in_array('Full Length', $test_type_filter)) echo 'checked'; ?>> Full Length</label>
+            <label><input type="checkbox" name="test_type[]" value="Full Test" <?php if (in_array('Full Test', $test_type_filter)) echo 'checked'; ?>> Full Length</label>
 
         </div>
 
@@ -164,6 +164,8 @@ $args = [
     's' => $search_term,
     'posts_per_page' => 12,
     'paged' => $paged,
+    'order' => 'ASC',
+
 ];
 
 // Run the query
@@ -241,9 +243,13 @@ $query = new WP_Query($args);
                 "SELECT COUNT(*) FROM {$table_name} WHERE testname LIKE %s",
                 '%' . $wpdb->esc_like($search_term) . '%'
             );
-            $total_tests = $wpdb->get_var($total_tests_query);
-            
+          
+            $total_tests = $wpdb->get_var($wpdb->prepare(
+                "SELECT COUNT(*) FROM {$table_name} WHERE testname LIKE %s $where_clause",
+                ...$params
+            ));
             $total_pages = ceil($total_tests / $limit);
+            
 
             echo paginate_links([
                 'total' => $total_pages, // Số trang tính toán chính xác

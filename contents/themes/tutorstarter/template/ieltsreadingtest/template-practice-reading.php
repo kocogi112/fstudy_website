@@ -69,12 +69,11 @@ if (is_user_logged_in()) {
 
 
    
-    //$custom_number = get_post_meta($post_id, '_ieltsreadingtest_custom_number', true);
-    // Thông tin kết nối databasef
-    $servername = "localhost";
-    $username = "root";
-    $password = ""; // No password by default
-    $dbname = "wordpress";
+   // Database credentials
+   $servername = DB_HOST;
+   $username = DB_USER;
+   $password = DB_PASSWORD;
+   $dbname = DB_NAME;
     
     // Tạo kết nối
     $conn = new mysqli($servername, $username, $password, $dbname);

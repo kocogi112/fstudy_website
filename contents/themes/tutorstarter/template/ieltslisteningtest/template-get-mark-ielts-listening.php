@@ -36,11 +36,11 @@ if (!empty($results)) {
 
 echo "<script>console.log('Custom Number doing template: " . esc_js($custom_number) . "');</script>";
 
-// Database credentials (update with your own database details)
-$servername = "localhost";
-$username = "root";
-$password = ""; // No password by default
-$dbname = "wordpress";
+  // Database credentials
+  $servername = DB_HOST;
+  $username = DB_USER;
+  $password = DB_PASSWORD;
+  $dbname = DB_NAME;
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);

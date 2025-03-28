@@ -86,7 +86,72 @@ $result = $conn->query($sql);
         }
        
     </style>
+<style>
+        /* Ẩn popup mặc định */
+        #popup-note {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            max-width: 90%;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-in-out;
+        }
 
+        /* Hiệu ứng mở popup */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -55%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+
+        /* Overlay làm mờ nền */
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 999;
+        }
+
+        /* Nút đóng */
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 20px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .close-btn:hover {
+            color: red;
+        }
+
+        /* Nút mở popup */
+        #open-popup {
+            padding: 10px 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #open-popup:hover {
+            background: #0056b3;
+        }
+    </style>
 </head>
 
 <body id="page-top">
@@ -107,27 +172,51 @@ $result = $conn->query($sql);
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
 
-           
+                <h1>Digital Practice SAT Questions Database - VERBAL (Reading - Writing) only</h1>
 
 
-<h1>Digital Practice SAT Questions Database - VERBAL (Reading - Writing) only</h1>
-Practice:
-<p>Verbal100 - Verbal206: Boundaries</p>
-<p>Verbal207 - Verbal272: Central ideas and detail</p>
-<p>Verbal273 - Verbal376: Form, Structure and Sense</p>
-<p>Verbal377 - Verbal450: Inferences </p>
-<p>Verbal451 - verbal493: Cross Text Connections</p>
-<p>Verbal494 - verbal623: Words in context</p>
-<p>Verbal624 - verbal695: Text Structure and Purpose</p>
-<p>Verbal696 - verbal781: Transition</p>
-<p>Verbal782 - verbal884: Rhetorical Analysis</p>
-<p>Verbal885 - verbal1035: Command of Evidence	</p>
+                <div id="overlay"></div>
 
-Full test:
-<p>Verbal1036 - : Practice Test 1 - (verbal(verbal1036-verbal1100): M1: verbal1036-verbal1067; M2: verbal1068-verbal1100)</p>
-<p>Verbal1101 - : Practice Test 2 - (verbal(verbal1101-verbal1166): M1: verbal1101-verbal1133; M2: verbal1134-verbal1166)</p>
-<p>Verbal1167 - : Practice Test 3 - (verbal(verbal1167-verbal1232): M1: verbal1167-verbal1199; M2: verbal1200-verbal1232)</p>
+                <div id="popup-note">
+                    <button class="close-btn" onclick="closePopup()">✖</button>
+                    <b>Old version SSQB</b>
+                    <p>Verbal100 - Verbal206: Boundaries</p>
+                    <p>Verbal207 - Verbal272: Central ideas and detail</p>
+                    <p>Verbal273 - Verbal376: Form, Structure and Sense</p>
+                    <p>Verbal377 - Verbal450: Inferences </p>
+                    <p>Verbal451 - verbal493: Cross Text Connections</p>
+                    <p>Verbal494 - verbal623: Words in context</p>
+                    <p>Verbal624 - verbal695: Text Structure and Purpose</p>
+                    <p>Verbal696 - verbal781: Transition</p>
+                    <p>Verbal782 - verbal884: Rhetorical Analysis</p>
+                    <p>Verbal885 - verbal1035: Command of Evidence	</p>
+                                        
 
+                    <h3>Full test:</h3>
+                    <p>Verbal1036 - : Practice Test 1 - (verbal(verbal1036-verbal1100): M1: verbal1036-verbal1067; M2: verbal1068-verbal1100)</p>
+                    <p>Verbal1101 - : Practice Test 2 - (verbal(verbal1101-verbal1166): M1: verbal1101-verbal1133; M2: verbal1134-verbal1166)</p>
+                    <p>Verbal1167 - : Practice Test 3 - (verbal(verbal1167-verbal1232): M1: verbal1167-verbal1199; M2: verbal1200-verbal1232)</p>
+                    <p>Verbal1233 - : Practice Test 4 - (verbal(verbal1233-verbal1296): M1: verbal1233-verbal1264; M2: verbal1265-verbal1296)</p>
+                    <p>Verbal1297 - : Practice Test 5 - (verbal(verbal1297-verbal1361): M1: verbal1297-verbal1329; M2: verbal1330-verbal1361)</p>
+                    <p>Verbal1297 - : Practice Test 6 - (verbal(verbal1693-verbal1757): M1: verbal1693-verbal1725; M2: verbal1726-verbal1757)</p>
+                    <b>New version SSQB</b>
+                    Boundaries (verbal1362 - verbal1402)
+                    Central ideas and detail(verbal1403  - verbal1430)
+                    Command of Evidence( verbal1431   - verbal1475)
+                    Cross Text Connections ( verbal1476 - verbal1481)
+                    Form, Structure and Sense (verbal1482   - verbal1518)
+                    Inferences (verbal1519  -   verbal1537)
+                    Rhetorical Analysis  (verbal1538  -  verbal1574)
+                    Text Structure and Purpose (verbal1575 - verbal1599)
+                    Transition (verbal1600 - verbal1641)
+                    Words in context (verbal1642  - verbal1692)
+
+                    <b>Sample Img</b>: /wordpress/contents/themes/tutorstarter/template/media_img_intest/digital_sat/verbal1143.png
+
+
+                    
+                </div>
+    
 
 <!-- Filter form -->
 <form method="GET" action="">
@@ -138,6 +227,8 @@ Full test:
         <button type="submit" class="btn btn-primary">Filter</button>
         <a href="?" class="btn btn-secondary">Clear Filter</a>
     </form>
+
+    <button id="open-popup">Xem ghi chú các câu/ các loại</button>
 
 <!-- Display the data from the database -->
 <table class="table table-bordered">
@@ -164,10 +255,12 @@ Full test:
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
                  // Process "Sample" and "Important Add" columns
+                 $question_content_sanitized = htmlspecialchars(json_encode($row['question_content'], JSON_HEX_APOS | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8');
                  $question_content_words = explode(' ', $row['question_content']);
                  $question_content_display = count($question_content_words) > 20 ? implode(' ', array_slice($question_content_words, 0, 20)) . '...' : $row['question_content'];
-                 $question_content_view_more = count($question_content_words) > 20 ? "<button class='btn btn-link' onclick='showFullContent(\"Question Content\", \"{$row['question_content']}\")'>View More</button>" : '';
- 
+                 $question_content_view_more = count($question_content_words) > 20 ? "<button class='btn btn-link' onclick='showFullContent(\"Question Content\", $question_content_sanitized)'>View More</button>" : '';
+                 
+
                  $explanation_words = explode(' ', $row['explanation']);
                  $explanation_display = count($explanation_words) > 20 ? implode(' ', array_slice($explanation_words, 0, 20)) . '...' : $row['explanation'];
                  $explanation_view_more = count($explanation_words) > 20 ? "<button class='btn btn-link' onclick='showFullContent(\"Explanation Add\", \"{$row['explanation']}\")'>View More</button>" : '';
@@ -428,6 +521,20 @@ Full test:
 <!-- jQuery and JavaScript for AJAX -->
 
 <script>
+        function openPopup() {
+            document.getElementById("popup-note").style.display = "block";
+            document.getElementById("overlay").style.display = "block";
+        }
+
+        function closePopup() {
+            document.getElementById("popup-note").style.display = "none";
+            document.getElementById("overlay").style.display = "none";
+        }
+
+        document.getElementById("open-popup").addEventListener("click", openPopup);
+        document.getElementById("overlay").addEventListener("click", closePopup);
+
+
 // Open the edit modal and populate it with data
 function openEditModal(number) {
     $.ajax({
@@ -446,6 +553,8 @@ function openEditModal(number) {
             $('#edit_answer_4').val(data.answer_4);
             $('#edit_correct_answer').val(data.correct_answer);
             $('#edit_explanation').val(data.explanation);
+            $('#edit_category').val(data.category);
+
             $('#edit_image_link').val(data.image_link);
             $('#editModal').modal('show');
         }

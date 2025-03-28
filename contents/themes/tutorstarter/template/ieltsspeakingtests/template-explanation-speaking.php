@@ -12,11 +12,11 @@ $post_id = get_the_ID();
 $custom_number =intval(get_query_var('id_test'));
 
 
-// Database credentials (update with your own database details)
-$servername = "localhost";
-$username = "root";
-$password = ""; // No password by default
-$dbname = "wordpress";
+  // Database credentials
+  $servername = DB_HOST;
+  $username = DB_USER;
+  $password = DB_PASSWORD;
+  $dbname = DB_NAME;
 $commentcount = get_comments_number( $post->ID );
 
 // Create connection

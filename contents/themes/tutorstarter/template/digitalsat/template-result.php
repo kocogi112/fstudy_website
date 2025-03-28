@@ -35,11 +35,10 @@ if (!empty($results)) {
 
 
 
-// Database credentials
-$servername = "localhost";
-$username = "root";
-$password = ""; // No password by default
-$dbname = "wordpress";
+$servername = DB_HOST;
+$username = DB_USER;
+$password = DB_PASSWORD;
+$dbname = DB_NAME;
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -330,15 +329,69 @@ body {
 .right-popup {
     background-color: #ffffff; /* Màu nền trắng */
 }
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
 
 </style>
 <head>
     <title>Digital SAT Report</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-
 </head>
-
+<body>
+    
+</body>
 <?php
 
     // Get current user's username
@@ -444,8 +497,7 @@ $new_skip_ans = 0;
                                 </div>
                                 
                             </div>
-                            <br>
-                            
+                           
                         </div>
                     </div>
                 </div>
@@ -454,29 +506,10 @@ $new_skip_ans = 0;
         echo'<button class="button-10" onclick ="redirectToTest()"> Làm lại bài thi </button>';
         echo'<button class="button-10" onclick = "opensharePermission()">Chia sẻ bài làm</button>';
         echo'<button class="button-10" onclick = "openRemarkTest()" >Chấm lại </button>';
-        echo'<button class="button-10" onclick = "redoWrongAns()"> Làm lại các câu sai</button><br><br>';
-
-      
-
-
-        echo '<div>
-        <canvas id="myLineChart" width="200" height="100"></canvas>
-
-        </div>';
+        echo'<button class="button-10" onclick = "redoWrongAns()"> Làm lại các câu sai</button>';
+        echo'<button class="button-10" onclick = "fullExplanation()"> Chi tiết đáp án </button><br><br>';
 
 
-
-
-
-
-
-
-        echo '<p>Username: ' . esc_html($result->username) . '</p>';
-        echo '<p>Ngày làm đề: ' . esc_html($result->dateform) . '</p>';
-        echo '<p>Tên đề thi: ' . esc_html($result->testname) . '</p>';
-        echo '<p>Thời gian làm bài: ' . esc_html($result->timedotest) . '</p>';
-        echo '<p>ID data: ' . esc_html($result->testsavenumber) . '</p>';
-        echo '<p>Result Test: ' . esc_html($result->resulttest) . '</p>';
         if ($review) {
             echo '<p>Type Test: ' . esc_html($review->test_type) . '</p>';
             echo '<p>Resource: ' . esc_html($review->book) . '</p>';
@@ -484,6 +517,26 @@ $new_skip_ans = 0;
             echo '<p>Type Test: N/A</p>';
             echo '<p>Resource: N/A</p>';
         }
+
+        echo'
+        <div style="display: flex; justify-content: space-around;">
+            <div style="width: 45%;">
+                <canvas id="domainRadarChart"></canvas>
+            </div>
+            <div style="width: 45%;">
+                <div style="margin-bottom: 10px;">
+                    <label class="switch">
+                        <input type="checkbox" id="togglePerformance">
+                        <span class="slider round"></span>
+                    </label>
+                    <span id="toggleLabel">Domain Performance</span>
+                </div>
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </div>
+        
+
+        ';
         
         // Start the table for answers
         echo '<table border="1">';
@@ -494,8 +547,8 @@ $new_skip_ans = 0;
         <th>User Answer</th>
         <th>Correct Answer</th>
         <th>Result</th>
-            <th>Time (seconds)</th>
-
+        <th>Domain</th>
+        <th>Time (seconds)</th>
         <th>Action</th>
         </tr>';
 
@@ -519,11 +572,21 @@ $new_skip_ans = 0;
 
 
 
+        $results_by_domain = [
+            'Standard English Conventions' => ['correct' => 0, 'incorrect' => 0, 'not_answered' => 0],
+            'Information and Ideas' => ['correct' => 0, 'incorrect' => 0, 'not_answered' => 0],
+            'Craft and Structure' => ['correct' => 0, 'incorrect' => 0, 'not_answered' => 0],
+            'Expression of Ideas' => ['correct' => 0, 'incorrect' => 0, 'not_answered' => 0]
+
+        ];
+        $results_by_category = []; // Mảng để lưu trữ kết quả theo category
+
+
         // Loop through all question IDs in the questions array
         foreach ($questions as $question_id) {
             if (strpos($question_id, "verbal") === 0) {
                 // Query for each question to get detailed data
-                $sql_question = "SELECT explanation, id_question, type_question, question_content, answer_1, answer_2, answer_3, answer_4, correct_answer, image_link FROM digital_sat_question_bank_verbal WHERE id_question = ?";
+                $sql_question = "SELECT explanation, id_question, type_question, question_content, answer_1, answer_2, answer_3, answer_4, correct_answer, image_link, category FROM digital_sat_question_bank_verbal WHERE id_question = ?";
                 $stmt_question = $conn->prepare($sql_question);
                 $stmt_question->bind_param("s", $question_id);
                 $stmt_question->execute();
@@ -531,7 +594,7 @@ $new_skip_ans = 0;
             }
             else  if (strpos($question_id, "math") === 0) {
                 // Query for each question to get detailed data
-                $sql_question = "SELECT explanation, id_question, type_question, question_content, answer_1, answer_2, answer_3, answer_4, correct_answer, image_link FROM digital_sat_question_bank_math WHERE id_question = ?";
+                $sql_question = "SELECT explanation, id_question, type_question, question_content, answer_1, answer_2, answer_3, answer_4, correct_answer, image_link, category FROM digital_sat_question_bank_math WHERE id_question = ?";
                 $stmt_question = $conn->prepare($sql_question);
                 $stmt_question->bind_param("s", $question_id);
                 $stmt_question->execute();
@@ -540,6 +603,17 @@ $new_skip_ans = 0;
 
             if ($result_question->num_rows > 0) {
                 $question_data = $result_question->fetch_assoc();
+                $domain = '';
+                if (in_array($question_data['category'], ['Boundaries', 'Form, Structure and Sense'])) {
+                    $domain = 'Standard English Conventions';
+                } else if (in_array($question_data['category'], ['Central ideas and detail', 'Command of Evidence', 'Inferences'])) {
+                    $domain = 'Information and Ideas';
+                } else if (in_array($question_data['category'], ['Cross Text Connections', 'Text Structure and Purpose', 'Words in context'])) {
+                    $domain = 'Craft and Structure';
+                } else if (in_array($question_data['category'], ['Rhetorical  Synthesis', 'Transition' ])) {
+                    $domain = 'Expression of Ideas';
+                }
+
                 
                 error_log(print_r($question_data, true)); // Check the output in your PHP error log
 
@@ -580,21 +654,37 @@ $new_skip_ans = 0;
           
                 // Determine if the answer is correct or incorrect
                 if ($user_answer  == ""){
-                    $result_status = "Not answered";
+                    $result_status = "not_answered";
+                    $result_check = "Not Answer";
                     $color_class = 'grey-text';
                     $new_skip_ans++;
                 }
                 else if ($user_answer == $correct_answer_text){
-                    $result_status = 'Correct' ;
+                    $result_status = "correct";
+                    $result_check = "Correct";
                     $color_class =  'green-text' ;
                     $new_correct_ans++;
                 }
                 else
                 {
-                    $result_status = 'Incorrect';
+                    $result_status = "incorrect";
+                    $result_check = "Incorrect";
                     $color_class =  'red-text';
                     $new_incorrrect_ans++;
                 }
+                if ($domain) {
+                    $results_by_domain[$domain][$result_status]++;
+                }
+                // Cập nhật kết quả vào mảng theo category
+                $category = $question_data['category'];
+                if (!isset($results_by_category[$category])) {
+                    $results_by_category[$category] = ['correct' => 0, 'incorrect' => 0, 'not_answered' => 0];
+                }
+                $results_by_category[$category][$result_status]++;
+
+
+
+
                 $time_spent = 'N/A';
                 foreach ($time_data as $time_entry) {
                     if ($time_entry['question'] == $question_number) {
@@ -608,7 +698,9 @@ $new_skip_ans = 0;
                 echo '<td>'.  $question_data['id_question'].  '</td>'; 
                 echo '<td>' . esc_html($user_answer) . '</td>';
                 echo '<td>' . $correct_answer_text . '</td>';
-                echo '<td class="' . $color_class . '">' . $result_status . '</td>'; // Apply color class
+                echo '<td class="' . $color_class . '">' . $result_check . '</td>'; // Apply color class
+                echo '<td>'.  $question_data['category'].  '</td>'; 
+
                 echo '<td>' . esc_html($time_spent) . '</td>'; // Cột thời gian
 
                 $explanation = isset($question_data['explanation']) ? htmlspecialchars($question_data['explanation'], ENT_QUOTES, 'UTF-8') : 'Explanation not available';
@@ -624,6 +716,53 @@ $new_skip_ans = 0;
 
         // End the table
         echo '</table>';
+
+        echo "Results by Domain:\n";
+        echo json_encode($results_by_domain, JSON_PRETTY_PRINT);
+        
+        echo "\n\nResults by Category:\n";
+        echo json_encode($results_by_category, JSON_PRETTY_PRINT);
+
+        
+        // Lọc các domain có tổng số câu hỏi > 0
+        $filtered_results_by_domain = array_filter($results_by_domain, function($domain) {
+            return ($domain['correct'] + $domain['incorrect'] + $domain['not_answered']) > 0;
+        });
+
+        // Lọc các category có tổng số câu hỏi > 0
+        $filtered_results_by_category = array_filter($results_by_category, function($category) {
+            return ($category['correct'] + $category['incorrect'] + $category['not_answered']) > 0;
+        });
+
+        // Chuyển dữ liệu sang JavaScript
+        echo "<script>";
+        echo "const filteredResultsByDomain = " . json_encode($results_by_domain) . ";";
+        echo "const filteredResultsByCategory = " . json_encode($filtered_results_by_category) . ";";
+        echo "</script>";
+        $domainPercentages = [];
+        $domainAnswered = [];
+        foreach ($results_by_domain as $domain => $results) {
+            $total = $results['correct'] + $results['incorrect'] + $results['not_answered'];
+            $percentage = ($total > 0) ? ($results['correct'] / $total) * 100 : 0;
+            $domainPercentages[$domain] = $percentage;
+            $domainAnswered[$domain] = ($total > 0);
+        }
+
+        // Tính tỷ lệ phần trăm số câu đúng cho mỗi category
+        $categoryPercentages = [];
+        $categoryAnswered = [];
+        foreach ($results_by_category as $category => $results) {
+            $total = $results['correct'] + $results['incorrect'] + $results['not_answered'];
+            $percentage = ($total > 0) ? ($results['correct'] / $total) * 100 : 0;
+            $categoryPercentages[$category] = $percentage;
+            $categoryAnswered[$category] = ($total > 0);
+        }
+
+        echo "<script>";
+        echo "const domainPercentages = " . json_encode($domainPercentages) . ";";
+        echo "const domainAnswered = " . json_encode($domainAnswered) . ";";
+        echo "const categoryPercentages = " . json_encode($categoryPercentages) . ";";
+        echo "const categoryAnswered = " . json_encode($categoryAnswered) . ";";        echo "</script>";
 
 
         remove_filter("the_content", "wptexturize");
@@ -644,7 +783,8 @@ $new_skip_ans = 0;
                     MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
 
             });
-    </script>';
+    </script>
+    ';
     }
 } else {
     // If no results with testsavenumber
@@ -740,6 +880,198 @@ $new_skip_ans = 0;
 
             });
 
+
+   // Hàm để tạo biểu đồ radar
+function createRadarChart(canvasId, data, title) {
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    const labels = Object.keys(data);
+    const datasets = [];
+
+    // Tạo dataset cho từng loại kết quả (correct, incorrect, not_answered)
+    const resultTypes = ['correct', 'incorrect', 'not_answered'];
+    const colors = [
+        { bg: 'rgba(75, 192, 192, 0.2)', border: 'rgba(75, 192, 192, 1)' }, // Màu cho correct
+        { bg: 'rgba(255, 99, 132, 0.2)', border: 'rgba(255, 99, 132, 1)' }, // Màu cho incorrect
+        { bg: 'rgba(201, 203, 207, 0.2)', border: 'rgba(201, 203, 207, 1)' } // Màu cho not_answered
+    ];
+
+    resultTypes.forEach((type, index) => {
+        const dataset = {
+            label: type,
+            data: labels.map(label => data[label][type]),
+            backgroundColor: colors[index].bg,
+            borderColor: colors[index].border,
+            borderWidth: 1
+        };
+        datasets.push(dataset);
+    });
+
+    new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: labels,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: title
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw || 0;
+                            const datasetLabel = context.dataset.label || '';
+                            return `${label}: ${datasetLabel} - ${value}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                r: {
+                    angleLines: {
+                        display: true
+                    },
+                    suggestedMin: 0,
+                    suggestedMax: Math.max(...datasets.flatMap(dataset => dataset.data)) + 1
+                }
+            }
+        }
+    });
+}
+
+// Tạo biểu đồ radar cho Domain
+createRadarChart('domainRadarChart', filteredResultsByDomain, 'Results by Domain');
+
+// Tạo biểu đồ radar cho Category
+// Tạo biểu đồ cột ngang
+function createHorizontalBarChart(canvasId, data, answered, title) {
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    const labels = Object.keys(data);
+    const percentages = Object.values(data);
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Percentage Correct',
+                data: percentages,
+                backgroundColor: labels.map(label => answered[label] ? 'rgba(75, 192, 192, 0.6)' : 'rgba(201, 203, 207, 0.6)'),
+                borderColor: labels.map(label => answered[label] ? 'rgba(75, 192, 192, 1)' : 'rgba(201, 203, 207, 1)'),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y', // Hiển thị cột ngang
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: title
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.raw}% Correct`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    max: 100, // Giới hạn trục x từ 0 đến 100
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+// Biến để lưu trữ đối tượng biểu đồ
+let performanceChart = null;
+
+// Hàm tạo biểu đồ cột ngang
+function createHorizontalBarChart(canvasId, data, answered, title) {
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    const labels = Object.keys(data);
+    const percentages = Object.values(data);
+
+    // Hủy biểu đồ cũ nếu tồn tại
+    if (performanceChart) {
+        performanceChart.destroy();
+    }
+
+    // Tạo biểu đồ mới
+    performanceChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Percentage Correct',
+                data: percentages,
+                backgroundColor: labels.map(label => answered[label] ? 'rgba(75, 192, 192, 0.6)' : 'rgba(201, 203, 207, 0.6)'),
+                borderColor: labels.map(label => answered[label] ? 'rgba(75, 192, 192, 1)' : 'rgba(201, 203, 207, 1)'),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y', // Hiển thị cột ngang
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: title
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.raw}% Correct`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    max: 100, // Giới hạn trục x từ 0 đến 100
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// Hàm khởi tạo biểu đồ ban đầu
+function initializeChart() {
+    const isDomain = !document.getElementById('togglePerformance').checked; // Mặc định là Domain Performance
+    const data = isDomain ? domainPercentages : categoryPercentages;
+    const answered = isDomain ? domainAnswered : categoryAnswered;
+    const title = isDomain ? 'Domain Performance' : 'Category Performance';
+    createHorizontalBarChart('performanceChart', data, answered, title);
+}
+
+// Xử lý sự kiện toggle
+document.getElementById('togglePerformance').addEventListener('change', function() {
+    const toggleLabel = document.getElementById('toggleLabel');
+    toggleLabel.textContent = this.checked ? 'Category Performance' : 'Domain Performance';
+    initializeChart();
+});
+
+// Khởi tạo biểu đồ khi trang được tải
+document.addEventListener('DOMContentLoaded', function() {
+    // Đặt toggle mặc định là Domain Performance
+    document.getElementById('togglePerformance').checked = false;
+    document.getElementById('toggleLabel').textContent = 'Domain Performance';
+    initializeChart();
+});
+
+
+
+
+
+
 // Close the draft popup when the close button is clicked
 function closeDetailExplanation() {
     document.getElementById('explanation_popup').style.display = 'none';
@@ -759,6 +1091,11 @@ function  redoWrongAns(){
   //var currentLink = "<?= $site_url ?>/digitalsat/result/<?= $testsavenumber ?>";
   window.location.href = currentLink + "/practice";
 }
+function fullExplanation(){
+   
+   //var currentLink = "<?= $site_url ?>/digitalsat/result/<?= $testsavenumber ?>";
+   window.location.href = currentLink + "/explanation";
+ }
 
 
 function openDetailExplanation(questionNumber, questionId, questionContent, imageQuestion, answer1, answer2, answer3, answer4, correctAnswer, userAnswer, explanationQuestion) {

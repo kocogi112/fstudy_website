@@ -20,14 +20,14 @@ $user_id = get_current_user_id();
 $additional_info = get_post_meta($post_id, '_studyvocabulary_additional_info', true); 
 //$custom_number = get_post_meta($post_id, '_studyvocabulary_custom_number', true);
 $custom_number =intval(get_query_var('id_test'));
-// Database credentials
-$servername = "localhost";
-$username = "root";
-$password = ""; // No password by default
-$dbname = "wordpress";
-
+  // Database credentials
+  $servername = DB_HOST;
+  $username = DB_USER;
+  $password = DB_PASSWORD;
+  $dbname = DB_NAME;
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
+$conn->set_charset("utf8mb4");
 
 // Check connection
 if ($conn->connect_error) {
@@ -45,11 +45,39 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
-// Fetch test data if available
-$data = $result->fetch_assoc();
-$testname = $data['testname'];
+    // Fetch test data if available
+    $data = $result->fetch_assoc();
+    $testname = $data['testname'];
+    $user_id = get_current_user_id();
+    $current_user = wp_get_current_user();
+    $current_user_id = $current_user->ID;
 
+    $current_username = $current_user->user_login;
 
+    // Get current time (hour, minute, second)
+    $hour = date("H"); // Giờ
+    $minute = date("i"); // Phút
+    $second = date("s"); // Giây
+
+    // Generate random two-digit number
+    $random_number = rand(10, 99);
+    // Handle user_id and id_test error, set to "00" if invalid
+    if (!$user_id) {
+        $user_id = "00"; // Set user_id to "00" if invalid
+    }
+
+    if (!$id_test) {
+        $id_test = "00"; // Set id_test to "00" if invalid
+    }
+
+    $result_id = $hour . $minute . $second . $id_test . $user_id . $random_number;
+
+    echo '<script>
+        var currentUsername = "' . $current_username . '";
+        var currentUserid = "' . $current_user_id . '";
+        console.log("Current Username: " + currentUsername);
+        console.log("Current User ID: " + currentUserid);
+    </script>';
 
     add_filter('document_title_parts', function ($title) use ($testname) {
         $title['title'] = $testname; // Use the $testname variable from the outer scope
@@ -59,10 +87,9 @@ $testname = $data['testname'];
 
     echo "<script> 
    
-   
-    var siteUrl = '" .
-    $site_url .
-    "';
+    var resultId = '" . $result_id . "';
+    var siteUrl = '" .    $site_url . "';
+
     console.log('Result ID: ' + resultId);
 </script>";
 // Initialize quizData structure
@@ -436,7 +463,7 @@ table th {
     <script>
            let pre_id_test_ = `<?php echo esc_html($custom_number); ?>`;
     </script>
-    <script src="http://localhost/wordpress/contents/themes/tutorstarter/study_vocabulary_toolkit/test-new-word/script.js"></script>
+    <script src="http://localhost/wordpress/contents/themes/tutorstarter/study_vocabulary_toolkit/test-new-word/script1.js"></script>
 
 </body>
 </html>

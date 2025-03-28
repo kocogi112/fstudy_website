@@ -5,11 +5,11 @@ require_once('C:\xampp\htdocs\wordpress\wp-load.php'); // Adjust the path as nec
 global $wpdb;
 
 // Get the data from the POST request
-$number = wp_kses_post($_POST['number']);
-$id_test = wp_kses_post($_POST['id_test']);
-$type_test = wp_kses_post($_POST['type_test']);
-$testname = wp_kses_post($_POST['testname']);
-$id_video = wp_kses_post($_POST['id_video']);
+$number = wp_unslash($_POST['number']);
+$id_test = wp_unslash($_POST['id_test']);
+$type_test = wp_unslash($_POST['type_test']);
+$testname = wp_unslash($_POST['testname']);
+$id_video = wp_unslash($_POST['id_video']);
 $transcript = wp_unslash($_POST['transcript']);
 $token_need = wp_unslash($_POST['token_need']);
 $role_access = wp_unslash($_POST['role_access']);

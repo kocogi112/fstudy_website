@@ -20,14 +20,15 @@ $user_id = get_current_user_id();
 $additional_info = get_post_meta($post_id, '_studyvocabulary_additional_info', true); 
 //$custom_number = get_post_meta($post_id, '_studyvocabulary_custom_number', true);
 $custom_number =intval(get_query_var('id_test'));
-// Database credentials
-$servername = "localhost";
-$username = "root";
-$password = ""; // No password by default
-$dbname = "wordpress";
+  // Database credentials
+  $servername = DB_HOST;
+  $username = DB_USER;
+  $password = DB_PASSWORD;
+  $dbname = DB_NAME;
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
+$conn->set_charset("utf8mb4");
 
 // Check connection
 if ($conn->connect_error) {

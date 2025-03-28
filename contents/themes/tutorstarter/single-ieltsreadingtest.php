@@ -5,11 +5,11 @@ $custom_number =intval(get_query_var('id_test'));
 //$custom_number = get_post_meta($post_id, '_ieltsreadingtest_custom_number', true);
 $site_url = get_site_url();
 
-// Database credentials (update with your own database details)
-$servername = "localhost";
-$username = "root";
-$password = ""; // No password by default
-$dbname = "wordpress";
+  // Database credentials
+  $servername = DB_HOST;
+  $username = DB_USER;
+  $password = DB_PASSWORD;
+  $dbname = DB_NAME;
 //$commentcount = get_comments_number( $post->ID );
 
 // Create connection

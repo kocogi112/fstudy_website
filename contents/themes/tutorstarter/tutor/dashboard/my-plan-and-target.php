@@ -362,6 +362,10 @@ $siteurl = get_site_url();
         console.log("Hôm nay:", formattedToday);
 
 
+
+
+
+
         // Lọc kế hoạch cho 3 ngày tiếp theo
         const upcomingPlans = planData
             .filter(plan => {
@@ -373,27 +377,33 @@ $siteurl = get_site_url();
 
         // Hiển thị kế hoạch hôm nay
         if (todayPlan) {
+            const formattedPlanContext = todayPlan.plan_context.replaceAll("\\n", "<br>");
+
             todayPlanContainer.innerHTML += `
                 <div>
                     <p><strong>Ngày:</strong> ${todayPlan.date}</p>
-                    <p><strong>Nội dung:</strong> ${todayPlan.plan_context}</p>
+                    <p><strong>Nội dung:</strong> ${formattedPlanContext}</p>
                     <p><strong>Mức độ:</strong> ${todayPlan.level}</p>
                 </div>
             `;
+
         } else {
             todayPlanContainer.innerHTML += `<p>Không có kế hoạch nào cho hôm nay.</p>`;
         }
 
         // Hiển thị kế hoạch sắp tới
         if (upcomingPlans.length > 0) {
+            const formattedUpcomingContext = plan.plan_context.replaceAll("\\n", "<br>");
+
             upcomingPlans.forEach(plan => {
                 upcomingPlanContainer.innerHTML += `
                     <div>
                         <p><strong>Ngày:</strong> ${plan.date}</p>
-                        <p><strong>Nội dung:</strong> ${plan.plan_context}</p>
+                        <p><strong>Nội dung:</strong> ${formattedUpcomingContext}</p>
                         <p><strong>Mức độ:</strong> ${plan.level}</p>
                     </div>
                 `;
+
             });
         } else {
             upcomingPlanContainer.innerHTML += `<p>Không có kế hoạch sắp tới.</p>`;
@@ -593,7 +603,8 @@ $siteurl = get_site_url();
     document.querySelector("#saveEventBtn").addEventListener("click", function (e) {
     e.preventDefault();
 
-    const planContext = document.querySelector("#plan_context").value;
+    const planContext = document.querySelector("#plan_context").value.replace(/\n/g, "\\n");
+
     const level = document.querySelector("#level").value;
     const selectedDate = document.querySelector("#selectedDate").innerText.replace('Ngày: ', ''); 
 

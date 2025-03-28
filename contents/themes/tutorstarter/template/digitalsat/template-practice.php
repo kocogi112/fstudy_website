@@ -35,11 +35,10 @@ if (!empty($results)) {
 
 
 
-// Database credentials
-$servername = "localhost";
-$username = "root";
-$password = ""; // No password by default
-$dbname = "wordpress";
+$servername = DB_HOST;
+$username = DB_USER;
+$password = DB_PASSWORD;
+$dbname = DB_NAME;
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -704,7 +703,7 @@ if (window.MathJax) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title></title>
-    <link rel="stylesheet" href="/wordpress/contents/themes/tutorstarter/system-test-toolkit/style/style_10.css">
+        <link rel="stylesheet" href="/wordpress/contents/themes/tutorstarter/system-test-toolkit/style/style_11.css">
    
 <style type="text/css">
 
@@ -746,10 +745,15 @@ if (window.MathJax) {
 }
 
 
-.quiz-section {
+           .quiz-section {
                display: flex;
                flex-direction: row;
            }
+           .review-page{
+                height: 100%;
+                display: flex;
+                flex-direction: row;
+            }
            .question-side, .answer-side {
                width: 50%;
                padding: 10px;
@@ -759,6 +763,11 @@ if (window.MathJax) {
                .quiz-section {
                    flex-direction: column;
                }
+               .review-page{
+                    height: 100%;
+                    flex-direction: column;
+
+                }
                .question-side, .answer-side {
                    width: 100%;
                }
@@ -1045,14 +1054,7 @@ img {
   100%  {transform:scaleY(-1) rotate(-135deg)}
 }
 /* Flex container for left and right navigation */
-.navigation-group {
-    display: flex;           /* Use flexbox for layout */
-    justify-content: space-between; /* Distribute space between left and right */
-    align-items: center;     /* Vertically center items */
-    margin: 10px 0;          /* Add some margin above and below */
-    width: 100%;             /* Ensure full width */
-    height: 20px;
-}
+
 @media (max-width: 768px) {
     
     .navigation-group {
@@ -1182,6 +1184,28 @@ img {
     overflow: auto; 
     background-color: rgba(0,0,0,0.4); 
 }
+.navigation-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.left-group {
+    padding-left: 10px;
+}
+
+.center-group {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.right-group {
+    padding-right: 3px;
+    display: flex;
+    gap: 6px; /* Giãn cách giữa các nút */
+}
 
 /* Modal Content */
 .modal-content {
@@ -1266,6 +1290,117 @@ img {
 .fail {
     color: red;
 }
+.section-pageview {
+    margin-top: 24px;
+    display: flex
+;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.ctrl-pageview {
+    background-color: #fff;
+    border: 1px solid #324dc7;
+    color: #324dc7;
+    width: 200px;
+}
+.ctrl-btn {
+    padding: 2px 23px;
+    /* border-block-color: #324dc7; */
+    height: 46px;
+    /* width: 86px; */
+    font-size: 1rem;
+    border-radius: 23px;
+    border: 1px solid #2f72dc;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #324dc7;
+    font-weight: 700;
+    cursor: initial;
+    user-select: none;
+    opacity: 1;
+    cursor: pointer;
+    pointer-events: all;
+}
+
+
+
+.close-review {
+    background-color: #fff;
+    border: 1px solid #324dc7;
+    color: #324dc7;
+    width: 200px;
+    padding: 2px 23px;
+    /* border-block-color: #324dc7; */
+    height: 46px;
+    /* width: 86px; */
+    font-size: 1rem;
+    border-radius: 23px;
+    border: 1px solid #2f72dc;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    cursor: initial;
+    user-select: none;
+    opacity: 1;
+    cursor: pointer;
+    pointer-events: all;
+}
+.next-module-review {
+    background-color: #3e98d5;
+    border: 1px solid #324dc7;
+    width: 200px;
+    padding: 2px 23px;
+    /* border-block-color: #324dc7; */
+    height: 46px;
+    /* width: 86px; */
+    font-size: 1rem;
+    border-radius: 23px;
+    border: 1px solid #2f72dc;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    cursor: initial;
+    user-select: none;
+    opacity: 1;
+    cursor: pointer;
+    pointer-events: all;
+}
+#name-module-checkbox{
+    justify-content: center;
+    text-align: center;
+}
+.contents{
+    width: 100%;
+    display: flex
+;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+.question-list{
+    column-gap: 35px;
+    row-gap: 25px;
+    display: flex;
+    flex-direction: row;
+    gap: 18px;
+    border: none;
+    border-top: solid #b2b2b2 1px;
+    width: 100%;
+    padding: 28px 10px 0;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+}
+
    </style>
 </head>
 

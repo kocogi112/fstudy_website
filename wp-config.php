@@ -103,6 +103,10 @@ define('WP_CONTENT_FOLDERNAME', 'contents');
 define('WP_CONTENT_DIR', ABSPATH . WP_CONTENT_FOLDERNAME);
 define('WP_CONTENT_URL', 'http://localhost/wordpress/' . WP_CONTENT_FOLDERNAME);
 
+define('AUTOMATIC_UPDATER_DISABLED', true);
+define('WP_AUTO_UPDATE_CORE', false);
+
+
 /** Sets up WordPress vars and included files. */
 require_once ABSPATH . 'wp-settings.php';
 

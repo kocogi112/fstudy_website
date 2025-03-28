@@ -3,11 +3,11 @@
  $user_id = get_current_user_id();// Get the custom number field value
 $custom_number =intval(get_query_var('id_test'));
 
-// Database credentials (update with your own database details)
-$servername = "localhost";
-$username = "root";
-$password = ""; // No password by default
-$dbname = "wordpress";
+  // Database credentials
+  $servername = DB_HOST;
+  $username = DB_USER;
+  $password = DB_PASSWORD;
+  $dbname = DB_NAME;
 $site_url = get_site_url();
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);

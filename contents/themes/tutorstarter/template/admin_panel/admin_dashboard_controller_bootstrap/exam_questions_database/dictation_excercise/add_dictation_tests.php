@@ -2,11 +2,28 @@
 /*
  * Template Name: Dictation Excercise
  */
+// Kiểm tra đường dẫn WordPress
+$wp_load_paths = [
+    $_SERVER['DOCUMENT_ROOT'] . '/wordpress/wp-load.php', // Local (có thư mục wordpress)
+    $_SERVER['DOCUMENT_ROOT'] . '/wp-load.php'            // Live server (không có thư mục wordpress)
+];
 
-$servername = "localhost";
-$username = "root";
-$password = ""; // No password by default
-$dbname = "wordpress";
+foreach ($wp_load_paths as $path) {
+    if (file_exists($path)) {
+        require_once $path;
+        break;
+    }
+}
+
+// Kiểm tra nếu chưa load được WordPress
+if (!defined('DB_HOST')) {
+    die("Error: Unable to load WordPress configuration.");
+}
+
+ $servername = DB_HOST;
+ $username = DB_USER;
+ $password = DB_PASSWORD;
+ $dbname = DB_NAME;
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);

@@ -19,11 +19,11 @@ if (is_user_logged_in()) {
     //$custom_number = get_post_meta($post_id, '_ieltsspeakingtests_custom_number', true);
     $custom_number =intval(get_query_var('id_test'));
 
-// Database credentials (update with your own database details)
-$servername = "localhost";
-$username = "root";
-$password = ""; // No password by default
-$dbname = "wordpress";
+  // Database credentials
+  $servername = DB_HOST;
+  $username = DB_USER;
+  $password = DB_PASSWORD;
+  $dbname = DB_NAME;
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -180,7 +180,7 @@ if (!empty($question_choose)) {
 
     while ($row = $result1->fetch_assoc()) {
         $questions[] = [
-            "question" => $row['question_content'],
+            "question" => addslashes($row['question_content']),
             "part" => $row['speaking_part'],
             "stt" => $row['stt'],
             "topic" => $row['topic'],
@@ -200,7 +200,7 @@ if (!empty($question_choose)) {
 
     while ($row = $result2->fetch_assoc()) {
         $questions[] = [
-            "question" => $row['question_content'],
+            "question" => addslashes($row['question_content']),
             "part" => $row['speaking_part'],
             "id" => $row['id_test'],
             "stt" => 1,
@@ -220,7 +220,7 @@ if (!empty($question_choose)) {
 
     while ($row = $result3->fetch_assoc()) {
         $questions[] = [
-            "question" => $row['question_content'],
+            "question" => addslashes($row['question_content']),
             "part" => $row['speaking_part'],
             "stt" => $row['stt'],
             "id" => $row['id_test'],
@@ -452,6 +452,30 @@ $conn->close();
                 
                 
             </div>
+    </div>
+
+    <div id="review-page" style="display: none">
+        <b>Review Page</b>
+        <div id="preface">
+            <i>Due to user's confusing pronunciation, some user's answer may lack of meaning. You now have another chance to make sure your answer correctly. </i>
+            <p>We provide this feature and we want your band show accurately because some other criterias may affect. </p>
+            <p style="color: red">Important Note: In real test, you will not have any chance to edit your answer </p>
+        </div>
+        <div id="edit-ans-area"></div>
+        <button id="log-edited-answer">Log Edited Answer</button>
+        <button id="log-original-answer">Log Original Answer with Edits</button>
+        <button id="log-edited-words">Log All Edited Words</button>
+
+    </div>
+
+
+    <!-- Popup sửa từ -->
+    <div id="word-edit-popup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+        background: white; padding: 10px; border: 2px solid black; z-index: 1000;">
+        <p>Edit Word:</p>
+        <input type="text" id="edit-word-input">
+        <button id="save-word-btn">Save</button>
+        <button id="cancel-word-btn">Cancel</button>
     </div>
 
 
@@ -902,7 +926,9 @@ async function uploadRecording(blob) {
     formData.append('file', blob, 'recording.mp3');
     formData.append('upload_preset', 'ccgbws2m');  // Replace with your preset name
 
-    const response = await fetch('https://api.cloudinary.com/v1_1/dloq2wl7k/upload', {  // Replace with your cloud name
+    //const response = await fetch('https://api.cloudinary.com/v1_1/dloq2wl7k/upload', {  // Replace with your cloud name
+    const response = await fetch('https://api.com/v1_1/dloq2wl7k/upload', {  // Replace with your cloud name
+
         method: 'POST',
         body: formData,
     });
@@ -962,6 +988,7 @@ async function uploadRecording(blob) {
         let numRecordings = 0;
 
         
+        let editCounts = {}; // Đếm số lần chỉnh sửa cho mỗi câu trả lời
 
         let audioChunks = [];
         let recordingInterval;
@@ -1012,7 +1039,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // Collect and save the user's answer
                     let answer = textarea.value.trim();
-                    answers['answer' + (currentQuestionIndex + 1)] = answer;
+                    answers['answer' + (currentQuestionIndex + 1)] = processAnswer(answer);
                     console.log("Question " + (currentQuestionIndex + 1) + ": " + questionElement.textContent);
                     console.log("Answer " + (currentQuestionIndex + 1) + ": " + answer);
 
@@ -1025,9 +1052,20 @@ document.addEventListener('DOMContentLoaded', function () {
                         loadQuestion();
                     } else {
                         document.getElementById('startButton').style.display = 'none';
+                        document.getElementById('reAnswerButton').style.display = 'none';
                         document.getElementById('stopButton').style.display = 'none';
+                        document.getElementById('review-page').style.display = 'block';
+
                         document.getElementById('submitButton').style.display = 'block';
-                        endTest();
+                        console.log("Show Review for exam");
+                        for (let i = 0; i < quizData.questions.length; i++){
+                            part = quizData.questions[i].part;
+                             ReviewPage(i);
+
+                            //await GetSummaryPart1(i);
+                            
+                        }
+                        //endTest();
                         showRecordings();
                     }
                 }
@@ -1057,6 +1095,25 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .catch(console.error);
 });
+// Function to process punctuation rules
+function processAnswer(text) {
+    const specialWords = ["furthermore", "moreover", "however", "therefore", "consequently", "nevertheless"];
+    const conjunctions = ["and", "but"];
+    
+    // Xử lý từ đặc biệt (viết hoa, thêm dấu . trước, dấu , sau)
+    specialWords.forEach(word => {
+        const regex = new RegExp(`\\b${word}\\b`, 'gi');
+        text = text.replace(regex, match => {
+            return `. ${match.charAt(0).toUpperCase() + match.slice(1)},`;
+        });
+    });
+
+    // Xử lý "and" và "but" (ngoại trừ "but also")
+    text = text.replace(/\b(and|but)\b(?! also)/gi, "$1,");
+
+    return text.trim();
+}
+
 
 var questionList = document.getElementById("question-list");
         questionList.innerHTML = ""; // Clear any existing content
@@ -1450,7 +1507,9 @@ async function submitAnswers() {
 
 for (let i = 0; i < quizData.questions.length; i++){
     part = quizData.questions[i].part;
-    await GetSummaryPart1(i);
+    //await ReviewPage(i);
+
+    //await GetSummaryPart1(i);
     
 }
     quizData.questions.forEach((question, i) => {
@@ -1676,7 +1735,7 @@ function recordWord(expectedWord, buttonElement) {
             
 </script>
 
-<script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\summarynew.js"></script>
+<script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\summary_3.js"></script>
 <script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\overalltab.js"></script>
 <script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\sample-tab.js"></script>
 <script src = "\wordpress\contents\themes\tutorstarter\scan-device\location_ip.js"></script>
