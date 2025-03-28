@@ -1,7 +1,7 @@
 <?php
  $post_id = get_the_ID();
  $user_id = get_current_user_id();// Get the custom number field value
-$custom_number =intval(get_query_var('id_test'));
+$custom_number = get_query_var('id_test');
 $site_url = get_site_url();
 // Database credentials (update with your own database details)
   // Database credentials
@@ -270,7 +270,7 @@ $parts = explode(',', $question_choose);
                             <td><?php echo esc_html($result->overallband); ?></td>
                             <td><?php echo esc_html($result->correct_number) ;?>/ <?php echo esc_html($result->total_question_number); ?></td>
                             <td>
-                                    <a href="<?php echo $site_url?>/ieltslisteningtest/result/<?php echo esc_html($result->testsavenumber); ?>">
+                                    <a href="<?php echo $site_url?>/ielts/l/result/<?php echo esc_html($result->testsavenumber); ?>">
 
                                     Xem bài làm
                                 </a>
@@ -309,7 +309,7 @@ $parts = explode(',', $question_choose);
                 <h4 class="alert-heading">Pro tips:</h4> <hr>
                 <p>Sẵn sàng để bắt đầu làm full test? Để đạt được kết quả tốt nhất, bạn cần dành ra 40 phút cho bài test này.</p>
             </div><br>
-            <a class="btn-submit" href="<?php echo $site_url?>/ieltslisteningtest/<?php echo $custom_number?>/start/" >Bắt đầu bài thi</a>
+            <a class="btn-submit" href="<?php echo $site_url?>/test/ielts/l/<?php echo $custom_number?>/start/" >Bắt đầu bài thi</a>
         </div>
 
         <div id="practice-content" style="display: none;">
@@ -319,7 +319,7 @@ $parts = explode(',', $question_choose);
             </div><br>
 
             <p class="h2-test">Giới hạn thời gian (Để trống để làm bài không giới hạn):</p>
-            <form action="<?php echo $site_url?>/ieltslisteningtest/<?php echo $custom_number?>/start/" method="get">
+            <form action="<?php echo $site_url?>/test/ielts/l/<?php echo $custom_number?>/start/" method="get">
                 <label style="font-size: 18px;" for="timer"></label>
 
                 <select id="timer" name="option">

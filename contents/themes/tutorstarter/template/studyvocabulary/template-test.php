@@ -40,7 +40,7 @@ $id_test = $custom_number;
 // Prepare the SQL statement
 $sql = "SELECT testname, test_type, question_choose, id_test FROM list_test_vocabulary_book WHERE id_test = ?";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $id_test);
+$stmt->bind_param("s", $id_test);
 $stmt->execute();
 $result = $stmt->get_result();
 

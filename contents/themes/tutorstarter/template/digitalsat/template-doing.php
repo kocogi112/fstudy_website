@@ -24,7 +24,7 @@ if (is_user_logged_in()) {
 
 
     //$custom_number = get_post_meta($post_id, "_digitalsat_custom_number", true);
-    $custom_number =intval(get_query_var('id_test'));
+    $custom_number = get_query_var('id_test');
     // Database credentials
     $servername = DB_HOST;
     $username = DB_USER;
@@ -113,7 +113,7 @@ $stmt = $conn->prepare($sql);
 if (!$stmt) {
     die("Error preparing statement 1: " . $conn->error);
 }
-$stmt->bind_param("i", $id_test);
+$stmt->bind_param("s", $id_test);
 $stmt->execute();
 $result = $stmt->get_result();
 

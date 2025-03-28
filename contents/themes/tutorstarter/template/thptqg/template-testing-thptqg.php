@@ -10,7 +10,7 @@ if (is_user_logged_in()) {
     $post_id = get_the_ID();
     $user_id = get_current_user_id();
 
-    $custom_number =intval(get_query_var('id_test'));
+    $custom_number = get_query_var('id_test');
     $current_user = wp_get_current_user();
     $current_username = $current_user->user_login;
     $username = $current_username;
@@ -81,7 +81,7 @@ $sql2 = "SELECT token, token_use_history
 // Use prepared statements to execute the query
 $stmt_test = $conn->prepare($sql_test);
 $id_test = $custom_number;
-$stmt_test->bind_param("i", $id_test);
+$stmt_test->bind_param("s", $id_test);
 $stmt_test->execute();
 
 // Get the result

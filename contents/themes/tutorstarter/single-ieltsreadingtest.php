@@ -1,7 +1,7 @@
 <?php
  $post_id = get_the_ID();
  $user_id = get_current_user_id();// Get the custom number field value
-$custom_number =intval(get_query_var('id_test'));
+$custom_number = get_query_var('id_test');
 //$custom_number = get_post_meta($post_id, '_ieltsreadingtest_custom_number', true);
 $site_url = get_site_url();
 
@@ -20,7 +20,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 // Truy vấn `question_choose` từ bảng `ielts_reading_test_list` theo `id_test`
-$sql_test = "SELECT  testname, test_type, question_choose FROM ielts_reading_test_list WHERE id_test = ?";
+$sql_test = "SELECT  testname, test_type, question_choose FROM ielts_reading_test_list WHERE BINARY id_test = ?";
 $stmt_test = $conn->prepare($sql_test);
 
 if ($stmt_test === false) {
@@ -28,7 +28,7 @@ if ($stmt_test === false) {
 }
 
 
-$stmt_test->bind_param("i", $custom_number);
+$stmt_test->bind_param("s", $custom_number);
 $stmt_test->execute();
 $result_test = $stmt_test->get_result();
 // Fetch the result
@@ -271,7 +271,7 @@ $parts = explode(',', $question_choose);
                             <td><?php echo esc_html($result->overallband); ?></td>
                             <td><?php echo esc_html($result->correct_number) ;?>/ <?php echo esc_html($result->total_question_number); ?></td>
                             <td>
-                                <a href="<?php echo $site_url?>/ieltsreadingtest/result/<?php echo esc_html($result->testsavenumber); ?>">
+                                <a href="<?php echo $site_url?>/ielts/r/result/<?php echo esc_html($result->testsavenumber); ?>">
                                     Xem bài làm
                                 </a>
 
@@ -309,7 +309,7 @@ $parts = explode(',', $question_choose);
                 <h4 class="alert-heading">Pro tips:</h4> <hr>
                 <p>Sẵn sàng để bắt đầu làm full test? Để đạt được kết quả tốt nhất, bạn cần dành ra 40 phút cho bài test này.</p>
             </div><br>
-            <a class="btn-submit" href="<?php echo $site_url?>/ieltsreadingtest/<?php echo $custom_number?>/start/">Bắt đầu bài thi</a>
+            <a class="btn-submit" href="<?php echo $site_url?>/test/ielts/r/<?php echo $custom_number?>/start/">Bắt đầu bài thi</a>
         </div>
 
         <div id="practice-content" style="display: none;">
@@ -319,7 +319,7 @@ $parts = explode(',', $question_choose);
             </div><br>
 
             <p class="h2-test">Giới hạn thời gian (Để trống để làm bài không giới hạn):</p>
-            <form action="<?php echo $site_url?>/ieltsreadingtest/<?php echo $custom_number?>/start/" method="get">
+            <form action="<?php echo $site_url?>/test/ielts/r/<?php echo $custom_number?>/start/" method="get">
                 <label style="font-size: 18px;" for="timer"></label>
 
                 <select id="timer" name="option">

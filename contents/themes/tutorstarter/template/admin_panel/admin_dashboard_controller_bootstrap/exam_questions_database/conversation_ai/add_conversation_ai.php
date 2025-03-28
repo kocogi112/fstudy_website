@@ -273,7 +273,10 @@ if ($result->num_rows > 0) {
             </div>
             <div class="modal-body">
                 <form id="addForm">
-                    ID Test: <input type="text" id="add_id_test" name="id_test" class="form-control" required><br>
+                    ID Test: <input type="text" id="add_id_test" name="id_test" class="form-control" disabled required><br>
+                    <button type="button" id="generate_id_btn" class="btn btn-primary">Generate ID</button><br>
+
+
                     Test Name (context): <textarea type="text" id="add_testname" name="testname" class="form-control" required></textarea><br>
                     Intruction: <textarea type="number" id="add_instruction" name="instruction" class="form-control" required></textarea><br>
                     Target 1: <textarea id="add_target_1" name="target_1" class="form-control" required></textarea><br>
@@ -338,6 +341,16 @@ if ($result->num_rows > 0) {
 <!-- jQuery and JavaScript for AJAX -->
 
 <script>
+    document.getElementById("generate_id_btn").addEventListener("click", function() {
+        let now = new Date();
+        let timestamp = `${now.getSeconds()}${now.getMinutes()}${now.getHours()}${now.getDate()}${now.getMonth() + 1}`;
+        let randomStr1 = Math.random().toString(36).substring(2, 4).toUpperCase(); // Random 2 ký tự
+        let randomStr2 = Math.random().toString(36).substring(2, 6).toUpperCase(); // Random 4 ký tự
+        let encoded = (timestamp + randomStr1 + randomStr2).toString(36).toUpperCase(); // Chuyển đổi base 36
+        document.getElementById("add_id_test").value = encoded;
+    });
+
+
 // Open the edit modal and populate it with data
 function openEditModal(number) {
     $.ajax({

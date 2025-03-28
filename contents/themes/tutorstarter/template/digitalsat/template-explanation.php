@@ -54,7 +54,7 @@ $id_test = $custom_number;
 // Prepare the SQL statement
 $sql = "SELECT testname, time, test_type, question_choose, tag, number_question, book, id_test, full_test_specific_module FROM digital_sat_test_list WHERE id_test = ?";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $id_test);
+$stmt->bind_param("s", $id_test);
 $stmt->execute();
 $result = $stmt->get_result();
 $site_url = get_site_url();

@@ -177,7 +177,7 @@ $result = $conn->query($sql);
                         <td>{$row['number']}</td>
                         <td>
                             
-                                <a href='http://localhost/wordpress/digitalsat/{$row['id_test']}' target='_blank'> {$row['id_test']}</a> 
+                                <a href='http://localhost/wordpress/test/digitalsat/{$row['id_test']}' target='_blank'> {$row['id_test']}</a> 
                           
                         </td>
                         <td>{$row['testname']}</td>
@@ -259,7 +259,11 @@ $result = $conn->query($sql);
             <div class="modal-body">
                 <form id="editForm">
                     <input type="hidden" id="edit_number" name="number">
-                    ID Test: <input type="text" id="edit_id_test" name="id_test" class="form-control" required><br>
+                    ID Test: <input type="text" id="edit_id_test" name="id_test" class="form-control" required ><br>
+
+            
+
+
                     Test Name: <input type="text" id="edit_testname" name="testname" class="form-control" required><br>
                     Number Question: <input type="text" id="edit_number_question" name="number_question" class="form-control" required><br>
                     Time: <input type="text" id="edit_time" name="time" class="form-control" required><br>
@@ -331,7 +335,10 @@ $result = $conn->query($sql);
             <div class="modal-body">
             <form id="addForm">
                     <input type="hidden" id="add_number" name="number">
-                    ID Test: <input type="text" id="add_id_test" name="id_test" class="form-control" required><br>
+                    ID Test: <input type="text" id="add_id_test" name="id_test" class="form-control" required disabled><br>
+                    <button type="button" id="generate_id_btn" class="btn btn-primary">Generate ID</button><br>
+
+
                     Test Name: <input type="text" id="add_testname" name="testname" class="form-control" required><br>
                     Number Question: <input type="text" id="add_number_question" name="number_question" class="form-control" required><br>
                     Time: <input type="text" id="add_time" name="time" class="form-control" required><br>
@@ -432,6 +439,17 @@ $result = $conn->query($sql);
 
 <!-- jQuery and JavaScript for AJAX -->
 <script>
+    document.getElementById("generate_id_btn").addEventListener("click", function() {
+        let now = new Date();
+        let timestamp = `${now.getSeconds()}${now.getMinutes()}${now.getHours()}${now.getDate()}${now.getMonth() + 1}`;
+        let randomStr1 = Math.random().toString(36).substring(2, 4).toUpperCase(); // Random 2 ký tự
+        let randomStr2 = Math.random().toString(36).substring(2, 6).toUpperCase(); // Random 4 ký tự
+        let encoded = (timestamp + randomStr1 + randomStr2).toString(36).toUpperCase(); // Chuyển đổi base 36
+        document.getElementById("add_id_test").value = encoded;
+    });
+    
+
+    
 
 function toggleFullTestSpecificModule() {
     var typeTest = document.getElementById('type_test').value;
@@ -516,7 +534,9 @@ function openEditModal(number) {
         type: 'POST',
         data: { number: number },
         success: function(response) {
+            
             var data = JSON.parse(response);
+            console.log(`Data: ${JSON.stringify(data, null, 2)}`);
             $('#edit_number').val(data.number);
             $('#edit_id_test').val(data.id_test);
             $('#edit_testname').val(data.testname);
@@ -535,21 +555,26 @@ function openEditModal(number) {
             $('#editModal').modal('show');
 
 
-            $('#edit_time_0').val(data.full_test_specific_module.rw_module_1.time);
-            $('#edit_start_0').val(data.full_test_specific_module.rw_module_1.question_particular[0].replace(/\D/g, ''));
-            $('#edit_end_0').val(data.full_test_specific_module.rw_module_1.question_particular.slice(-1)[0].replace(/\D/g, ''));
+            // Parse chuỗi JSON thành object trước
+            const moduleData = JSON.parse(data.full_test_specific_module);
 
-            $('#edit_time_1').val(data.full_test_specific_module.rw_module_2.time);
-            $('#edit_start_1').val(data.full_test_specific_module.rw_module_2.question_particular[0].replace(/\D/g, ''));
-            $('#edit_end_1').val(data.full_test_specific_module.rw_module_2.question_particular.slice(-1)[0].replace(/\D/g, ''));
+            // Lấy giá trị time (chú ý tên section có dấu cách, cần dùng ["..."] thay vì .)
+            $('#edit_time_0').val(moduleData["Section 1: Reading And Writing"].time);
+            $('#edit_start_0').val(moduleData["Section 1: Reading And Writing"].question_particular[0].replace(/\D/g, ''));
+            $('#edit_end_0').val(moduleData["Section 1: Reading And Writing"].question_particular.slice(-1)[0].replace(/\D/g, ''));
 
-            $('#edit_time_2').val(data.full_test_specific_module.math_module_1.time);
-            $('#edit_start_2').val(data.full_test_specific_module.math_module_1.question_particular[0].replace(/\D/g, ''));
-            $('#edit_end_2').val(data.full_test_specific_module.math_module_1.question_particular.slice(-1)[0].replace(/\D/g, ''));
+            $('#edit_time_1').val(moduleData["Section 2: Reading And Writing"].time);
+            $('#edit_start_1').val(moduleData["Section 2: Reading And Writing"].question_particular[0].replace(/\D/g, ''));
+            $('#edit_end_1').val(moduleData["Section 2: Reading And Writing"].question_particular.slice(-1)[0].replace(/\D/g, ''));
 
-            $('#edit_time_3').val(data.full_test_specific_module.math_module_2.time);
-            $('#edit_start_3').val(data.full_test_specific_module.math_module_2.question_particular[0].replace(/\D/g, ''));
-            $('#edit_end_3').val(data.full_test_specific_module.math_module_2.question_particular.slice(-1)[0].replace(/\D/g, ''));
+            $('#edit_time_2').val(moduleData["Section 1: Math"].time);
+            $('#edit_start_2').val(moduleData["Section 1: Math"].question_particular[0].replace(/\D/g, ''));
+            $('#edit_end_2').val(moduleData["Section 1: Math"].question_particular.slice(-1)[0].replace(/\D/g, ''));
+
+            $('#edit_time_3').val(moduleData["Section 2: Math"].time);
+            $('#edit_start_3').val(moduleData["Section 2: Math"].question_particular[0].replace(/\D/g, ''));
+            $('#edit_end_3').val(moduleData["Section 2: Math"].question_particular.slice(-1)[0].replace(/\D/g, ''));
+
 
         }
     });

@@ -144,7 +144,7 @@ $result = $conn->query($sql);
                         <td>{$row['number']}</td>
                         <td>
                             
-                                <a href='http://localhost/wordpress/ieltsreadingtest/{$row['id_test']}' target='_blank'> {$row['id_test']}</a> 
+                                <a href='http://localhost/wordpress/test/ielts/r/{$row['id_test']}' target='_blank'> {$row['id_test']}</a> 
                           
                         </td>
                         
@@ -243,7 +243,12 @@ $result = $conn->query($sql);
             <div class="modal-body">
                 <form id="editForm">
                     <input type="hidden" id="edit_number" name="number">
-                    ID Test: <input type="text" id="edit_id_test" name="id_test" class="form-control" required><br>
+                    ID Test: <input type="text" id="edit_id_test" name="id_test" class="form-control" required ><br>
+                    <!--ADD TẠM THỜI-->
+                    <button type="button" id="generate_id_btn_edit" class="btn btn-primary">Generate ID</button><br>
+                    <!--ADD TẠM THỜI-->
+
+
                     Test Name: <input type="text" id="edit_testname" name="testname" class="form-control" required><br>
                     Test Type:<select id="edit_test_type" name="test_type" class="form-control" required>
                             <option value="">Select a Test Type</option>
@@ -287,7 +292,11 @@ $result = $conn->query($sql);
             <div class="modal-body">
             <form id="addForm">
                     <input type="hidden" id="add_number" name="number">
-                    ID Test: <input type="text" id="add_id_test" name="id_test" class="form-control" required><br>
+                    ID Test: <input type="text" id="add_id_test" name="id_test" class="form-control" required disabled><br>
+                    <button type="button" id="generate_id_btn" class="btn btn-primary">Generate ID</button><br>
+
+
+
                     Test Name: <input type="text" id="add_testname" name="testname" class="form-control" required><br>
 
                     Test Type:<select id="add_test_type" name="test_type" class="form-control" required>
@@ -356,10 +365,27 @@ $result = $conn->query($sql);
 <!-- jQuery and JavaScript for AJAX -->
 
 <script>
+    document.getElementById("generate_id_btn").addEventListener("click", function() {
+        let now = new Date();
+        let timestamp = `${now.getSeconds()}${now.getMinutes()}${now.getHours()}${now.getDate()}${now.getMonth() + 1}`;
+        let randomStr1 = Math.random().toString(36).substring(2, 4).toUpperCase(); // Random 2 ký tự
+        let randomStr2 = Math.random().toString(36).substring(2, 6).toUpperCase(); // Random 4 ký tự
+        let encoded = (timestamp + randomStr1 + randomStr2).toString(36).toUpperCase(); // Chuyển đổi base 36
+        document.getElementById("add_id_test").value = encoded;
+    });
+
+    document.getElementById("generate_id_btn_edit").addEventListener("click", function() {
+        let now = new Date();
+        let timestamp = `${now.getSeconds()}${now.getMinutes()}${now.getHours()}${now.getDate()}${now.getMonth() + 1}`;
+        let randomStr1 = Math.random().toString(36).substring(2, 4).toUpperCase(); // Random 2 ký tự
+        let randomStr2 = Math.random().toString(36).substring(2, 6).toUpperCase(); // Random 4 ký tự
+        let encoded = (timestamp + randomStr1 + randomStr2).toString(36).toUpperCase(); // Chuyển đổi base 36
+        document.getElementById("edit_id_test").value = encoded;
+    });
 // Open the edit modal and populate it with data
 function openEditModal(number) {
     $.ajax({
-        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ieltsreadingtest/test-list/get_question.php', // Fetch the question details
+        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ielts/ieltsreadingtest/test-list/get_question.php', // Fetch the question details
         type: 'POST',
         data: { number: number },
         success: function(response) {
@@ -382,7 +408,7 @@ function openEditModal(number) {
 // Save the edited data
 function saveEdit() {
     $.ajax({
-        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ieltsreadingtest/test-list/update_question.php',
+        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ielts/ieltsreadingtest/test-list/update_question.php',
         type: 'POST',
         data: $('#editForm').serialize(),
         success: function(response) {
@@ -399,7 +425,7 @@ function openAddModal() {
 // Save the new question
 function saveNew() {
     $.ajax({
-        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ieltsreadingtest/test-list/add_question.php',
+        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ielts/ieltsreadingtest/test-list/add_question.php',
         type: 'POST',
         data: $('#addForm').serialize(),
         success: function(response) {
@@ -412,7 +438,7 @@ function saveNew() {
 function deleteRecord(number) {
     if (confirm('Are you sure you want to delete this question?')) {
         $.ajax({
-            url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ieltsreadingtest/test-list/delete_question.php',
+            url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ielts/ieltsreadingtest/test-list/delete_question.php',
             type: 'POST',
             data: { number: number },
             success: function(response) {

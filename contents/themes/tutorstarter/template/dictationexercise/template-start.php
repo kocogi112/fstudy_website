@@ -38,7 +38,7 @@ $sql_test = "SELECT * FROM dictation_question WHERE id_test = ?";
 
 
 $stmt_test = $conn->prepare($sql_test);
-$stmt_test->bind_param("i", $custom_number); // 'i' is used for integer
+$stmt_test->bind_param("s", $custom_number); // 'i' is used for integer
 $stmt_test->execute();
 $result_test = $stmt_test->get_result();
 

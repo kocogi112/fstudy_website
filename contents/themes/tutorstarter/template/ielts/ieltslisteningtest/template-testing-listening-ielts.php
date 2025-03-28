@@ -1,22 +1,21 @@
 <?php
 /*
- * Template Name: Doing Template Reading Test
- * Template Post Type: ieltsreadingtest
+ * Template Name: Doing Template Listening
+ * Template Post Type: ieltslisteningtest
  
  */
 
 
-if (is_user_logged_in()) {
+ if (is_user_logged_in()) {
     $post_id = get_the_ID();
     $user_id = get_current_user_id();
+
     $current_user = wp_get_current_user();
     $current_username = $current_user->user_login;
     $username = $current_username;
     // Lấy giá trị custom number từ custom field
     $custom_number = intval(get_query_var('id_test'));
-    $current_user_id = $current_user->ID;
-
-    //$custom_number = get_post_meta($post_id, '_ieltsreadingtest_custom_number', true);
+   
       // Database credentials
       $servername = DB_HOST;
       $username = DB_USER;
@@ -31,7 +30,8 @@ if (is_user_logged_in()) {
         die("Connection failed: " . $conn->connect_error);
     }
     
-$sql_test = "SELECT * FROM ielts_reading_test_list WHERE id_test = ?";
+// Truy vấn `question_choose` từ bảng `ielts_listening_test_list` theo `id_test`
+$sql_test = "SELECT * FROM ielts_listening_test_list WHERE id_test = ?";
 $stmt_test = $conn->prepare($sql_test);
 
 if ($stmt_test === false) {
@@ -62,8 +62,8 @@ if (!$custom_number) {
 
  echo "<script> 
         var resultId = '" . $result_id . "';
-       
-        var siteUrl = '" .
+        console.log('Result ID: ' + resultId);
+         var siteUrl = '" .
         $site_url .
         "';
         var id_test = '" .
@@ -71,18 +71,18 @@ if (!$custom_number) {
         "';
 
 
-        console.log('Result ID: ' + resultId);
     </script>";
 
 
 
-$stmt_test->bind_param("i", $custom_number);
+$stmt_test->bind_param("s", $custom_number);
 $stmt_test->execute();
 $result_test = $stmt_test->get_result();
 
 
 
 $current_url = $_SERVER['REQUEST_URI'];
+
 
 
 // Query to fetch token details for the current username
@@ -92,7 +92,6 @@ $sql2 = "SELECT token, token_use_history
 
 
 // Prepare and execute the first query
-
 
 if ($result_test->num_rows > 0) {
     // Lấy các ID từ question_choose (ví dụ: "1001,2001,3001")
@@ -124,12 +123,7 @@ if ($result_test->num_rows > 0) {
         $token_use_history = $token_data['token_use_history'];
 
         echo "<script>console.log('Token: $token, Token Use History: $token_use_history, Mày tên: $current_username');</script>";
-        echo '<script>
-            var currentUsername = "' . $current_username . '";
-            var currentUserid = "' . $current_user_id . '";
-            console.log("Current Username: " + currentUsername);
-            console.log("Current User ID: " + currentUserid);
-        </script>';
+       
 
     } else {
         echo "Lỗi đề thi";
@@ -196,7 +190,7 @@ if (strpos($current_url, '?part=') !== false) {
         $id_parts_raw = explode(',', $query_params['part']);
         
         // Tạo mảng mặc định với 3 phần tử
-        $id_parts = ["0", "0", "0"];
+        $id_parts = ["0", "0", "0", "0"];
 
         // Lặp qua các giá trị và đặt vào mảng kết quả
         foreach ($id_parts_raw as $part) {
@@ -236,16 +230,20 @@ if (strpos($current_url, '?part=') !== false) {
         // Xác định bảng và câu lệnh SQL tương ứng dựa trên index của part
         switch ($index) {
             case 0:
-                $sql_part = "SELECT part, duration, number_question_of_this_part, paragraph, group_question, category 
-                             FROM ielts_reading_part_1_question WHERE id_part = ?";
+                $sql_part = "SELECT part, duration, audio_link, group_question, category 
+                             FROM ielts_listening_part_1_question WHERE id_part = ?";
                 break;
             case 1:
-                $sql_part = "SELECT part, duration, number_question_of_this_part, paragraph, group_question, category 
-                             FROM ielts_reading_part_2_question WHERE id_part = ?";
+                $sql_part = "SELECT part, duration, audio_link, group_question, category 
+                             FROM ielts_listening_part_2_question WHERE id_part = ?";
                 break;
             case 2:
-                $sql_part = "SELECT part, duration, number_question_of_this_part, paragraph, group_question, category 
-                             FROM ielts_reading_part_3_question WHERE id_part = ?";
+                $sql_part = "SELECT part, duration, audio_link, group_question, category 
+                             FROM ielts_listening_part_3_question WHERE id_part = ?";
+                break;
+            case 3:
+                $sql_part = "SELECT part, duration, audio_link, group_question, category 
+                             FROM ielts_listening_part_4_question WHERE id_part = ?";
                 break;
             default:
                 continue 2; // Nếu có nhiều hơn 3 phần, bỏ qua
@@ -265,8 +263,7 @@ if (strpos($current_url, '?part=') !== false) {
         while ($row = $result_part->fetch_assoc()) {
             $entry = [
                 'part_number' => $row['part'],
-                'paragraph' => $row['paragraph'],
-                'number_question_of_this_part' => $row['number_question_of_this_part'],
+                'audio_link' => $row['audio_link'],
                 'duration' => $row['duration'],
                 'category' => $row['category'],
                 'group_question' => $row['group_question']
@@ -308,7 +305,7 @@ if (strpos($current_url, '?part=') !== false) {
             }
 
             // Cập nhật số câu hỏi của phần hiện tại để cộng vào phần tiếp theo
-            $previous_part_questions += $row['number_question_of_this_part'];
+            $previous_part_questions += 10;
 
 
             // Thêm phần vào mảng part
@@ -332,18 +329,13 @@ if (strpos($current_url, '?part=') !== false) {
 $conn->close();
 
 ?>
-    
-
-
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ielts Reading Computer </title>
+    <title>Ielts Listening Test</title>
     <style>
-      
-
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -352,54 +344,7 @@ body {
 
 }
 
-.form-group{
- 
- position: relative;
- font-size: 15px;
- color: #666;
- &+&{
-   margin-top: 30px;
- }
- 
- 
-}
 
-
-.form-label{
-   position: absolute;
-   z-index: 1;
-   left: 0;
-   top: 5px;
-   @include transition(.3s);
-   
- }
- 
- .form-control{
-    width: 150px;
-
-   position: relative;
-   z-index: 3;
-   height: 35px;
-   background: none;
-   border:none;
-   padding: 5px 0;
-   @include transition(.3s);
-   border-bottom: 1px solid #777;
-   color: #555;
-   &:invalid{outline: none;}
-   
-   &:focus , &:valid{
-     outline: none;
-
-     @include box-shadow(0 1px $primary);
-     border-color:$primary;
-     + .form-label{
-       font-size: 12px;
-       color: $primary;
-       @include translateY(-15px);
-     }
-   }
- }
 .content-left {
     width: 50%;
     padding: 20px;
@@ -445,7 +390,21 @@ body {
     border-radius: 4px;
     box-sizing: border-box;
 }
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
 
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
 /* Fixed header for question range */
 .fixed-above {
     background-color: #f8f9fa; /* Màu nền cho header */
@@ -467,101 +426,33 @@ body {
 .test-taker-id {
     font-weight: bold;
 }
+.group-control-part-btn{
+    position: fixed;
+    bottom: 70px;
+    right: 10px;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+}
+.control-part-btn{
+    background-color:black;
+    color: #ffffff;
+    height:60px;
+    width: 60px;
+}
+
+.bookmark-btn{
+    height: 30px;
+}
 
 
-
-.above-test {
+.question-range {
     background-color: #e9ecef; /* Màu xám cho phần câu hỏi */
     padding: 14px; /* Khoảng cách bên trong */
     margin-top: 30px; /* Tăng giá trị để tránh che khuất bởi header */
+    width: 97%; /* Không chiếm chiều rộng đầy đủ */
     margin: 0 auto; /* Căn giữa */
-    display: flex; /* Sử dụng flexbox để căn chỉnh các phần tử con */
-    justify-content: space-between; /* Đưa icon và thời gian ra hai bên */
-    align-items: center; /* Căn chỉnh theo chiều dọc */
-}
-
-.above-test i {
-    margin: 0 10px; /* Tạo khoảng cách giữa các icon */
-    cursor: pointer; /* Cho hiệu ứng con trỏ khi hover */
-
-}
-
-
-.above-test .fa-regular.fa-clock {
-    margin-right: 10px; /* Tạo khoảng cách giữa fa-clock và timer */
-}
-
-.above-test .timer {
-    margin-right: 20px; /* Tạo khoảng cách giữa timer và fa-bug */
-}
-
-.above-test .fa-solid.fa-bug.fa-expand {
-    margin-right: 20px; /* Tạo khoảng cách giữa fa-bug và fa-circle-info */
-}
-
-#question-range-of-part {
-    flex-grow: 1; /* Cho phép phần tử này chiếm không gian còn lại */
-}
-html {
-  scroll-behavior: smooth;
-}
-
-.question-checkbox {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    width: 32px;
-    height: 32px;
-    font-size: 16px;
-    font-weight: 500;
-    color: #282828;
-    flex-shrink: 0;
-    background-color: #fff;
-    cursor: pointer;
-    opacity: 1;
-    font-family: "Montserrat", Helvetica, Arial, sans-serif;
-    -moz-transition: all ease 0.2s;
-    -o-transition: all ease 0.2s;
-    -webkit-transition: all ease 0.2s;
-    transition: all ease 0.2s;
-    font-size: 12px;
-    border: 1px solid #EAECEF;
-}
-
-.number-question {
-    border-radius: 50%; 
-    background-color: #e8f2ff;
-    color: #35509a;
-    width: 35px;
-    height: 35px;
-    line-height: 35px;
-    font-size: 15px;
-    text-align: center;
-    display: inline-block;
-}
-.highlight-marked {
-    background-color: yellow !important;
-}
-
-.checkbox-marked {
-    background-color: yellow !important;
-}
-
-
-
-.highlight-current-question {
-    font-weight: bold; /* In đậm */
-    border: 2px solid #ffcc00; /* Viền ngoài sáng màu vàng */
-    border-radius: 5px; /* Bo tròn góc */
-    padding: 5px; /* Tạo khoảng cách giữa chữ và viền */
-    background-color: #f9f6e8; /* Thêm nền nhạt */
-    transition: all 0.3s ease; /* Hiệu ứng mượt */
-}
-.checkbox-answered {
-    background-color: #e6f7ff; /* Màu nền xanh nhạt */
-    border-color: #1890ff;    /* Viền xanh đậm */
-    color: #1890ff;           /* Chữ màu xanh */
 }
 
 
@@ -596,8 +487,8 @@ html {
 }
 
 /* Right side scrollable content (questions) */
-.content-right {
-    width: 50%;
+.test-content {
+    width: 100%;
     padding: 20px;
     overflow-y: auto; /* Make it scrollable */
 }
@@ -653,6 +544,116 @@ html {
 }
 
 
+.question-checkbox {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    overflow: auto;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #282828;
+    flex-shrink: 0;
+    background-color: #fff;
+    cursor: pointer;
+    opacity: 1;
+    font-family: "Montserrat", Helvetica, Arial, sans-serif;
+    -moz-transition: all ease 0.2s;
+    -o-transition: all ease 0.2s;
+    -webkit-transition: all ease 0.2s;
+    transition: all ease 0.2s;
+    font-size: 12px;
+    border: 1px solid #EAECEF;
+}
+
+.number-question {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #282828;
+    flex-shrink: 0;
+    background-color: #fff;
+    cursor: pointer;
+    opacity: 1;
+    font-family: "Montserrat", Helvetica, Arial, sans-serif;
+    -moz-transition: all ease 0.2s;
+    -o-transition: all ease 0.2s;
+    -webkit-transition: all ease 0.2s;
+    transition: all ease 0.2s;
+    font-size: 12px;
+    border: 1px solid #EAECEF;
+}
+.highlight-marked {
+    background-color: yellow !important;
+}
+
+.checkbox-marked {
+    background-color: yellow !important;
+}
+
+.form-group{
+ 
+ position: relative;
+ font-size: 15px;
+ color: #666;
+ &+&{
+   margin-top: 30px;
+ }
+ 
+ 
+}
+
+
+.form-label{
+   position: absolute;
+   z-index: 1;
+   left: 0;
+   top: 5px;
+   
+ }
+ 
+ .form-control{
+   width: 100%;
+   position: relative;
+   z-index: 3;
+   height: 35px;
+   background: none;
+   border:none;
+   padding: 5px 0;
+   border-bottom: 1px solid #777;
+   color: #555;
+   &:invalid{outline: none;}
+   
+   &:focus , &:valid{
+     outline: none;
+
+     + .form-label{
+       font-size: 12px;
+     }
+   }
+ }
+
+
+.highlight-current-question {
+    font-weight: bold; /* In đậm */
+    border: 2px solid #ffcc00; /* Viền ngoài sáng màu vàng */
+    border-radius: 5px; /* Bo tròn góc */
+    padding: 5px; /* Tạo khoảng cách giữa chữ và viền */
+    background-color: #f9f6e8; /* Thêm nền nhạt */
+    transition: all 0.3s ease; /* Hiệu ứng mượt */
+}
+.checkbox-answered {
+    background-color: #e6f7ff; /* Màu nền xanh nhạt */
+    border-color: #1890ff;    /* Viền xanh đậm */
+    color: #1890ff;           /* Chữ màu xanh */
+}
 @keyframes l20-1{
    0%    {clip-path: polygon(50% 50%,0       0,  50%   0%,  50%    0%, 50%    0%, 50%    0%, 50%    0% )}
    12.5% {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100%   0%, 100%   0%, 100%   0% )}
@@ -670,6 +671,7 @@ html {
 }
 /* Fixed bottom navigation for questions */
 .fixed-bottom {
+    overflow: auto;
     position: fixed;
     bottom: 0;
     width: 100%;
@@ -680,7 +682,6 @@ html {
 }
 
 #part-navigation {
-    overflow: auto;
     display: flex;
     justify-content: space-between; /* Ensure even spacing */
     width: 100%;
@@ -713,10 +714,9 @@ html {
     color: white;
     border: 1px solid #0073e6;
 }
-.wp-dark-mode-active .tooltip {
-    background-color: #343b47 !important;
+img{
+    max-width: 100%;
 }
-
 
 .tooltip {
     position: relative;
@@ -727,7 +727,7 @@ html {
   
   .tooltip .tooltiptext {
     visibility: hidden;
-    width: 180px;
+    width: 150px;
     background-color: #555;
     color: #fff;
     text-align: center;
@@ -788,29 +788,55 @@ html {
     cursor: pointer; /* Change cursor to pointer on hover */
     vertical-align: middle; /* Align images vertically in the middle */
 }
-.group-control-part-btn{
-    position: fixed;
-    bottom: 70px;
-    right: 10px;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    cursor: pointer;
-}
-.control-part-btn{
-    background-color:black;
-    color: #ffffff;
-    height:60px;
-    width: 60px;
-}
+.audio-player {
+      margin: 20px auto;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    audio {
+      flex: 1;
+      outline: none;
+      border-radius: 10px;
+    }
+    /* Ẩn nút download và menu playback speed mặc định */
+    audio::-webkit-media-controls-enclosure {
+      overflow: hidden;
+    }
+    audio::-webkit-media-controls-download-button,
+    audio::-webkit-media-controls-playback-rate-button {
+      display: none;
+    }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .controls button, .controls select {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background: #007bff;
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      outline: none;
+      transition: background 0.3s ease;
+    }
+    .controls button:hover, .controls select:hover {
+      background: #0056b3;
+    }
+    .controls select {
+      background: #fff;
+      color: #333;
+    }
 
-.bookmark-btn{
-    height: 30px;
-}
-
-
-
-.start_test {
+    .start_test {
   appearance: none;
   background-color: #2ea44f;
   border: 1px solid rgba(27, 31, 35, .15);
@@ -862,12 +888,35 @@ html {
 }
 
 
-</style>
+.above-test {
+    background-color: #e9ecef; /* Màu xám cho phần câu hỏi */
+    padding: 14px; /* Khoảng cách bên trong */
+    margin-top: 30px; /* Tăng giá trị để tránh che khuất bởi header */
+    margin: 0 auto; /* Căn giữa */
+    display: flex; /* Sử dụng flexbox để căn chỉnh các phần tử con */
+    justify-content: space-between; /* Đưa icon và thời gian ra hai bên */
+    align-items: center; /* Căn chỉnh theo chiều dọc */
+}
+
+.above-test .fa-regular.fa-clock {
+    margin-right: 10px; /* Tạo khoảng cách giữa fa-clock và timer */
+}
+
+.above-test .timer {
+    margin-right: 20px; /* Tạo khoảng cách giữa timer và fa-bug */
+}
+
+.above-test .fa-solid.fa-bug {
+    margin-right: 20px; /* Tạo khoảng cách giữa fa-bug và fa-circle-info */
+}
+
+
+    </style>
 </head>
 <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
-<script> let pre_id_test_ = `<?php echo esc_html($custom_number); ?>`;</script>
+
 <body onload="main()">
-    <div id = "test-prepare">
+<div id = "test-prepare">
         <div class="loader"></div>
         <h3>Your test will begin shortly</h3>
         <div id = "checkpoint" class = "checkpoint">
@@ -882,6 +931,7 @@ html {
                     }
                         ?>
         </div>    
+
         <div id = "quick-instruction">
             <i>Quick Instruction:<br>
             - If you find any errors from test (image,display,text,...), please let us know by clicking icon <i class="fa-solid fa-bug"></i><br> 
@@ -891,7 +941,7 @@ html {
 
         </div>
         <div style="display: none;" id="date" style="visibility:hidden;"></div>
-        <div style="display: none;" id="title-test"><?php echo esc_html($testname);?></div>
+        <div style="display: none;" id="title" style="visibility:hidden;"><?php the_title(); ?></div>
         <div  style="display: none;"  id="id_test"  style="visibility:hidden;"><?php echo esc_html($custom_number);?></div>
         <button  style="display: none;" class ="start_test" id="start_test"  onclick = "prestartTest()">Start test</button>
         <i id = "welcome" style = "display:none">Click Start Test button to start the test now. Good luck</i>
@@ -900,54 +950,55 @@ html {
     </div>
 
 
-    
-    
+
     
     <div id="content1" style="display: none;">
-        <div class="above-test">
-            <div id="question-range-of-part" class="question-range"></div>
-            <i class="fa-regular fa-clock"></i>
-            <span id="timer" class="timer" style="font-weight: bold"></span>
-            <i class="fa-solid fa-bug"></i>
-            <i class="fa-solid fa-circle-info"></i>
-            <i id="fullscreen-toggle" class="fa-solid fa-expand"></i>
-        </div>
+            <div class = "above-test">
+                <div id="question-range-of-part" class="question-range"></div>
+                <i class="fa-regular fa-clock"></i><span id="timer" class="timer" style="font-weight: bold"></span>
+                <i class="fa-solid fa-bug"></i>
+                <i class="fa-solid fa-circle-info"></i>
+            </div>
+                        <div class="audio-player">
+                <audio id="audio" controls>
+                    <source id="audio-source" src="" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+                <div class="controls">
+                  <button id="reload">Reload</button>
+                  <select id="speed">
+                    <option value="0.5">0.5x</option>
+                    <option value="1" selected>1x (Normal)</option>
+                    <option value="1.5">1.5x</option>
+                    <option value="2">2x</option>
+                  </select>
+                </div>
+              </div>
 
 
         <div class="quiz-container">
-            <div class = "group-control-part-btn">
-                <button id="prev-btn" class= "control-part-btn" ><i class="fa-solid fa-arrow-left fa-xl"></i></button>
-                <button id="next-btn" class= "control-part-btn" ><i class="fa-solid fa-arrow-right  fa-xl"></i></button>
-            </div>
+            
 
-            <div class="content-left">
-                <div class = "top-left"></div>
-
-                <div id="paragraph-container">
-                    <!-- Paragraph will be loaded dynamically -->
-                </div>
-            </div>
-            <div class="content-right">
-            <div class = "top-right"></div>
-
+           
+            <div class="test-content">
                 <div id="questions-container">
                     <!-- Questions will be loaded dynamically -->
                 </div>
 
-
              <div class="pagination-container">
-                   
-
+                    <button id="prev-btn" style="display: none;" >Previous</button>
+                    
+                    <button id="next-btn" style="display: none;" >Next</button>
                     <h5  id="time-result"></h5>
 
-                    <h5 id ="useranswerdiv"></h5>
-                     <!-- giấu form send kết quả bài thi -->
+                    <h5 id ="useranswerdiv">Here: </h5>
+        <!-- giấu form send kết quả bài thi -->
 
 
     
   
-     <span id="message" style="display:none" ></span>
-     <form id="saveReadingResult"  style="display:none" >
+        <span id="message" style="display:none" ></span>
+     <form id="saveListeningResult">
                 <div class="card">
                     <div class="card-header">Form lưu kết quả</div>
                     <div class="card-body" >
@@ -1041,13 +1092,17 @@ html {
     </form>
     <!-- kết thúc send form -->
 
+
                 </div> 
+
+                
+
                 <div id="results-container"></div>
             </div>       
 
+
         </div>
         
-
 
         <div id="question-nav-container" class="fixed-bottom">
             <!-- <span id="part-label"></span>
@@ -1058,44 +1113,29 @@ html {
         </div>
     </div>
 
+    
+    <!-- kết thúc send form -->
+        
     <script>
-        let DoingTest = false;
-
             let highlights = {}; // Object để lưu trữ các highlight
 
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://smtpjs.com/v3/smtp.js"></script>
-    <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/script_reading_2.js"></script>
-    <script src="/wordpress/contents/themes/tutorstarter/ielts-reading-tookit/highlight-text-1.js"></script>
+     <script src="\wordpress\contents\themes\tutorstarter\ielts-listening-toolkit\script_listening.js"></script>  
+     <script src="\wordpress\contents\themes\tutorstarter\ielts-listening-toolkit\highlight_text.js"></script>
 
 </body>
+
 <script>
-    document.getElementById("fullscreen-toggle").addEventListener("click", function () {
-    if (!document.fullscreenElement) {
-        // Kích hoạt fullscreen
-        document.documentElement.requestFullscreen();
-        this.classList.remove("fa-expand");
-        this.classList.add("fa-compress");
-    } else {
-        // Thoát fullscreen
-        document.exitFullscreen();
-        this.classList.remove("fa-compress");
-        this.classList.add("fa-expand");
-    }
-});
-
-
     // function save data qua ajax
-jQuery('#saveReadingResult').submit(function(event) {
+jQuery('#saveListeningResult').submit(function(event) {
     event.preventDefault(); // Prevent the default form submission
     
      var link = "<?php echo admin_url('admin-ajax.php'); ?>";
     
-     var form = jQuery('#saveReadingResult').serialize();
+     var form = jQuery('#saveListeningResult').serialize();
      var formData = new FormData();
-     formData.append('action', 'save_user_result_ielts_reading');
-     formData.append('save_user_result_ielts_reading', form);
+     formData.append('action', 'save_user_result_ielts_listening');
+     formData.append('save_user_result_ielts_listening', form);
     
      jQuery.ajax({
          url: link,
@@ -1106,7 +1146,7 @@ jQuery('#saveReadingResult').submit(function(event) {
          success: function(result) {
              jQuery('#submit').attr('disabled', false);
              if (result.success == true) {
-                 jQuery('#saveReadingResult')[0].reset();
+                 jQuery('#saveListeningResult')[0].reset();
              }
              jQuery('#result_msg').html('<span class="' + result.success + '">' + result.data + '</span>');
          }
@@ -1125,8 +1165,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-
-//end new adding
 
 </script>
 </html>
@@ -1180,10 +1218,10 @@ else{
                 data: {
                     action: 'update_buy_test',
                     type_transaction: 'paid',
-                    table: 'ielts_reading_test_list',
+                    table: 'ielts_listening_test_list',
                     change_token: '$token_need',
                     payment_gate: 'token',
-                    title: 'Renew test $testname with $id_test (Ielts Reading Test) with $token_need (Buy $time_allow time do this test)',
+                    title: 'Buy test $testname with $id_test (Ielts Listening Test) with $token_need tokens (Buy $time_allow time do this test)',
                     id_test: id_test
                 },
                 success: function (response) {

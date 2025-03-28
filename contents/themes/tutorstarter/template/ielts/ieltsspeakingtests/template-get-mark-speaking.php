@@ -51,7 +51,7 @@ $id_test = $custom_number;
 // Prepare the SQL statement
 $sql = "SELECT testname, id_test, test_type, question_choose, tag, book FROM ielts_speaking_test_list WHERE id_test = ?";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $id_test);
+$stmt->bind_param("s", $id_test);
 $stmt->execute();
 $result = $stmt->get_result();
 

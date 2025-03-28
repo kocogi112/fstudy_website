@@ -391,7 +391,7 @@ async function openPreviewModal(idPart) {
     
     try {
         // Gửi yêu cầu AJAX để lấy dữ liệu
-        const response = await fetch(`http://localhost/wordpress/contents/themes/tutorstarter/template/ieltsreadingtest/reading-part-1-database-template/get_question_data.php?id_part=${idPart}`);
+        const response = await fetch(`http://localhost/wordpress/contents/themes/tutorstarter/template/ielts/ieltsreadingtest/reading-part-1-database-template/get_question_data.php?id_part=${idPart}`);
         const data = await response.json();
         
         // Cập nhật dữ liệu cho quizData
@@ -500,7 +500,7 @@ function generateRangeFields(context) {
 // Open the edit modal and populate it with data
 function openEditModal(number) {
     $.ajax({
-        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ieltsreadingtest/reading-part-1-database-template/get_question.php', // Fetch the question details
+        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ielts/ieltsreadingtest/reading-part-1-database-template/get_question.php', // Fetch the question details
         type: 'POST',
         data: { number: number },
         success: function(response) {
@@ -540,7 +540,7 @@ function saveEdit() {
 
 
     $.ajax({
-        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ieltsreadingtest/reading-part-1-database-template/update_question.php',
+        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ielts/ieltsreadingtest/reading-part-1-database-template/update_question.php',
         type: 'POST',
         data: formData,
         processData: false, // Required for FormData
@@ -576,7 +576,7 @@ function saveNew() {
 
 
     $.ajax({
-        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ieltsreadingtest/reading-part-1-database-template/add_question.php',
+        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ielts/ieltsreadingtest/reading-part-1-database-template/add_question.php',
         type: 'POST',
         data: formData,
         processData: false, // Required for FormData
@@ -591,7 +591,7 @@ function saveNew() {
 function deleteRecord(number) {
     if (confirm('Are you sure you want to delete this question?')) {
         $.ajax({
-            url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ieltsreadingtest/reading-part-1-database-template/delete_question.php',
+            url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ielts/ieltsreadingtest/reading-part-1-database-template/delete_question.php',
             type: 'POST',
             data: { number: number },
             success: function(response) {

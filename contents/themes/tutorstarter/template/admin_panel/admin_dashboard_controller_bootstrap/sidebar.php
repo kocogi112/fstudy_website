@@ -14,7 +14,53 @@ require_once($_SERVER['DOCUMENT_ROOT'] . '/wordpress/wp-load.php');
     </div>
     <div class="sidebar-brand-text mx-3">FStudy <sup>Admin</sup></div>
 </a>
-
+<style>
+    #caution {
+            color: blue;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        
+        #caution:hover {
+            color: darkblue;
+        }
+        
+        .modal2 {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content2 {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 5px;
+            position: relative;
+        }
+        
+        .close2 {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: black;
+        }
+</style>
 <!-- Divider -->
 <hr class="sidebar-divider my-0">
 
@@ -23,6 +69,40 @@ require_once($_SERVER['DOCUMENT_ROOT'] . '/wordpress/wp-load.php');
     <a class="nav-link" href="<?php echo MAIN_PATH; ?>index.php">
         <i class="fas fa-fw fa-tachometer-alt"></i>
         <span>Dashboard</span></a>
+        <span class="nav-link" id = "caution">Lưu ý chung</span>
+        <div id="myModal" class="modal2">
+
+        <div class="modal-content2">
+            <span class="close2">&times;</span>
+            <h2>Lưu ý chung</h2>
+            * ID các Test
+            - Chỉ generate ID được mã hóa Base24 cho các đề thi trong thư viện đề thi, KHÔNG mã hóa từng phần, để dễ quản lý
+            - Ví dụ generate id cho 1 test ielts reading, KHÔNG generate id cho từng ielts reading part 1,2,3.
+        </div>
+    </div>
+    <script>
+        // Lấy các phần tử cần thiết
+        const modal = document.getElementById("myModal");
+        const btn = document.getElementById("caution");
+        const span = document.getElementsByClassName("close2")[0];
+        
+        // Khi nhấn vào "Lưu ý chung", hiển thị modal
+        btn.onclick = function() {
+            modal.style.display = "block";
+        }
+        
+        // Khi nhấn vào nút đóng (x), ẩn modal
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+        
+        // Khi nhấn vào bất kỳ đâu bên ngoài modal, ẩn modal
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
 </li>
 
 <!-- Divider -->
@@ -124,6 +204,27 @@ require_once($_SERVER['DOCUMENT_ROOT'] . '/wordpress/wp-load.php');
         </div>
     </div>
 </li>
+
+
+
+<!-- Nav Item - Pages Collapse Menu -->
+<li class="nav-item">
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTopikReading"
+        aria-expanded="true" aria-controls="collapseTopikReading">
+        <i class="fas fa-fw fa-cog"></i>
+        <span>Topik Reading Tests</span>
+    </a>
+    <div id="collapseTopikReading" class="collapse" aria-labelledby="headingIeltsSpeaking" data-parent="#accordionSidebar">
+        <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header">Custom Topik Reading:</h6>
+            <a class="collapse-item" href="<?php echo MAIN_PATH; ?>exam_questions_database/topik_reading/add_topik_reading_tests.php">Thêm đề thi</a>
+            <h6 class="collapse-header">Chi tiết</h6>
+            <a class="collapse-item" href="<?php echo MAIN_PATH; ?>exam_questions_database/ielts_speaking/all_result_topik_reading.php">Bảng kết quả bài thi</a>
+            <a class="collapse-item" href="blank.html">Phân tích chuyên sâu</a>
+        </div>
+    </div>
+</li>
+
 
 
 <!-- Nav Item - Pages Collapse Menu -->

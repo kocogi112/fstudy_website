@@ -108,7 +108,7 @@ if (is_user_logged_in()) {
 
 
 
-$stmt_test->bind_param("i", $custom_number);
+$stmt_test->bind_param("s", $custom_number);
 $stmt_test->execute();
 $result_test = $stmt_test->get_result();
 

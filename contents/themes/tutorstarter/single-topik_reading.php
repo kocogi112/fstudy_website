@@ -2,13 +2,16 @@
  $post_id = get_the_ID();
  $user_id = get_current_user_id();// Get the custom number field value
 $custom_number = get_query_var('id_test');
+//$custom_number = get_post_meta($post_id, '_ieltsreadingtest_custom_number', true);
+$site_url = get_site_url();
 
   // Database credentials
   $servername = DB_HOST;
   $username = DB_USER;
   $password = DB_PASSWORD;
   $dbname = DB_NAME;
-$site_url = get_site_url();
+//$commentcount = get_comments_number( $post->ID );
+
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -16,11 +19,8 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-// Truy vấn `question_choose` từ bảng `ielts_writing_test_list` theo `id_test`
-//$sql_test = "SELECT  testname, test_type, question_choose FROM shadowing_question WHERE id_test = ?";
-
-$sql_test = "SELECT testname, time, number_question, year, subject FROM thptqg_question WHERE id_test = ?";
-
+// Truy vấn `question_choose` từ bảng `ielts_reading_test_list` theo `id_test`
+$sql_test = "SELECT  * FROM topik_reading_test_list WHERE id_test = ?";
 $stmt_test = $conn->prepare($sql_test);
 
 if ($stmt_test === false) {
@@ -32,6 +32,7 @@ $stmt_test->bind_param("i", $custom_number);
 $stmt_test->execute();
 $result_test = $stmt_test->get_result();
 // Fetch the result
+$question_choose = '';
 
 if ($result_test->num_rows === 0) {
     // Nếu không tìm thấy id_test, chuyển hướng đến trang 404
@@ -42,13 +43,11 @@ if ($result_test->num_rows === 0) {
 
 if ($result_test->num_rows > 0) {
     $row = $result_test->fetch_assoc();
+    $test_type = $row['test_type'];
     $testname = $row['testname'];
-    $time = $row['time'];
-    $number_question = $row['number_question'];
-    $year = $row['year'];
-    $subject = $row['subject'];
-
+    $question_choose = $row['question_choose']; // Comma-separated string
 }
+
 
 
 
@@ -66,6 +65,7 @@ get_header(); // Gọi phần đầu trang (header.php)
 $conn->close();
 
 // Split the comma-separated string into an array
+$parts = explode(',', $question_choose);
 
 
 
@@ -78,7 +78,7 @@ $conn->close();
 
     // Get results for the current user and specific idtest (custom_number)
     $results_query = $wpdb->prepare("
-        SELECT * FROM save_user_result_thptqg
+        SELECT * FROM save_user_result_ielts_reading 
         WHERE username = %s 
         AND idtest = %d
         ORDER BY dateform DESC",
@@ -257,7 +257,6 @@ $conn->close();
                             <th>Ngày làm</th>
                             <th>Kết quả</th>
                             <th>Điểm thành phần</th>
-                            <th>Thời gian làm bài</th>
                             <th>Chi tiết bài làm</th>
 
                         </tr>
@@ -269,15 +268,13 @@ $conn->close();
                         ?>
                         <tr>
                             <td><?php echo esc_html($result->dateform); ?></td>
-                            <td><?php echo esc_html($result->finalresult); ?></td>
-                            <td><?php echo esc_html($result->number_correct) ;?></td>
-                            <td><?php echo esc_html($result->timedotest) ;?></td>
-
+                            <td><?php echo esc_html($result->overallband); ?></td>
+                            <td><?php echo esc_html($result->correct_number) ;?>/ <?php echo esc_html($result->total_question_number); ?></td>
                             <td>
-                                <a href="<?php echo $site_url?>/thptqg/result/<?php echo esc_html($result->testsaveuuid); ?>">
-
+                                <a href="<?php echo $site_url?>/topik/r/result/<?php echo esc_html($result->testsavenumber); ?>">
                                     Xem bài làm
                                 </a>
+
                             </td>
                         </tr>
                         <?php
@@ -312,7 +309,7 @@ $conn->close();
                 <h4 class="alert-heading">Pro tips:</h4> <hr>
                 <p>Sẵn sàng để bắt đầu làm full test? Để đạt được kết quả tốt nhất, bạn cần dành ra 40 phút cho bài test này.</p>
             </div><br>
-            <a class="btn-submit" href="<?php echo $site_url?>/test/thptqg/<?php echo $custom_number?>/start/" >Bắt đầu bài thi</a>
+            <a class="btn-submit" href="<?php echo $site_url?>/test/topik/r/<?php echo $custom_number?>/start/">Bắt đầu bài thi</a>
         </div>
 
         <div id="practice-content" style="display: none;">
@@ -322,7 +319,7 @@ $conn->close();
             </div><br>
 
             <p class="h2-test">Giới hạn thời gian (Để trống để làm bài không giới hạn):</p>
-            <form action="<?php echo $site_url?>/test/thptqg/<?php echo $custom_number?>/start/"  method="get">
+            <form action="<?php echo $site_url?>/test/topik/r/<?php echo $custom_number?>/start/" method="get">
                 <label style="font-size: 18px;" for="timer"></label>
 
                 <select id="timer" name="option">

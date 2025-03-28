@@ -1,6 +1,6 @@
 <?php
 /*
- * Template Name: THPTQG
+ * Template Name: Test LIST Ielts Reading
  */
 
 $servername = "localhost";
@@ -24,7 +24,7 @@ $limit = 10; // Number of records per page
 $page = isset($_GET['page']) ? $_GET['page'] : 1; // Current page number
 $offset = ($page - 1) * $limit; // Calculate offset
 
-$total_sql = "SELECT COUNT(*) FROM thptqg_question";
+$total_sql = "SELECT COUNT(*) FROM topik_reading_test_list";
 if ($id_test_filter) {
     $total_sql .= " WHERE id_test LIKE '%$id_test_filter%'"; // Apply filter to total count
 }
@@ -32,7 +32,7 @@ $total_result = $conn->query($total_sql);
 $total_rows = $total_result->fetch_row()[0];
 $total_pages = ceil($total_rows / $limit); // Calculate total pages
 
-$sql = "SELECT * FROM thptqg_question";
+$sql = "SELECT * FROM topik_reading_test_list";
 if ($id_test_filter) {
     $sql .= " WHERE id_test LIKE '%$id_test_filter%'"; // Apply filter to the SQL query
 }
@@ -53,8 +53,7 @@ $result = $conn->query($sql);
 
 
     <!-- Custom fonts for this template-->
-    <link href="../../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link
+    <link href="../../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">    <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
 
@@ -62,7 +61,7 @@ $result = $conn->query($sql);
     <link href="../../css/sb-admin-2.min.css" rel="stylesheet">
 
     <meta charset="UTF-8">
-    <title>THPTQG Questions Database</title>
+    <title>List các đề Topik Reading</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
@@ -88,7 +87,6 @@ $result = $conn->query($sql);
 
 </head>
 
-
 <body id="page-top">
 
     <!-- Page Wrapper -->
@@ -107,7 +105,9 @@ $result = $conn->query($sql);
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
 
-                <h1>THPTQG Questions Database</h1>
+     
+<h1>List các đề TOPIK Reading Test</h1>
+</b>
 
 <!-- Filter form -->
 <form method="GET" action="">
@@ -124,45 +124,49 @@ $result = $conn->query($sql);
     <tr>
         <th>Number</th>
         <th>ID Test</th>
-        <th>Subject</th>
-        <th>Year</th>
         <th>Test Name</th>
-        <th>Link test file</th>
         <th>Time</th>
-        <th>Number Question</th>
-        <th>Test Code (JSON)</th>
+        <th>Test Type</th>
+        <th>Test Code</th>
+        <th>Correct Ans</th>
         <th>Token Need</th>
         <th>Role Access</th>
         <th>Permissive Management</th>
         <th>Time Allow</th>
-        <th>Actions</th>
+
     </tr>
 
     <?php
         if ($result->num_rows > 0) {
-            while($row = $result->fetch_assoc()) {
-                $testcode_words = explode(' ', $row['testcode']);
-                $testcode_display = count($testcode_words) > 20 ? implode(' ', array_slice($testcode_words, 0, 20)) . '...' : $row['testcode'];
-                $testcode_view_more = count($testcode_words) > 20 ? "<button class='btn btn-link' onclick='showFullContent(\"TestCode\", \"{$row['testcode']}\")'>View More</button>" : '';
 
-               
+            while($row = $result->fetch_assoc()) {
+                $question_content_sanitized = htmlspecialchars(json_encode($row['testcode'], JSON_HEX_APOS | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8');
+                $question_content_words = explode(' ', $row['testcode']);
+                $question_content_display = count($question_content_words) > 20 ? implode(' ', array_slice($question_content_words, 0, 20)) . '...' : $row['testcode'];
+                $question_content_view_more = count($question_content_words) > 20 ? "<button class='btn btn-link' onclick='showFullContent(\"Question Content\", $question_content_sanitized)'>View More</button>" : '';
+                 
+
+
                 echo "<tr id='row_{$row['number']}'>
                         <td>{$row['number']}</td>
                         <td>
-                            <a href='http://localhost/wordpress/thptqg/{$row['id_test']}' target='_blank'> {$row['id_test']}</a> 
+                            
+                                <a href='http://localhost/wordpress/test/topik/r/{$row['id_test']}' target='_blank'> {$row['id_test']}</a> 
+                          
                         </td>
-                        <td>{$row['subject']}</td>
-                        <td>{$row['year']}</td>
+                        
                         <td>{$row['testname']}</td>
-                        <td>{$row['link_file']}</td>
-
                         <td>{$row['time']}</td>
-                        <td>{$row['number_question']}</td>
-                        <td>{$testcode_display} $testcode_view_more</td>
+                        <td>{$row['test_type']}</td>
+                        <td>{$question_content_display} $question_content_view_more</td>
+                        <td>{$row['correct_answer']}</td>
+
                         <td>{$row['token_need']}</td>
                         <td>{$row['role_access']}</td>
                         <td>{$row['permissive_management']}</td>
                         <td>{$row['time_allow']}</td>
+
+                        
                         <td>
                             <button class='btn btn-primary btn-sm' onclick='openEditModal({$row['number']})'>Edit</button>
                             <button class='btn btn-danger btn-sm' onclick='deleteRecord({$row['number']})'>Delete</button>
@@ -172,6 +176,7 @@ $result = $conn->query($sql);
         } else {
             echo "<tr><td colspan='9'>No data found</td></tr>";
         }
+        
         ?>
 
 
@@ -227,19 +232,23 @@ $result = $conn->query($sql);
             <div class="modal-body">
                 <form id="editForm">
                     <input type="hidden" id="edit_number" name="number">
-                    
                     ID Test: <input type="text" id="edit_id_test" name="id_test" class="form-control" required><br>
-                    subject: <input type="text" id="edit_subject" name="subject" class="form-control" required><br>
-                    year: <input type="text" id="edit_year" name="year" class="form-control" required><br>
-                    Test name: <textarea id="edit_testname" name="testname" class="form-control" required></textarea><br>
-                    Link file: <textarea id="edit_link_file" name="link_file" class="form-control" required></textarea><br>
+                    Test Name: <input type="text" id="edit_testname" name="testname" class="form-control" required><br>
+                    Time: <input type="number" id="edit_time" name="time" class="form-control" required><br>
 
-                    Time: <input type = "number" id="edit_time" name="time" class="form-control"><br>
-                    Number Question: <textarea id="edit_number_question" name="number_question" class="form-control"></textarea><br>
-                    Test Code json: <textarea  id="edit_testcode" name="testcode" class="form-control" required></textarea> <br>
+                    Test Type:<select id="edit_test_type" name="test_type" class="form-control" required>
+                            <option value="">Select a Test Type</option>
+                            <option value="TOPIK I">TOPIK I</option>
+                            <option value="TOPIK II">TOPIK II</option>
+                        </select><br>
+                    
+                    Testcode: <textarea id="edit_testcode" name="testcode" class="form-control"></textarea><br>
+                    Correct Answer: <textarea id="edit_correct_answer" name="correct_answer" class="form-control"></textarea><br>
+                    
                     Token Need: <input type = "number" id="edit_token_need" name="token_need" class="form-control" required><br>
                     Role Access: <textarea  id="edit_role_access" name="role_access" class="form-control" required></textarea> <br>
-                    Time Allow: <input type = "number"  id="edit_time_allow" name="time_allow" class="form-control" required> <br>
+                    Time Allow: <textarea  id="edit_time_allow" name="time_allow" class="form-control" required></textarea> <br>
+                   
                 </form>
             </div>
             <div class="modal-footer">
@@ -260,25 +269,30 @@ $result = $conn->query($sql);
             </div>
             <div class="modal-body">
                 <form id="addForm">
-                    ID Test: <input type="text" id="add_id_test" name="id_test" class="form-control" required disabled><br>
+                    <input type="hidden" id="add_number" name="number">
+                    ID Test: 
+                    <input type="text" id="add_id_test" name="id_test" class="form-control" required>
                     <button type="button" id="generate_id_btn" class="btn btn-primary">Generate ID</button><br>
 
+                    Test Name: <input type="text" id="add_testname" name="testname" class="form-control" required><br>
+                    Time: <input type="number" id="add_time" name="time" class="form-control" required><br>
 
-                    Subject: <input type="text" id="add_subject" name="subject" class="form-control" required><br>
-                    Year: <input type="text" id="add_year" name="year" class="form-control" required><br>
-                    Test Name: <textarea id="add_testname" name="testname" class="form-control" required></textarea><br>
-                    Link file: <textarea id="add_link_file" name="link_file" class="form-control" required></textarea><br>
+                    Test Type:
+                    <select id="add_test_type" name="test_type" class="form-control" required>
+                        <option value="">Select a Test Type</option>
+                        <option value="TOPIK I">TOPIK I</option>
+                        <option value="TOPIK II">TOPIK II</option>
+                    </select><br>
 
-                    Time: <textarea id="add_time" name="time" class="form-control"></textarea><br>
-                    Number Question: <textarea id="add_number_question" name="number_question" class="form-control"></textarea><br>
-                    Test Code: <textarea  id="add_testcode" name="testcode" class="form-control" required></textarea> <br>
+                    Testcode: <textarea id="add_testcode" name="testcode" class="form-control"></textarea><br>
+                    Correct Answer: <textarea id="add_correct_answer" name="correct_answer" class="form-control"></textarea><br>
 
-                    Token Need: <input type = "number" id="add_token_need" name="token_need" class="form-control" required><br>
-                    Role Access: <textarea  id="add_role_access" name="role_access" class="form-control" required></textarea> <br>
-                    Time Allow: <input  type = "number" id="add_time_allow" name="time_allow" class="form-control" required> <br>
-
+                    Token Need: <input type="number" id="add_token_need" name="token_need" class="form-control" required><br>
+                    Role Access: <textarea id="add_role_access" name="role_access" class="form-control" required></textarea> <br>
+                    Time Allow: <textarea id="add_time_allow" name="time_allow" class="form-control" required></textarea> <br>
                 </form>
             </div>
+
             <div class="modal-footer">
                 <button type="button" class="btn btn-success" onclick="saveNew()">Add Question</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -287,8 +301,8 @@ $result = $conn->query($sql);
     </div>
 </div>
 
-</div>
 
+                </div>
                 <!-- /.container-fluid -->
 
             </div>
@@ -311,7 +325,6 @@ $result = $conn->query($sql);
     <!-- Bootstrap core JavaScript-->
     <script src="../../vendor/jquery/jquery.min.js"></script>
     <script src="../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
     <!-- Core plugin JavaScript-->
     <script src="../../vendor/jquery-easing/jquery.easing.min.js"></script>
 
@@ -321,32 +334,37 @@ $result = $conn->query($sql);
 </body>
 
 <!-- jQuery and JavaScript for AJAX -->
+
 <script>
-    document.getElementById("generate_id_btn").addEventListener("click", function() {
-        let now = new Date();
+   document.getElementById("generate_id_btn").addEventListener("click", function() {
+    let now = new Date();
         let timestamp = `${now.getSeconds()}${now.getMinutes()}${now.getHours()}${now.getDate()}${now.getMonth() + 1}`;
         let randomStr1 = Math.random().toString(36).substring(2, 4).toUpperCase(); // Random 2 ký tự
         let randomStr2 = Math.random().toString(36).substring(2, 6).toUpperCase(); // Random 4 ký tự
         let encoded = (timestamp + randomStr1 + randomStr2).toString(36).toUpperCase(); // Chuyển đổi base 36
         document.getElementById("add_id_test").value = encoded;
-    });
+});
+
+
+
+
 // Open the edit modal and populate it with data
 function openEditModal(number) {
     $.ajax({
-        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/thptqg/database-template/get_question.php', // Fetch the question details
+        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/topik/topik_reading/test-list/get_question.php', // Fetch the question details
         type: 'POST',
         data: { number: number },
         success: function(response) {
             var data = JSON.parse(response);
             $('#edit_number').val(data.number);
             $('#edit_id_test').val(data.id_test);
-            $('#edit_subject').val(data.subject);
-            $('#edit_year').val(data.year);
             $('#edit_testname').val(data.testname);
-            $('#edit_link_file').val(data.link_file);
             $('#edit_time').val(data.time);
-            $('#edit_number_question').val(data.number_question);
+
+            $('#edit_test_type').val(data.test_type);
             $('#edit_testcode').val(data.testcode);
+            $('#edit_correct_answer').val(data.correct_answer);
+
             $('#edit_token_need').val(data.token_need);
             $('#edit_role_access').val(data.role_access);
             $('#edit_time_allow').val(data.time_allow);
@@ -358,7 +376,7 @@ function openEditModal(number) {
 // Save the edited data
 function saveEdit() {
     $.ajax({
-        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/thptqg/database-template/update_question.php',
+        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/topik/topik_reading/test-list/update_question.php',
         type: 'POST',
         data: $('#editForm').serialize(),
         success: function(response) {
@@ -375,7 +393,7 @@ function openAddModal() {
 // Save the new question
 function saveNew() {
     $.ajax({
-        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/thptqg/database-template/add_question.php',
+        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/topik/topik_reading/test-list/add_question.php',
         type: 'POST',
         data: $('#addForm').serialize(),
         success: function(response) {
@@ -386,9 +404,9 @@ function saveNew() {
 
 // Delete a record
 function deleteRecord(number) {
-    if (confirm('Are you sure you want to delete this question?')) {
+    if (confirm('Are you sure you want to delete this test ?')) {
         $.ajax({
-            url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/thptqg/database-template/delete_question.php',
+            url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/topik/topik_reading/test-list/delete_question.php',
             type: 'POST',
             data: { number: number },
             success: function(response) {
@@ -410,6 +428,5 @@ function showFullContent(title, content) {
 
 
 </script>
-
 
 </html>

@@ -5,7 +5,7 @@ $post_id = get_the_ID();
 $user_id = get_current_user_id();
 // Get the custom number field value
 //$custom_number = get_post_meta($post_id, '_dictationexercise_custom_number', true);
-$custom_number =intval(get_query_var('id_test'));
+$custom_number = get_query_var('id_test');
 $site_url = get_site_url();
 /*
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['doing_text'])) {
@@ -29,7 +29,7 @@ if (is_user_logged_in()) {
     // Get results for the current user and specific idtest (custom_number)
     $results_query = $wpdb->prepare("
         SELECT * FROM dictation_question 
-        WHERE idtest = %d
+        WHERE idtest = %s
         ",
         $current_username,
         $custom_number
@@ -279,7 +279,7 @@ get_header(); // Gọi phần đầu trang (header.php)
                     </div><br>
                     
                     <p class ="h2-test" >Giới hạn thời gian (Để trống để làm bài không giới hạn):</p>
-                    <form action="<?php echo $site_url?>/conversation_ai/<?php echo $custom_number?>/start/" method="get" method="get">
+                    <form action="<?php echo $site_url?>/practice/conversation_ai/<?php echo $custom_number?>/start/" method="get" method="get">
                         <label style="font-size: 18px;"  for="timer"></label>
 
                         <select id="timer" name="option">
@@ -304,7 +304,7 @@ get_header(); // Gọi phần đầu trang (header.php)
                         <h4 class="alert-heading">Pro tips:</h4> <hr>
                         <p>Sẵn sàng để bắt đầu làm full test? Để đạt được kết quả tốt nhất, bạn cần dành ra 40 phút cho bài test này.</p>
                         </div><br>
-                    <a   class="btn-submit" href="<?php echo $site_url?>/conversation_ai/<?php echo $custom_number?>/start/" method="get">Bắt đầu bài thi</a>
+                    <a   class="btn-submit" href="<?php echo $site_url?>/practice/conversation_ai/<?php echo $custom_number?>/start/" method="get">Bắt đầu bài thi</a>
                 </div>
             </div>
         </div>

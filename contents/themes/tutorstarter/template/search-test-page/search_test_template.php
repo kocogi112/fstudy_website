@@ -32,15 +32,26 @@ var siteUrl = "' . $site_url .'";
 // Define the post types with labels for the navigation
 $test_tables = [
     'digitalsat' => 'digital_sat_test_list',
-    'ieltsreadingtest' => 'ielts_reading_test_list',
     'thptqg' => 'thptqg_question',
-    'ieltsspeakingtests' => 'ielts_speaking_test_list',
-    'ieltslisteningtest' => 'ielts_listening_test_list',
+
+
+
     'conversation_ai' => 'conversation_with_ai_list',
     'studyvocabulary' => 'list_test_vocabulary_book',
-    'ieltswritingtests' => 'ielts_writing_test_list',
     'dictation' => 'dictation_question',
     'shadowing' => 'shadowing_question',
+
+
+    'ieltsreadingtest' => 'ielts_reading_test_list',
+    'ieltsspeakingtests' => 'ielts_speaking_test_list',
+    'ieltslisteningtest' => 'ielts_listening_test_list',
+    'ieltswritingtests' => 'ielts_writing_test_list',
+
+
+    'topikreading' => 'topik_reading_test_list',
+    'topiklistening' => 'topik_listening_test_list',
+    'topikwriting' => 'topik_writing_test_list',
+    'topikspeaking' => 'topik_speaking_test_list',
 
 ];
 
@@ -56,6 +67,10 @@ $test_labels = [
     'ieltswritingtests' => 'IELTS Writing',
     'dictation' => 'Dictation',
     'shadowing' => 'Shadowing',
+    'topikreading' => 'Topik Reading',
+    'topiklistening' => 'Topik Listening',
+    'topikwriting' => 'Topik Writing',
+    'topikspeaking' => 'Topik Speaking',
 
 
 ];
@@ -230,7 +245,33 @@ $query = new WP_Query($args);
                     <i class="fa-solid fa-check" style="color: #63E6BE;"></i>
                 </div>
             <?php endif; ?>
-            <a href="<?php echo esc_url(home_url("/{$current_post_type}/{$test->id_test}")); ?>" class="detail-button">Take Test</a>
+            <?php
+                $custom_paths = [
+                    'ieltswritingtests' => '/test/ielts/w/',
+                    'ieltsspeakingtests' => '/test/ielts/s/',
+                    'ieltslisteningtest' => '/test/ielts/l/',
+                    'ieltsreadingtest' => '/test/ielts/r/',
+                    'digitalsat' => '/test/digitalsat/',
+                    'thptqg' => '/test/thptqg/',
+                    'conversation_ai' => '/practice/conversation_ai/',
+                    'studyvocabulary' => '/practice/studyvocabulary/',
+                    'dictation' => '/practice/dictation/',
+                    'shadowing' => '/practice/shadowing/'
+
+
+                ];
+
+               
+
+
+
+
+                $base_path = $custom_paths[$current_post_type] ?? "/test/{$current_post_type}/";
+                $test_url = home_url("{$base_path}{$test->id_test}");
+            ?>
+
+
+                <a href="<?php echo esc_url($test_url); ?>" class="detail-button">Take Test</a>
         </div>
     <?php endforeach; ?>
 </div>

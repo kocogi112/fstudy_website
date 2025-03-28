@@ -297,7 +297,7 @@ $result = $conn->query($sql);
 // Open the edit modal and populate it with data
 function openEditModal(number) {
     $.ajax({
-        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ieltsspeakingtests/speaking-part-2-database-template/get_question.php', // Fetch the question details
+        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ielts/ieltsspeakingtests/speaking-part-2-database-template/get_question.php', // Fetch the question details
         type: 'POST',
         data: { number: number },
         success: function(response) {
@@ -317,7 +317,7 @@ function openEditModal(number) {
 // Save the edited data
 function saveEdit() {
     $.ajax({
-        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ieltsspeakingtests/speaking-part-2-database-template/update_question.php',
+        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ielts/ieltsspeakingtests/speaking-part-2-database-template/update_question.php',
         type: 'POST',
         data: $('#editForm').serialize(),
         success: function(response) {
@@ -334,7 +334,7 @@ function openAddModal() {
 // Save the new question
 function saveNew() {
     $.ajax({
-        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ieltsspeakingtests/speaking-part-2-database-template/add_question.php',
+        url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ielts/ieltsspeakingtests/speaking-part-2-database-template/add_question.php',
         type: 'POST',
         data: $('#addForm').serialize(),
         success: function(response) {
@@ -347,7 +347,7 @@ function saveNew() {
 function deleteRecord(number) {
     if (confirm('Are you sure you want to delete this question?')) {
         $.ajax({
-            url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ieltsspeakingtests/speaking-part-2-database-template/delete_question.php',
+            url: 'http://localhost/wordpress/contents/themes/tutorstarter/template/ielts/ieltsspeakingtests/speaking-part-2-database-template/delete_question.php',
             type: 'POST',
             data: { number: number },
             success: function(response) {
