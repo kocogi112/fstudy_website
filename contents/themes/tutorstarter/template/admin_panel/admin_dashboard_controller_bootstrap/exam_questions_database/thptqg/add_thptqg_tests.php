@@ -228,7 +228,7 @@ $result = $conn->query($sql);
                 <form id="editForm">
                     <input type="hidden" id="edit_number" name="number">
                     
-                    ID Test: <input type="text" id="edit_id_test" name="id_test" class="form-control" required><br>
+                    ID Test: <input type="text" id="edit_id_test" name="id_test" class="form-control" required readonly><br>
                     subject: <input type="text" id="edit_subject" name="subject" class="form-control" required><br>
                     year: <input type="text" id="edit_year" name="year" class="form-control" required><br>
                     Test name: <textarea id="edit_testname" name="testname" class="form-control" required></textarea><br>
@@ -260,7 +260,7 @@ $result = $conn->query($sql);
             </div>
             <div class="modal-body">
                 <form id="addForm">
-                    ID Test: <input type="text" id="add_id_test" name="id_test" class="form-control" required disabled><br>
+                    ID Test: <input type="text" id="add_id_test" name="id_test" class="form-control" required readonly><br>
                     <button type="button" id="generate_id_btn" class="btn btn-primary">Generate ID</button><br>
 
 

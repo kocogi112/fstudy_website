@@ -235,10 +235,8 @@ $result = $conn->query($sql);
             <div class="modal-body">
                 <form id="editForm">
                     <input type="hidden" id="edit_number" name="number">
-                    ID Test: <input type="text" id="edit_id_test" name="id_test" class="form-control" required disabled><br>
-                    <!--ADD TẠM THỜI-->
-                    <button type="button" id="generate_id_btn_edit" class="btn btn-primary">Generate ID</button><br>
-            <!--ADD TẠM THỜI-->
+                    ID Test: <input type="text" id="edit_id_test" name="id_test" class="form-control" required readonly><br>
+                    
 
                     Test Name: <input type="text" id="edit_testname" name="testname" class="form-control" required><br>
                     Test Type:<select id="edit_test_type" name="test_type" class="form-control" required>
@@ -282,7 +280,7 @@ $result = $conn->query($sql);
             <div class="modal-body">
             <form id="addForm">
                     <input type="hidden" id="add_number" name="number">
-                    ID Test: <input type="text" id="add_id_test" name="id_test" class="form-control" required disabled><br>
+                    ID Test: <input type="text" id="add_id_test" name="id_test" class="form-control" required readonly><br>
                     <button type="button" id="generate_id_btn" class="btn btn-primary">Generate ID</button><br>
 
                     Test Name: <input type="text" id="add_testname" name="testname" class="form-control" required><br>
@@ -361,14 +359,6 @@ $result = $conn->query($sql);
         document.getElementById("add_id_test").value = encoded;
     });
 
-    document.getElementById("generate_id_btn_edit").addEventListener("click", function() {
-        let now = new Date();
-        let timestamp = `${now.getSeconds()}${now.getMinutes()}${now.getHours()}${now.getDate()}${now.getMonth() + 1}`;
-        let randomStr1 = Math.random().toString(36).substring(2, 4).toUpperCase(); // Random 2 ký tự
-        let randomStr2 = Math.random().toString(36).substring(2, 6).toUpperCase(); // Random 4 ký tự
-        let encoded = (timestamp + randomStr1 + randomStr2).toString(36).toUpperCase(); // Chuyển đổi base 36
-        document.getElementById("edit_id_test").value = encoded;
-    });
 
 // Open the edit modal and populate it with data
 function openEditModal(number) {

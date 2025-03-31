@@ -116,6 +116,7 @@ function fetchAIResponse($question, $answer, $part) {
     }
 
     $post_data = json_encode([
+        'type_test' => 'ieltsWriting',
         'question' => $question,
         'part' => $part,
         'answer' => $answer

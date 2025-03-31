@@ -28,7 +28,7 @@ $results = $wpdb->get_results(
 $custom_number = 0; // Default value
 if (!empty($results)) {
     // Assuming you want the first result's id_test
-    $custom_number = intval($results[0]->idtest);
+    $custom_number = $results[0]->idtest;
     $testname = $results[0]->testname;
 
 }

@@ -236,7 +236,7 @@ if ($result->num_rows > 0) {
                 <form id="editForm">
                     <input type="hidden" id="edit_number" name="number">
                     
-                    ID Test: <input type="text" id="edit_id_test" name="id_test" class="form-control" required><br>
+                    ID Test: <input type="text" id="edit_id_test" name="id_test" class="form-control" required readonly><br>
                     Test Name (context): <textarea type="text" id="edit_testname" name="testname" class="form-control" required></textarea><br>
                     Instruction: <textarea type="number" id="edit_instruction" name="instruction" class="form-control" required></textarea><br>
                     Target 1: <textarea id="edit_target_1" name="target_1" class="form-control" required></textarea><br>
@@ -273,7 +273,7 @@ if ($result->num_rows > 0) {
             </div>
             <div class="modal-body">
                 <form id="addForm">
-                    ID Test: <input type="text" id="add_id_test" name="id_test" class="form-control" disabled required><br>
+                    ID Test: <input type="text" id="add_id_test" name="id_test" class="form-control" readonly required><br>
                     <button type="button" id="generate_id_btn" class="btn btn-primary">Generate ID</button><br>
 
 

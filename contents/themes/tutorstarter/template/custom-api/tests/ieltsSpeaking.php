@@ -15,53 +15,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
 
     // Kiểm tra nếu các trường cần thiết tồn tại
-    if (isset($input['question'], $input['answer'], $input['sample'], $input['part'], $input['idquestion'])) {
-        $question = $input['question'];
-        $answer = $input['answer'];
-        $sample = $input['sample'];
+    if (isset($input['part'], $input['data'])) {
+       
+        $data = $input['data'];
         $part = $input['part'];
-        $idquestion = $input['idquestion'];
-        $essay_type = $input['type'];
 
-        // Gọi các hàm xử lý dữ liệu
-        $grammarCheck = checkGrammarAndSpelling($answer);
-        $ai_route_stats = prepareAIRoute();
-        $ai_response = fetchAIResponse($question, $answer, $part);
-        $finaloverall = finalOveralBand();
-        $finalcomment = finalComment();
-        $finalSuggestion = finalImprovementSuggestion();
+
+        $ai_response = fetchAIResponse($data, $part);
+
+
+        $pronunciationBand = overallPronounciation($data);
+        $finalOveralCritariaBand = overallCritariaBand($data);
+        $finaCommentAllcritaria = commentAllCritaria($data);
         $finalImprovement_Suggest_words = finalSuggestionWordAndPhrase();
-        $finalTopWeak = finalTopWeakPoint();
-        $finalOverviewEssay = finaloverViewEssay($answer, $essay_type, $linkingWords);
+        $finalTopWeak = finalTopWeakPoint($data);
 
-        $wordFrequency = getWordFrequency($answer);
-        $standardCheck = CheckStandard($answer);
-        $linkingWordsCheck = checkLinkingWords($answer, $linkingWords);
+
+        $ai_route_stats = prepareAIRoute();
+
+/*
+        // Gọi các hàm xử lý dữ liệu
+        $grammarCheck = checkGrammarAndSpelling($data);
+
+        //$finalSuggestion = finalImprovementSuggestion();
+       // 
+
+
+        //$finalOverviewEssay = finaloverViewEssay($part, $data);
+
+        $wordFrequency = getWordFrequency($data);
+        $standardCheck = CheckStandard($data);
+        $linkingWordsCheck = checkLinkingWords($data, $linkingWords);
+        */
 
         // Trả về dữ liệu đã nhận và kết quả phân tích
         echo json_encode([
             'status' => 'success',
-            'question' => $question, /*For dev - not show in live */
-            'answer' => $answer, 
-            'sample' => $sample, /*For dev - not show in live */
-            'part' => $part, /*For dev - not show in live */
+            'data' => $data, /*For dev - not show in live */
+            'part' => $part, 
             'ai_route_stats' => $ai_route_stats, /*For dev - not show in live */
-            'idquestion' => $idquestion,
             'ai_response' => $ai_response, /*For dev - not show in live */
 
             'final_analysis' => [
                 'analysis' => [
-                    'grammarCheck' => $grammarCheck,
-                    'wordFrequency' => $wordFrequency,
-                    'standardCheck' => $standardCheck,
-                    'linkingWordsCheck' => $linkingWordsCheck
+                    //'grammarCheck' => $grammarCheck,
+                    'pronunciationBand' => $pronunciationBand
                 ],
-                'overview_essay' => $finalOverviewEssay,
-                'band' => $finaloverall,
-                'detail_recommendation' => $finalcomment,
+                //'overview_essay' => $finalOverviewEssay,
+                'band' => $finalOveralCritariaBand,
+                'detail_recommendation' => $finaCommentAllcritaria,
                 'improvement_words' => $finalImprovement_Suggest_words,
-                'suggestion' => $finalSuggestion,
                 'top_weak_point' => $finalTopWeak
+                //'suggestion' => $finalSuggestion,
+                
             ]
 
         ]);
@@ -96,9 +102,9 @@ function prepareAIRoute() {
 
 $ai_response_data = null; // Biến toàn cục để cache response
 
-function fetchAIResponse($question, $answer, $part) {
+function fetchAIResponse($data, $part) {
     global $ai_response_data;
-    
+
     if ($ai_response_data !== null) {
         return $ai_response_data;
     }
@@ -115,10 +121,17 @@ function fetchAIResponse($question, $answer, $part) {
         return ['error' => 'API endpoint URL is missing'];
     }
 
+    // Xóa các key không mong muốn
+    $remove_keys = ['length', 'avarage_speak', 'time_spent', 'edit_word'];
+    $cleandata = array_map(function ($item) use ($remove_keys) {
+        return array_diff_key($item, array_flip($remove_keys));
+    }, $data);
+
     $post_data = json_encode([
-        'question' => $question,
+        'type_test' => 'ieltsSpeaking',
         'part' => $part,
-        'answer' => $answer
+        'data' => $data
+       // 'data' => array_values($cleandata) // array_values để đảm bảo JSON không bị key số bị lệch
     ]);
 
     $options = [
@@ -138,7 +151,30 @@ function fetchAIResponse($question, $answer, $part) {
 }
 
 
-function finalOveralBand() {
+
+
+
+
+
+function commentPronounciation($data){
+    
+    $total_edits = 0;
+    
+    foreach ($data as $section) {
+        if (isset($section['edit_word']['number_edit'])) {
+            $total_edits += $section['edit_word']['number_edit'];
+        }
+    }
+    
+    $pro_comment = "Bạn đã sửa tổng cộng $total_edits lần";
+    
+    return $pro_comment;
+
+}
+
+
+function commentAllCritaria($data){
+    
     global $ai_response_data;
 
     if (!isset($ai_response_data['choices'][0]['message']['content'])) {
@@ -147,34 +183,88 @@ function finalOveralBand() {
 
     $content = $ai_response_data['choices'][0]['message']['content'];
 
-    preg_match('/"Task_Achievement":\s*([\d\.]+)/', $content, $ta);
-    preg_match('/"Coherence_and_Cohesion":\s*([\d\.]+)/', $content, $cc);
+
+    // Dùng regex để lấy các comment của từng tiêu chí
+    preg_match('/"fluency_and_coherence_comment":\s*"([^"]+)"/', $content, $flu_comment);
+    preg_match('/"lexical_resource_comment":\s*"([^"]+)"/', $content, $lr_comment);
+    preg_match('/"grammatical_range_and_accuracy_comment":\s*"([^"]+)"/', $content, $gra_comment);
+
+    // Kiểm tra nếu có thiếu comment nào thì báo lỗi
+    if (!isset($flu_comment[1]) || !isset($lr_comment[1]) || !isset($gra_comment[1])) {
+        return ['error' => 'Missing comment values'];
+    }
+    $pro_comment = commentPronounciation($data);
+
+    return [
+        'flu' => $flu_comment[1],
+        'gra' => $gra_comment[1],
+        'lr' => $lr_comment[1],
+        'pro' => $pro_comment
+    ];
+
+
+}
+
+
+
+function overallPronounciation($data) {
+    $total_edits = 0;
+    
+    foreach ($data as $section) {
+        if (isset($section['edit_word']['number_edit'])) {
+            $total_edits += $section['edit_word']['number_edit'];
+        }
+    }
+    
+    // Xác định pro_score dựa trên tổng số edits
+    if ($total_edits > 3) {
+        $pro_score = 5;
+    } elseif ($total_edits > 2) {
+        $pro_score = 6;
+    } else {
+        $pro_score = 7;
+    }
+    
+    return $pro_score;
+}
+
+
+function overallCritariaBand($data) {
+    global $ai_response_data;
+
+    if (!isset($ai_response_data['choices'][0]['message']['content'])) {
+        return ['error' => 'Invalid AI response'];
+    }
+
+    $content = $ai_response_data['choices'][0]['message']['content'];
+
+    preg_match('/"Fluency_and_Coherence":\s*([\d\.]+)/', $content, $flu);
     preg_match('/"Lexical_Resource":\s*([\d\.]+)/', $content, $lr);
     preg_match('/"Grammatical_Range_and_Accuracy":\s*([\d\.]+)/', $content, $gra);
+    
 
-    $ta_score  = isset($ta[1]) ? floatval($ta[1]) : null;
-    $cc_score  = isset($cc[1]) ? floatval($cc[1]) : null;
+    $flu_score  = isset($flu[1]) ? floatval($flu[1]) : null;
     $lr_score  = isset($lr[1]) ? floatval($lr[1]) : null;
     $gra_score = isset($gra[1]) ? floatval($gra[1]) : null;
 
-    if (is_null($ta_score) || is_null($cc_score) || is_null($lr_score) || is_null($gra_score)) {
+    if (is_null($flu_score) || is_null($lr_score) || is_null($gra_score)) {
         return ['error' => 'Missing score values'];
     }
 
+    $pro_score = overallPronounciation($data);
+
     // Tính tổng và làm tròn .5 hoặc .0
-    $average = round((($ta_score + $cc_score + $lr_score + $gra_score) / 4) * 2) / 2;
 
     return [
-        'ta'  => $ta_score,
-        'cc'  => $cc_score,
+        'flu'  => $flu_score,
         'lr'  => $lr_score,
         'gra' => $gra_score,
-        'overallband' => $average
+        'pro' => $pro_score
     ];
 }
 
-function finalTopWeakPoint() {
-    $scores = finalOveralBand();
+function finalTopWeakPoint($data) {
+    $scores = overallCritariaBand($data);
 
     if (isset($scores['error'])) {
         return $scores; // Trả về lỗi nếu có
@@ -182,8 +272,8 @@ function finalTopWeakPoint() {
 
     // Danh sách tiêu chí với điểm
     $criteria = [
-        'Task Achievement'                => $scores['ta'],
-        'Coherence and Cohesion'          => $scores['cc'],
+        'Fluency And Coherence'                => $scores['flu'],
+        'Pronunciation'          => $scores['pro'],
         'Lexical Resource'                => $scores['lr'],
         'Grammatical Range and Accuracy'  => $scores['gra']
     ];
@@ -201,34 +291,6 @@ function finalTopWeakPoint() {
     ];
 }
 
-
-function finalComment() {
-    global $ai_response_data;
-
-    if (!isset($ai_response_data['choices'][0]['message']['content'])) {
-        return ['error' => 'Invalid AI response'];
-    }
-
-    $content = $ai_response_data['choices'][0]['message']['content'];
-
-    // Dùng regex để lấy các comment của từng tiêu chí
-    preg_match('/"task_response_comment":\s*"([^"]+)"/', $content, $ta_comment);
-    preg_match('/"coherence_and_cohesion_comment":\s*"([^"]+)"/', $content, $cc_comment);
-    preg_match('/"lexical_resource_comment":\s*"([^"]+)"/', $content, $lr_comment);
-    preg_match('/"grammatical_range_and_accuracy_comment":\s*"([^"]+)"/', $content, $gra_comment);
-
-    // Kiểm tra nếu có thiếu comment nào thì báo lỗi
-    if (!isset($ta_comment[1]) || !isset($cc_comment[1]) || !isset($lr_comment[1]) || !isset($gra_comment[1])) {
-        return ['error' => 'Missing comment values'];
-    }
-
-    return [
-        'ta_tr' => $ta_comment[1],
-        'cc' => $cc_comment[1],
-        'lr' => $lr_comment[1],
-        'gra' => $gra_comment[1]
-    ];
-}
 function finalImprovementSuggestion() {
     global $ai_response_data;
 
@@ -265,19 +327,19 @@ function finalSuggestionWordAndPhrase() {
     return json_decode($suggestions[1], true);
 }
 
-function finaloverViewEssay($answer, $essay_type, $linkingWords) {
-    $word_count = str_word_count($answer);
-    $sentence_count = preg_match_all('/[.!?]/', $answer, $matches);
-    $paragraph_count = substr_count($answer, "\n") + 1; // Đếm số dòng xuống
+function finaloverViewEssay($data, $essay_type, $linkingWords) {
+    $word_count = str_word_count($data);
+    $sentence_count = preg_match_all('/[.!?]/', $data, $matches);
+    $paragraph_count = substr_count($data, "\n") + 1; // Đếm số dòng xuống
 
     // Kiểm tra Linking Words
-    $linkingWordsData = checkLinkingWords($answer, $linkingWords);
+    $linkingWordsData = checkLinkingWords($data, $linkingWords);
 
     // Kiểm tra Lỗi Ngữ Pháp & Chính Tả
-    $grammarAndSpellingData = checkGrammarAndSpelling($answer);
+    $grammarAndSpellingData = checkGrammarAndSpelling($data);
 
     // Tính tần suất từ
-    $wordFrequency = getWordFrequency($answer);
+    $wordFrequency = getWordFrequency($data);
 
     return [
         "word_count" => $word_count,
@@ -332,10 +394,10 @@ function getWordFrequency($text) {
     return $frequency;
 }
 
-function CheckStandard($answer) {
-    $wordCount = str_word_count($answer);
-    $sentenceCount = substr_count($answer, '.') + substr_count($answer, '!') + substr_count($answer, '?');
-    $totalErrors = checkGrammarAndSpelling($answer)['total_errors_count'];
+function CheckStandard($data) {
+    $wordCount = str_word_count($data);
+    $sentenceCount = substr_count($data, '.') + substr_count($data, '!') + substr_count($data, '?');
+    $totalErrors = checkGrammarAndSpelling($data)['total_errors_count'];
     $errorPercentage = ($totalErrors / $wordCount) * 100;
 
     $maxPointOverall = 8.5;
@@ -378,10 +440,10 @@ $adjective_adverb_Words=["significantlly","rapidly","rapid","significant","fast"
 $well_adjective_adverb_Words=["temporarily","dramatically","dramatical","exponentially","exponential","notably","notable","minimally","minimal","sizably","sizable","halve","abrupt","abruptly","gradually","gradual","consistently","consistent","shift","shiftly"];
 
 
-function checkVocabularyRange($answer, $wordList) {
+function checkVocabularyRange($data, $wordList) {
     $wordCount = 0;
     $uniqueWords = [];
-    $essayWords = preg_split("/\s+/", strtolower($answer));
+    $essayWords = preg_split("/\s+/", strtolower($data));
 
     foreach ($wordList as $word) {
         $count = array_count_values($essayWords)[$word] ?? 0;
@@ -406,13 +468,13 @@ $linkingWords = [
   "therefore", "thus", "consequently", "for this reason", "so", "hence"
 ];
 
-function checkLinkingWords($answer) {
+function checkLinkingWords($data) {
     global $linkingWords; // Gọi biến toàn cục
 
     $linkingWordsCount = 0;
     $uniqueLinkingWords = [];
     $foundLinkingWords = [];
-    $essayWords = preg_split("/\s+/", strtolower($answer));
+    $essayWords = preg_split("/\s+/", strtolower($data));
 
     foreach ($linkingWords as $word) {
         $count = array_count_values($essayWords)[$word] ?? 0;
@@ -430,16 +492,6 @@ function checkLinkingWords($answer) {
     ];
 }
 
-function findCommonNumbers($answer, $sample) {
-    $answerNumbers = preg_match_all('/\b\d+\b/', $answer, $answerMatches) ? $answerMatches[0] : [];
-    $sampleNumbers = preg_match_all('/\b\d+\b/', $sample, $sampleMatches) ? $sampleMatches[0] : [];
-    $commonNumbers = array_values(array_intersect($answerNumbers, $sampleNumbers));
-    return [
-        'count' => count($commonNumbers),
-        'numbers' => $commonNumbers
-    ];
-}
-
 function wordCountPerParagraph($text) {
     $paragraphs = preg_split('/\n+/', $text, -1, PREG_SPLIT_NO_EMPTY);
     $details = [];
@@ -453,11 +505,11 @@ function wordCountPerParagraph($text) {
     return $details;
 }
 
-function checkOverall($answer) {
-    $wordCount = str_word_count($answer);
-    $paragraphs = preg_split('/\n+/', $answer, -1, PREG_SPLIT_NO_EMPTY);
-    $sentenceCount = substr_count($answer, '.');
-    $wordsPerParagraph = wordCountPerParagraph($answer);
+function checkOverall($data) {
+    $wordCount = str_word_count($data);
+    $paragraphs = preg_split('/\n+/', $data, -1, PREG_SPLIT_NO_EMPTY);
+    $sentenceCount = substr_count($data, '.');
+    $wordsPerParagraph = wordCountPerParagraph($data);
 
     return [
         'word_count' => $wordCount,
@@ -467,8 +519,8 @@ function checkOverall($answer) {
     ];
 }
 
-function determineQuestionType($part, $question) {
-    $lowerQuestion = strtolower($question);
+function determineQuestionType($part, $data) {
+    $lowerQuestion = strtolower($data);
     if ($part == 1) {
         if (strpos($lowerQuestion, 'line') !== false) return 'Line graph';
         if (strpos($lowerQuestion, 'chart') !== false || strpos($lowerQuestion, 'bar chart') !== false) return 'Bar/Pie chart';
@@ -489,8 +541,8 @@ function determineQuestionType($part, $question) {
 
 
 // Hàm phân tích cấu trúc đoạn văn
-function find_structure_positions($answer) {
-    $paragraphs = preg_split('/\n+/', trim($answer));
+function find_structure_positions($data) {
+    $paragraphs = preg_split('/\n+/', trim($data));
     $results = [
         'overall' => [
             'wordFound' => false,
@@ -676,8 +728,8 @@ function analyze_main_idea($testQuestion, $essay, $part) {
     $commonTerms = array_intersect($testWords, $essayWords);
 
     if (count($commonTerms) > 5) {
-        return "Essay addresses the main idea of the test question. Common terms: " . implode(', ', $commonTerms);
+        return "Essay addresses the main idea of the test data. Common terms: " . implode(', ', $commonTerms);
     } else {
-        return "Essay does not adequately address the main idea of the test question. Common terms: " . implode(', ', $commonTerms);
+        return "Essay does not adequately address the main idea of the test data. Common terms: " . implode(', ', $commonTerms);
     }
 }

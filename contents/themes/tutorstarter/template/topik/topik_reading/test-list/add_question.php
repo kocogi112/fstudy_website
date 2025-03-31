@@ -8,10 +8,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Get and sanitize input data
     $id_test = wp_kses_post($_POST['id_test']);
     $testname = wp_kses_post($_POST['testname']);
-    $testcode = wp_kses_post($_POST['testcode']);
+    $testcode = wp_unslash($_POST['testcode']); // Không lọc thẻ HTML
     $correct_answer = wp_kses_post($_POST['correct_answer']);
     $test_type = wp_kses_post($_POST['test_type']);
     $time = wp_kses_post($_POST['time']);
+    $number_question = wp_kses_post($_POST['number_question']);
 
     $permissive_management = wp_kses_post($_POST['permissive_management']);
     $token_need = wp_unslash($_POST['token_need']);
@@ -28,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'permissive_management' => $permissive_management,
         'token_need' => $token_need,
         'test_type' => $test_type,
+        'number_question' => $number_question,
         'time' => $time,
 
         'role_access' => $role_access,

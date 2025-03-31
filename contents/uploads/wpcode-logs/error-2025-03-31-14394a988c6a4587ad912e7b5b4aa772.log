@@ -1,0 +1,222 @@
+2025-03-31T06:32:49+00:00 Uncaught Exception: Text is required in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php:303
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php(26): checkGrammarAndSpelling(NULL)
+#1 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(745): include('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): my_custom_api_route_redirect('')
+#3 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#5 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#6 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#7 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#8 {main}
+  thrown
+2025-03-31T06:32:50+00:00 Uncaught Exception: Text is required in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php:303
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php(26): checkGrammarAndSpelling(NULL)
+#1 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(745): include('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): my_custom_api_route_redirect('')
+#3 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#5 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#6 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#7 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#8 {main}
+  thrown
+2025-03-31T06:32:51+00:00 Uncaught Exception: Text is required in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php:303
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php(26): checkGrammarAndSpelling(NULL)
+#1 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(745): include('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): my_custom_api_route_redirect('')
+#3 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#5 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#6 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#7 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#8 {main}
+  thrown
+2025-03-31T10:11:59+00:00 Uncaught ArgumentCountError: Too few arguments to function overallCritariaBand(), 0 passed in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php on line 31 and exactly 1 expected in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php:175
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php(31): overallCritariaBand()
+#1 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(745): include('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): my_custom_api_route_redirect('')
+#3 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#5 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#6 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#7 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#8 {main}
+  thrown
+2025-03-31T10:12:01+00:00 Uncaught ArgumentCountError: Too few arguments to function overallCritariaBand(), 0 passed in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php on line 31 and exactly 1 expected in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php:175
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php(31): overallCritariaBand()
+#1 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(745): include('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): my_custom_api_route_redirect('')
+#3 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#5 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#6 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#7 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#8 {main}
+  thrown
+2025-03-31T10:12:05+00:00 Uncaught ArgumentCountError: Too few arguments to function overallCritariaBand(), 0 passed in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php on line 31 and exactly 1 expected in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php:175
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php(31): overallCritariaBand()
+#1 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(745): include('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): my_custom_api_route_redirect('')
+#3 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#5 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#6 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#7 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#8 {main}
+  thrown
+2025-03-31T10:27:12+00:00 Uncaught ArgumentCountError: Too few arguments to function overallCritariaBand(), 0 passed in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php on line 31 and exactly 1 expected in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php:175
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php(31): overallCritariaBand()
+#1 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(745): include('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): my_custom_api_route_redirect('')
+#3 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#5 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#6 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#7 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#8 {main}
+  thrown
+2025-03-31T10:27:16+00:00 Uncaught ArgumentCountError: Too few arguments to function overallCritariaBand(), 0 passed in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php on line 31 and exactly 1 expected in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php:175
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php(31): overallCritariaBand()
+#1 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(745): include('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): my_custom_api_route_redirect('')
+#3 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#5 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#6 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#7 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#8 {main}
+  thrown
+2025-03-31T10:27:18+00:00 Uncaught ArgumentCountError: Too few arguments to function overallCritariaBand(), 0 passed in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php on line 31 and exactly 1 expected in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php:175
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php(31): overallCritariaBand()
+#1 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(745): include('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): my_custom_api_route_redirect('')
+#3 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#5 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#6 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#7 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#8 {main}
+  thrown
+2025-03-31T11:15:42+00:00 Uncaught ArgumentCountError: Too few arguments to function overallCritariaBand(), 0 passed in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php on line 31 and exactly 1 expected in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php:175
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php(31): overallCritariaBand()
+#1 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(745): include('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): my_custom_api_route_redirect('')
+#3 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#5 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#6 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#7 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#8 {main}
+  thrown
+2025-03-31T11:15:45+00:00 Uncaught ArgumentCountError: Too few arguments to function overallCritariaBand(), 0 passed in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php on line 31 and exactly 1 expected in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php:175
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php(31): overallCritariaBand()
+#1 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(745): include('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): my_custom_api_route_redirect('')
+#3 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#5 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#6 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#7 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#8 {main}
+  thrown
+2025-03-31T11:15:49+00:00 Uncaught ArgumentCountError: Too few arguments to function overallCritariaBand(), 0 passed in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php on line 31 and exactly 1 expected in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php:175
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php(31): overallCritariaBand()
+#1 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(745): include('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): my_custom_api_route_redirect('')
+#3 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#5 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#6 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#7 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#8 {main}
+  thrown
+2025-03-31T11:18:09+00:00 Uncaught ArgumentCountError: Too few arguments to function overallCritariaBand(), 0 passed in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php on line 31 and exactly 1 expected in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php:175
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php(31): overallCritariaBand()
+#1 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(745): include('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): my_custom_api_route_redirect('')
+#3 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#5 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#6 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#7 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#8 {main}
+  thrown
+2025-03-31T11:18:10+00:00 Uncaught ArgumentCountError: Too few arguments to function overallCritariaBand(), 0 passed in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php on line 31 and exactly 1 expected in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php:175
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php(31): overallCritariaBand()
+#1 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(745): include('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): my_custom_api_route_redirect('')
+#3 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#5 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#6 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#7 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#8 {main}
+  thrown
+2025-03-31T11:18:13+00:00 Uncaught ArgumentCountError: Too few arguments to function overallCritariaBand(), 0 passed in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php on line 31 and exactly 1 expected in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php:175
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php(31): overallCritariaBand()
+#1 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(745): include('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): my_custom_api_route_redirect('')
+#3 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#5 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#6 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#7 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#8 {main}
+  thrown
+2025-03-31T16:47:10+00:00 Uncaught ArgumentCountError: Too few arguments to function overallCritariaBand(), 0 passed in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php on line 266 and exactly 1 expected in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php:231
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php(266): overallCritariaBand()
+#1 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php(27): finalTopWeakPoint()
+#2 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(766): include('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): my_custom_api_route_redirect('')
+#4 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#5 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#6 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#7 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#8 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#9 {main}
+  thrown
+2025-03-31T16:47:11+00:00 Uncaught ArgumentCountError: Too few arguments to function overallCritariaBand(), 0 passed in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php on line 266 and exactly 1 expected in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php:231
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php(266): overallCritariaBand()
+#1 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php(27): finalTopWeakPoint()
+#2 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(766): include('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): my_custom_api_route_redirect('')
+#4 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#5 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#6 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#7 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#8 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#9 {main}
+  thrown
+2025-03-31T16:47:12+00:00 Uncaught ArgumentCountError: Too few arguments to function overallCritariaBand(), 0 passed in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php on line 266 and exactly 1 expected in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php:231
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php(266): overallCritariaBand()
+#1 C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\custom-api\tests\ieltsSpeaking.php(27): finalTopWeakPoint()
+#2 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(766): include('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): my_custom_api_route_redirect('')
+#4 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#5 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#6 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#7 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#8 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#9 {main}
+  thrown
+2025-03-31T17:06:04+00:00 Undefined variable $idquestion
+2025-03-31T17:06:08+00:00 Undefined variable $idquestion
+2025-03-31T17:06:12+00:00 Undefined variable $idquestion

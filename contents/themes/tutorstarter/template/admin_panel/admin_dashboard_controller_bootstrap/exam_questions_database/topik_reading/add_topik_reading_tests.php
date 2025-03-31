@@ -126,6 +126,7 @@ $result = $conn->query($sql);
         <th>ID Test</th>
         <th>Test Name</th>
         <th>Time</th>
+        <th>Number Question</th>
         <th>Test Type</th>
         <th>Test Code</th>
         <th>Correct Ans</th>
@@ -157,6 +158,7 @@ $result = $conn->query($sql);
                         
                         <td>{$row['testname']}</td>
                         <td>{$row['time']}</td>
+                        <td>{$row['number_question']}</td>
                         <td>{$row['test_type']}</td>
                         <td>{$question_content_display} $question_content_view_more</td>
                         <td>{$row['correct_answer']}</td>
@@ -232,9 +234,10 @@ $result = $conn->query($sql);
             <div class="modal-body">
                 <form id="editForm">
                     <input type="hidden" id="edit_number" name="number">
-                    ID Test: <input type="text" id="edit_id_test" name="id_test" class="form-control" required><br>
+                    ID Test: <input type="text" id="edit_id_test" name="id_test" class="form-control" required readonly><br>
                     Test Name: <input type="text" id="edit_testname" name="testname" class="form-control" required><br>
                     Time: <input type="number" id="edit_time" name="time" class="form-control" required><br>
+                    Number Question: <input type="number" id="edit_number_question" name="number_question" class="form-control" required><br>
 
                     Test Type:<select id="edit_test_type" name="test_type" class="form-control" required>
                             <option value="">Select a Test Type</option>
@@ -271,12 +274,12 @@ $result = $conn->query($sql);
                 <form id="addForm">
                     <input type="hidden" id="add_number" name="number">
                     ID Test: 
-                    <input type="text" id="add_id_test" name="id_test" class="form-control" required>
+                    <input type="text" id="add_id_test" name="id_test" class="form-control" required readonly>
                     <button type="button" id="generate_id_btn" class="btn btn-primary">Generate ID</button><br>
 
                     Test Name: <input type="text" id="add_testname" name="testname" class="form-control" required><br>
                     Time: <input type="number" id="add_time" name="time" class="form-control" required><br>
-
+                    Number Question: <input type="number" id="add_number_question" name="number_question" class="form-control" required><br>
                     Test Type:
                     <select id="add_test_type" name="test_type" class="form-control" required>
                         <option value="">Select a Test Type</option>
@@ -360,6 +363,7 @@ function openEditModal(number) {
             $('#edit_id_test').val(data.id_test);
             $('#edit_testname').val(data.testname);
             $('#edit_time').val(data.time);
+            $('#edit_number_question').val(data.number_question);
 
             $('#edit_test_type').val(data.test_type);
             $('#edit_testcode').val(data.testcode);

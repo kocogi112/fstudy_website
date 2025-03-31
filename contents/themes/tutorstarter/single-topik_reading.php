@@ -32,7 +32,6 @@ $stmt_test->bind_param("i", $custom_number);
 $stmt_test->execute();
 $result_test = $stmt_test->get_result();
 // Fetch the result
-$question_choose = '';
 
 if ($result_test->num_rows === 0) {
     // Nếu không tìm thấy id_test, chuyển hướng đến trang 404
@@ -45,7 +44,6 @@ if ($result_test->num_rows > 0) {
     $row = $result_test->fetch_assoc();
     $test_type = $row['test_type'];
     $testname = $row['testname'];
-    $question_choose = $row['question_choose']; // Comma-separated string
 }
 
 
@@ -65,7 +63,6 @@ get_header(); // Gọi phần đầu trang (header.php)
 $conn->close();
 
 // Split the comma-separated string into an array
-$parts = explode(',', $question_choose);
 
 
 
@@ -338,16 +335,7 @@ $parts = explode(',', $question_choose);
                 <button class="btn-submit" type="submit" value="Start test">Luyện tập</button>
             </form>
 
-   <!-- HTML Form to display checkboxes -->
-   <?php
-echo '<form id="myForm">';
-foreach ($parts as $part) {
-    echo '<label>';
-    echo '<input type="checkbox" name="part[]" value="' . esc_attr($part) . '"> ' . esc_html($part);
-    echo '</label><br>';
-}
-?>
-<button type="button" id="submitButton">Submit</button>
+  
 </form>
 
 
@@ -372,36 +360,15 @@ foreach ($parts as $part) {
 
     <script>
         
-        document.getElementById('submitButton').addEventListener('click', setPracticeLink);
 
-        function setPracticeLink(event) {
-    event.preventDefault();  // Ngừng việc gửi form
-    
-    var selectedParts = [];
-    var checkboxes = document.querySelectorAll('input[name="part[]"]:checked');
-    
-    checkboxes.forEach(function(checkbox) {
-        selectedParts.push(checkbox.value);
-    });
-
-    if (selectedParts.length > 0) {
-        var currentUrl = window.location.href;  // Lấy URL hiện tại
-        var newUrl = currentUrl +/start/+ (currentUrl.includes('?') ? '&' : '?') + 'part=' + selectedParts.join(',');
-        window.location.href = newUrl;  // Chuyển hướng đến URL mới
-    } else {
-        alert('No part selected');
+    function toggle_visibility(id) {
+        var e = document.getElementById(id);
+        if (e.style.display == 'block') {
+            e.style.display = 'none';
+        } else {
+            e.style.display = 'block';
+        }
     }
-}
-
-
-        function toggle_visibility(id) {
-  var e = document.getElementById(id);
-  if (e.style.display == 'block') {
-    e.style.display = 'none';
-  } else {
-    e.style.display = 'block';
-  }
-}
 
 document.getElementById('practice').addEventListener('click', function() {
     // Show practice content

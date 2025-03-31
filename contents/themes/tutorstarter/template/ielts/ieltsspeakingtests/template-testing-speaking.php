@@ -17,7 +17,7 @@ if (is_user_logged_in()) {
    
 // Get the custom number field value
     //$custom_number = get_post_meta($post_id, '_ieltsspeakingtests_custom_number', true);
-    $custom_number =intval(get_query_var('id_test'));
+    $custom_number = get_query_var('id_test');
 
   // Database credentials
   $servername = DB_HOST;
@@ -1735,7 +1735,7 @@ function recordWord(expectedWord, buttonElement) {
             
 </script>
 
-<script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\summary_3.js"></script>
+<script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\summary_6.js"></script>
 <script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\overalltab.js"></script>
 <script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\sample-tab.js"></script>
 <script src = "\wordpress\contents\themes\tutorstarter\scan-device\location_ip.js"></script>

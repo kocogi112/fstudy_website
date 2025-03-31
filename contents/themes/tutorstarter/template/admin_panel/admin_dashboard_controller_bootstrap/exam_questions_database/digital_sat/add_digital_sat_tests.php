@@ -259,7 +259,7 @@ $result = $conn->query($sql);
             <div class="modal-body">
                 <form id="editForm">
                     <input type="hidden" id="edit_number" name="number">
-                    ID Test: <input type="text" id="edit_id_test" name="id_test" class="form-control" required ><br>
+                    ID Test: <input type="text" id="edit_id_test" name="id_test" class="form-control" required readonly ><br>
 
             
 
@@ -335,7 +335,7 @@ $result = $conn->query($sql);
             <div class="modal-body">
             <form id="addForm">
                     <input type="hidden" id="add_number" name="number">
-                    ID Test: <input type="text" id="add_id_test" name="id_test" class="form-control" required disabled><br>
+                    ID Test: <input type="text" id="add_id_test" name="id_test" class="form-control" required readonly><br>
                     <button type="button" id="generate_id_btn" class="btn btn-primary">Generate ID</button><br>
 
 

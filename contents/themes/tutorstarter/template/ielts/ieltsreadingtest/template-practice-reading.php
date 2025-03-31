@@ -27,7 +27,7 @@ if (is_user_logged_in()) {
     $custom_number = 0; // Default value
     if (!empty($results)) {
         // Assuming you want the first result's id_test
-        $custom_number = intval($results[0]->idtest);
+        $custom_number = $results[0]->idtest;
         $userAnswers = $results[0]->useranswer;
         $questions = explode('Question:', $userAnswers); // Split by "Question:"
 

@@ -128,7 +128,7 @@ $result = $conn->query($sql);
         <th>last_use_end_point</th>
         <th>list_name_endpoint_order</th>
         <th>prompt_ielts_writing</th>
-        <th>prompt_conversation_ai</th>
+        <th>prompt_ielts_speaking</th>
        
         <th>Actions</th>
     </tr>
@@ -144,7 +144,7 @@ $result = $conn->query($sql);
                         <td>{$row['list_name_endpoint_order']}</td>
                         
                         <td>" . nl2br($row['prompt_ielts_writing']) . "</td>
-                        <td>" . nl2br($row['prompt_conversation_ai']) . "</td>
+                        <td>" . nl2br($row['prompt_ielts_speaking']) . "</td>
 
 
 
@@ -216,7 +216,7 @@ $result = $conn->query($sql);
                     last_use_end_point<input type="text" id="edit_last_use_end_point" name="last_use_end_point" class="form-control" required><br>
                     list_name_endpoint_order<textarea type="text" id="edit_list_name_endpoint_order" name="list_name_endpoint_order" class="form-control" required></textarea><br>
                     prompt_ielts_writing: <textarea id="edit_prompt_ielts_writing" name="prompt_ielts_writing" class="form-control" required></textarea><br>
-                    prompt_conversation_ai: <textarea type="text" id="edit_prompt_conversation_ai" name="prompt_conversation_ai" class="form-control" required></textarea> <br>
+                    prompt_ielts_speaking: <textarea type="text" id="edit_prompt_ielts_speaking" name="prompt_ielts_speaking" class="form-control" required></textarea> <br>
                    
                 </form>
             </div>
@@ -243,7 +243,7 @@ $result = $conn->query($sql);
                     last_use_end_point<input type="text" id="add_last_use_end_point" name="last_use_end_point" class="form-control" required><br>
                     list_name_endpoint_order<textarea type="text" id="add_list_name_endpoint_order" name="list_name_endpoint_order" class="form-control" required></textarea><br>
                     prompt_ielts_writing: <textarea id="add_prompt_ielts_writing" name="prompt_ielts_writing" class="form-control" required></textarea><br>
-                    prompt_conversation_ai: <textarea type="text" id="add_prompt_conversation_ai" name="prompt_conversation_ai" class="form-control" required></textarea> <br>
+                    prompt_ielts_speaking: <textarea type="text" id="add_prompt_ielts_speaking" name="prompt_ielts_speaking" class="form-control" required></textarea> <br>
                    
                            
                 </form>
@@ -306,7 +306,7 @@ function openEditModal(number) {
             $('#edit_list_name_endpoint_order').val(data.list_name_endpoint_order);
             $('#edit_last_use_end_point').val(data.last_use_end_point);
             $('#edit_prompt_ielts_writing').val(data.prompt_ielts_writing);
-            $('#edit_prompt_conversation_ai').val(data.prompt_conversation_ai);
+            $('#edit_prompt_ielts_speaking').val(data.prompt_ielts_speaking);
            
 
             $('#editModal').modal('show');

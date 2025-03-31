@@ -14,7 +14,7 @@
     $current_username = $current_user->user_login;
     $username = $current_username;
     // Lấy giá trị custom number từ custom field
-    $custom_number = intval(get_query_var('id_test'));
+    $custom_number = get_query_var('id_test');
    
       // Database credentials
       $servername = DB_HOST;
@@ -968,7 +968,9 @@ img{
                   <button id="reload">Reload</button>
                   <select id="speed">
                     <option value="0.5">0.5x</option>
+                    <option value="0.75">0.75x</option>
                     <option value="1" selected>1x (Normal)</option>
+                    <option value="1.25">1.25x</option>
                     <option value="1.5">1.5x</option>
                     <option value="2">2x</option>
                   </select>
@@ -998,7 +1000,7 @@ img{
     
   
         <span id="message" style="display:none" ></span>
-     <form id="saveListeningResult">
+     <form id="saveListeningResult" style="display:none" >
                 <div class="card">
                     <div class="card-header">Form lưu kết quả</div>
                     <div class="card-body" >

@@ -16,16 +16,8 @@ $user_id = $current_user->ID; // Lấy user ID
 $username = $current_user->user_login;
 
 
-echo "<script> 
-  const currentUsername = '" . strval($username) . "'; 
-
- </script>";
-
-echo '
-<script>
-var siteUrl = "' . $site_url .'";
-</script>
-';
+echo "<script>  const currentUsername = '" . strval($username) . "';  </script>";
+echo '<script>  var siteUrl = "' . $site_url .'";  </script>';
 
 
 
@@ -67,6 +59,7 @@ $test_labels = [
     'ieltswritingtests' => 'IELTS Writing',
     'dictation' => 'Dictation',
     'shadowing' => 'Shadowing',
+
     'topikreading' => 'Topik Reading',
     'topiklistening' => 'Topik Listening',
     'topikwriting' => 'Topik Writing',
@@ -253,10 +246,13 @@ $query = new WP_Query($args);
                     'ieltsreadingtest' => '/test/ielts/r/',
                     'digitalsat' => '/test/digitalsat/',
                     'thptqg' => '/test/thptqg/',
+                    'topikreading' => '/test/topik/r/',
+                    
                     'conversation_ai' => '/practice/conversation_ai/',
                     'studyvocabulary' => '/practice/studyvocabulary/',
                     'dictation' => '/practice/dictation/',
                     'shadowing' => '/practice/shadowing/'
+                    
 
 
                 ];

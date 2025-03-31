@@ -8,12 +8,14 @@ global $wpdb;
     $number = wp_kses_post($_POST['number']);
     $id_test = wp_kses_post($_POST['id_test']);
     $testname = wp_kses_post($_POST['testname']);
-    $testcode = wp_kses_post($_POST['testcode']);
+    $testcode = wp_unslash($_POST['testcode']); // Không lọc thẻ HTML
     $correct_answer = wp_kses_post($_POST['correct_answer']);
     $permissive_management = wp_kses_post($_POST['permissive_management']);
     $token_need = wp_unslash($_POST['token_need']);
     $role_access = wp_unslash($_POST['role_access']);
     $time_allow = wp_unslash($_POST['time_allow']);
+    $number_question = wp_unslash($_POST['number_question']);
+
     $test_type = wp_kses_post($_POST['test_type']);
     $time = wp_kses_post($_POST['time']);
 
@@ -28,7 +30,7 @@ $data = array(
         'permissive_management' => $permissive_management,
         'test_type' => $test_type,
         'time' => $time,
-
+        'number_question' => $number_question,
         'token_need' => $token_need,
         'role_access' => $role_access,
         'time_allow' => $time_allow,

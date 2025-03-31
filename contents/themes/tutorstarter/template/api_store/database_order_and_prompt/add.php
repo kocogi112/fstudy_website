@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 $last_use_end_point = wp_kses_post($_POST['last_use_end_point']);
 $list_name_endpoint_order = wp_unslash($_POST['list_name_endpoint_order']);
 $prompt_ielts_writing = wp_unslash($_POST['prompt_ielts_writing']);
-$prompt_conversation_ai = wp_unslash($_POST['prompt_conversation_ai']);
+$prompt_ielts_speaking = wp_unslash($_POST['prompt_ielts_speaking']);
 
 
 // Prepare the data for updating
@@ -17,7 +17,7 @@ $data = array(
     'last_use_end_point' => $last_use_end_point,
     'list_name_endpoint_order' => $list_name_endpoint_order,
     'prompt_ielts_writing' => $prompt_ielts_writing,
-    'prompt_conversation_ai' => $prompt_conversation_ai,
+    'prompt_ielts_speaking' => $prompt_ielts_speaking,
 
 );
 

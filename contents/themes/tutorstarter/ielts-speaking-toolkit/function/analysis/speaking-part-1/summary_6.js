@@ -157,6 +157,7 @@ document.getElementById('log-edited-answer').addEventListener('click', async () 
     await MarkTest(editedData);
 });
 
+ 
 // Hàm lấy dữ liệu từ log-edited-words
 function getWordEdits() {
     let wordEdits = {};
@@ -183,10 +184,11 @@ function getWordEdits() {
     return wordEdits;
 }
 
-// Hàm gửi dữ liệu từng phần lên API
+// Hàm gửi dữ
 async function MarkTest(editedData) {
     for (let part in editedData.detail) {
         console.log(`Loading part ${part}...`);
+        console.log(JSON.stringify({ [part]: editedData.detail[part] }, null, 4));
 
         try {
             let response = await fetch(`${siteUrl}/api/public/test/v1/ielts/speaking/`, {
@@ -194,20 +196,21 @@ async function MarkTest(editedData) {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ part: part, questions: editedData.detail[part] })
+                body: JSON.stringify({ part: part, data: editedData.detail[part] })
             });
 
-            if (response.ok) {
-                console.log(`Mark success for part ${part}`);
-            } else {
-                console.error(`Mark failed for part ${part}`);
-            }
+            let dataResponse = await response.json();
+            console.log(dataResponse);
+            console.log(part);
+
+
+        
+            
         } catch (error) {
             console.error(`Error sending part ${part}:`, error);
         }
     }
 }
-
 
 
 document.getElementById('log-edited-words').addEventListener('click', () => {
