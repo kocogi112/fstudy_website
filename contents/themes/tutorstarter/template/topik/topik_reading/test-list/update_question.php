@@ -9,7 +9,7 @@ global $wpdb;
     $id_test = wp_kses_post($_POST['id_test']);
     $testname = wp_kses_post($_POST['testname']);
     $testcode = wp_unslash($_POST['testcode']); // Không lọc thẻ HTML
-    $correct_answer = wp_kses_post($_POST['correct_answer']);
+    $correct_answer = wp_unslash($_POST['correct_answer']);
     $permissive_management = wp_kses_post($_POST['permissive_management']);
     $token_need = wp_unslash($_POST['token_need']);
     $role_access = wp_unslash($_POST['role_access']);

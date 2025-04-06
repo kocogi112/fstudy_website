@@ -194,6 +194,7 @@ get_header();
         .top-nav {
             display: flex;
             gap: 10px;
+            display: none;
         }
 
         .top-nav button {
@@ -270,11 +271,7 @@ get_header();
            /* margin: auto;*/
             height: 700px;
         }
-        .task-buttons {
-            display: flex;
-            gap: 10px; /* Khoảng cách giữa các button */
-            justify-content: flex-start; /* Căn các button sang góc trái */
-        }
+       
 
         .sidebar-buttons {
             display: flex;
@@ -301,7 +298,7 @@ get_header();
 
         /* Content Section (Left Column) */
         .content {
-            width: 70%; /* Adjust width as needed */
+            width: 100%; /* Adjust width as needed */
             background-color: white;
             border: 1px solid #e6e6e6;
             border-radius: 10px;
@@ -311,6 +308,7 @@ get_header();
 
         /* Right Column (Feedback and Sidebar) */
         .right-column {
+            
             width: 30%; /* Adjust width as needed */
             display: flex;
             flex-direction: column;
@@ -377,9 +375,7 @@ get_header();
             display: block;
         }
 
-        .top-nav {
-            margin-bottom: 20px;
-        }
+        
 
 
         .score-box {
@@ -417,29 +413,31 @@ get_header();
 
 
 
-/* CSS */
-.button-10 {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 6px 14px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
-  border-radius: 6px;
-  border: none;
 
-  color: #fff;
-  background: linear-gradient(180deg, #4B91F7 0%, #367AF6 100%);
-   background-origin: border-box;
-  box-shadow: 0px 0.5px 1.5px rgba(54, 122, 246, 0.25), inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2);
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-}
+        .task-buttons {
+            display: flex;
+            gap: 10px; /* Khoảng cách giữa các button */
+            justify-content: flex-start; /* Căn các button sang góc trái */
 
-.button-10:focus {
-  box-shadow: inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2), 0px 0.5px 1.5px rgba(54, 122, 246, 0.25), 0px 0px 0px 3.5px rgba(58, 108, 217, 0.5);
-  outline: 0;
-}
+        }
+
+        .task-buttons button {
+            padding: 10px 20px;
+            background-color: #ffefd8;
+            border: 1px solid #ff8f5a;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .task-buttons .active {
+            background-color: #ff8f5a;
+            color: white;
+        }
+
+
+
+
+
 .improvement-box {
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -480,7 +478,7 @@ get_header();
         </div>
         
         <div class="task-buttons">
-            <button id="overall" class ="active button-10"  onclick="setActiveTask('overall')">Overall</button>
+            <button id="overall" class ="button-10 active"  onclick="setActiveTask('overall')">Overall</button>
             <button id="task1"  class= "button-10" onclick="setActiveTask('task1')">Writing Task 1</button>
             <button id="task2" class= "button-10" onclick="setActiveTask('task2')">Writing Task 2</button>
         </div>
@@ -512,7 +510,7 @@ get_header();
                 <div id = "someElement" ></div>
             </div>
 
-            <div class="right-column">
+            <div class="right-column" style = "display: none;" >
                 <!-- Feedback Section -->
                 <div class="feedback">
                     <div class="score">
@@ -1332,6 +1330,30 @@ document.getElementById('details-sidebar').addEventListener('click', function() 
 
 // Function // Hàm setActiveTask
 function setActiveTask(task) {
+
+    
+    // Update active button state
+    var buttons = document.querySelectorAll('.button-10');
+    buttons.forEach(function(button) {
+        button.classList.remove('active');
+    });
+    document.querySelector(`.button-10[onclick="setActiveTask('${task}')"]`).classList.add('active');
+    
+    // Show or hide the right-column
+    const rightColumn = document.querySelector('.right-column');
+    const topNav = document.querySelector('.top-nav'); 
+    if (task === "overall") {
+        rightColumn.style.display = 'none';
+        topNav.style.display = 'none';
+    } else {
+        rightColumn.style.display = 'block';
+        topNav.style.display = 'block';
+
+    }
+
+
+
+    
     currentTask = task;  // Cập nhật task hiện tại
     console.log(currentTask);
 

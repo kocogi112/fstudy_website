@@ -115,7 +115,7 @@ if ($result_test->num_rows > 0) {
             die('Lỗi MySQL prepare: ' . $conn->error);
         }
 
-        $stmt_part->bind_param("i", $id_part);
+        $stmt_part->bind_param("s", $id_part);
         $stmt_part->execute();
         $result_part = $stmt_part->get_result();
 

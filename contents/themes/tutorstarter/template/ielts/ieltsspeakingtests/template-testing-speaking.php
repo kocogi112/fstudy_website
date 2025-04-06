@@ -53,7 +53,7 @@ if (!$id_test) {
 
 
  // Create result_id
- $result_id = $hour . $minute . $second . $id_test . $user_id . $random_number;
+ $result_id = $hour . $minute . $second  . $user_id . $random_number;
  $site_url = get_site_url();
 
  echo "<script> 
@@ -926,8 +926,8 @@ async function uploadRecording(blob) {
     formData.append('file', blob, 'recording.mp3');
     formData.append('upload_preset', 'ccgbws2m');  // Replace with your preset name
 
-    //const response = await fetch('https://api.cloudinary.com/v1_1/dloq2wl7k/upload', {  // Replace with your cloud name
-    const response = await fetch('https://api.com/v1_1/dloq2wl7k/upload', {  // Replace with your cloud name
+    const response = await fetch('https://api.cloudinary.com/v1_1/dloq2wl7k/upload', {  // Replace with your cloud name
+    //const response = await fetch('https://api.com/v1_1/dloq2wl7k/upload', {  // Replace with your cloud name
 
         method: 'POST',
         body: formData,
@@ -1026,28 +1026,33 @@ document.addEventListener('DOMContentLoaded', function () {
        
             clearInterval(interval);
 
-            mediaRecorder.onstop = () => {
+            mediaRecorder.onstop = async () => {
                 if (!isAnswerSubmitted) {
                     const blob = new Blob(recordedChunks, { type: 'audio/mp3' });
                     recordedChunks = [];
                     recordingsList.push(blob);
 
-                    uploadRecording(blob).then(link => {
-                        answers['link_audio' + (currentQuestionIndex)] = link;
-                        console.log(`Uploaded audio for Question ${currentQuestionIndex}: ${link}`);
-                    });
+                    // Tạo mảng promises cho tất cả các upload
+                    const uploadPromises = [];
+                    
+                    // Thêm promise upload audio hiện tại
+                    uploadPromises.push(
+                        uploadRecording(blob).then(link => {
+                            answers['link_audio' + currentQuestionIndex] = link;
+                            console.log(`Uploaded audio for Question ${currentQuestionIndex}: ${link}`);
+                        })
+                    );
 
-                    // Collect and save the user's answer
+                    // Lưu câu trả lời text
                     let answer = textarea.value.trim();
                     answers['answer' + (currentQuestionIndex + 1)] = processAnswer(answer);
                     console.log("Question " + (currentQuestionIndex + 1) + ": " + questionElement.textContent);
                     console.log("Answer " + (currentQuestionIndex + 1) + ": " + answer);
 
-                    counter = 0; // Reset counter
-                    ret.innerHTML = convertSec(counter); // Update display
-                    currentQuestionIndex++; // Move to next question or end the quiz
-                   
-               
+                    counter = 0;
+                    ret.innerHTML = convertSec(counter);
+                    currentQuestionIndex++;
+
                     if (currentQuestionIndex < quizData.questions.length) {
                         loadQuestion();
                     } else {
@@ -1055,18 +1060,24 @@ document.addEventListener('DOMContentLoaded', function () {
                         document.getElementById('reAnswerButton').style.display = 'none';
                         document.getElementById('stopButton').style.display = 'none';
                         document.getElementById('review-page').style.display = 'block';
-
                         document.getElementById('submitButton').style.display = 'block';
-                        console.log("Show Review for exam");
-                        for (let i = 0; i < quizData.questions.length; i++){
-                            part = quizData.questions[i].part;
-                             ReviewPage(i);
 
-                            //await GetSummaryPart1(i);
+                        try {
+                            // Đợi tất cả upload hoàn thành
+                            await Promise.all(uploadPromises);
+                            console.log("All audio uploads completed");
                             
+                            // Sau khi upload xong mới chuyển sang review
+                            for (let i = 0; i < quizData.questions.length; i++) {
+                                part = quizData.questions[i].part;
+                                ReviewPage(i);
+                            }
+                            
+                            showRecordings();
+                        } catch (error) {
+                            console.error("Error uploading audio:", error);
+                            // Xử lý lỗi nếu cần
                         }
-                        //endTest();
-                        showRecordings();
                     }
                 }
             };
@@ -1488,7 +1499,6 @@ async function submitAnswers() {
 
     document.getElementById("check-answer").style.display = "none";
     document.getElementById('answerTextarea').style.display = 'none';
-    document.getElementById("result-full-page").style.display="block";
     document.getElementById("container1").style.display = "none"
     textarea.value = '';
 
@@ -1623,14 +1633,10 @@ function ResultInput() {
     var contentToCopy9 = document.getElementById("testtype").textContent;
 
 
-    document.getElementById("user_answer_and_comment").value = contentToCopy1;
     document.getElementById("dateform").value = contentToCopy2;
     document.getElementById("testname").value = contentToCopy4;
     document.getElementById("idtest").value = contentToCopy6;
-    document.getElementById("resulttest").value = contentToCopy7;
-    document.getElementById("band_detail").value = contentToCopy8;
     document.getElementById("test_type").value = contentToCopy9;
-
     document.getElementById("testsavenumber").value = resultId;
 
    /* // Add a delay before submitting the form
@@ -1735,7 +1741,7 @@ function recordWord(expectedWord, buttonElement) {
             
 </script>
 
-<script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\summary_6.js"></script>
+<script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\summary_9.js"></script>
 <script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\overalltab.js"></script>
 <script src = "\wordpress\contents\themes\tutorstarter\ielts-speaking-toolkit\function\analysis\speaking-part-1\sample-tab.js"></script>
 <script src = "\wordpress\contents\themes\tutorstarter\scan-device\location_ip.js"></script>

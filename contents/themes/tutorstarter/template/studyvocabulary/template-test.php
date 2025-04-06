@@ -43,6 +43,7 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $id_test);
 $stmt->execute();
 $result = $stmt->get_result();
+get_header(); // Gọi phần đầu trang (header.php)
 
 if ($result->num_rows > 0) {
     // Fetch test data if available
@@ -132,10 +133,7 @@ $testname = $data['testname'] ?? "Test name not found";
 // Close the questions array and the main object
 echo "];";
 echo "</script>";
-} else {
-echo "<script>console.log('No data found for the given id_test');</script>";
-}
-get_header(); // Gọi phần đầu trang (header.php)
+
 
 
 // Close statement and connection
@@ -471,6 +469,9 @@ table th {
 
 
 <?php
+} else {
+    echo "No tests found !";
+    }
 get_footer();
 /*} else {
     get_header();

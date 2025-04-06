@@ -4,7 +4,6 @@
  * Template Post Type: ieltsspeakingtests
  */
 
-$post_id = get_the_ID();
 
 // Get the custom number field value
 //$custom_number = get_post_meta($post_id, '_ieltsspeakingtests_custom_number', true);
@@ -168,10 +167,7 @@ foreach ($results as $result) {
                     
               
             }
-        } else {
-            // If no results with testsavenumber
-            echo '<p>Không có kết quả tìm thấy cho đề thi này.</p>';
-        }
+        
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -286,7 +282,22 @@ foreach ($results as $result) {
             display: flex;
             gap: 10px; /* Khoảng cách giữa các button */
             justify-content: flex-start; /* Căn các button sang góc trái */
+
         }
+
+        .task-buttons button {
+            padding: 10px 20px;
+            background-color: #ffefd8;
+            border: 1px solid #ff8f5a;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .task-buttons .active {
+            background-color: #ff8f5a;
+            color: white;
+        }
+
 
         .sidebar-buttons {
             display: flex;
@@ -311,7 +322,7 @@ foreach ($results as $result) {
 
         /* Content Section (Left Column) */
         .content {
-            width: 70%; /* Adjust width as needed */
+            width: 100%; /* Adjust width as needed */
             background-color: white;
             border: 1px solid #e6e6e6;
             border-radius: 10px;
@@ -390,6 +401,7 @@ foreach ($results as $result) {
 
         .top-nav {
             margin-bottom: 20px;
+            display:none;
         }
 
 
@@ -428,29 +440,6 @@ foreach ($results as $result) {
 
 
 
-        /* CSS */
-        .button-10 {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 6px 14px;
-        font-family: -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
-        border-radius: 6px;
-        border: none;
-
-        color: #fff;
-        background: linear-gradient(180deg, #4B91F7 0%, #367AF6 100%);
-        background-origin: border-box;
-        box-shadow: 0px 0.5px 1.5px rgba(54, 122, 246, 0.25), inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2);
-        user-select: none;
-        -webkit-user-select: none;
-        touch-action: manipulation;
-        }
-
-        .button-10:focus {
-        box-shadow: inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2), 0px 0.5px 1.5px rgba(54, 122, 246, 0.25), 0px 0px 0px 3.5px rgba(58, 108, 217, 0.5);
-        outline: 0;
-        }
 
     </style>
 </head>
@@ -514,7 +503,7 @@ foreach ($results as $result) {
                 </div>
             </div>
 
-            <div class="right-column">
+            <div class="right-column" style = "display:none">
                 <!-- Feedback Section -->
                 <div class="feedback">
                     <div class="score">
@@ -543,6 +532,8 @@ foreach ($results as $result) {
                     <div class="sidebar-buttons">
                         <button class ="btn-sidebar active" id ="general-sidebar"><i class="fa-solid fa-circle" style="color: #74C0FC;"></i>General Comment</button>
                         <button class ="btn-sidebar" id ="details-sidebar"> <i class="fa-solid fa-circle" style="color: #B197FC;"></i> Detail Comment</button>
+                        <button class ="btn-sidebar" id ="suggestion-sidebar"> <i class="fa-solid fa-circle" style="color: #B197FC;"></i> Suggestion</button>
+
                     </div>
                 <div class="sidebar" id="sidebarContent"></div>
 
@@ -552,11 +543,8 @@ foreach ($results as $result) {
     <!--<script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/process_result.js"></script> 
     <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/submit_result.js"></script> -->
 
-    <script> 
-    
-
-
- // Decode HTML entities first
+    <script>
+// Decode HTML entities first
 const decodeHTML = (html) => {
   const txt = document.createElement('textarea');
   txt.innerHTML = html;
@@ -565,33 +553,84 @@ const decodeHTML = (html) => {
 
 // Decode the task1BreakdownForm string
 const ResultTest = decodeHTML('<?php echo esc_js(wp_kses_post($result->resulttest)); ?>');
-const bandDetails = decodeHTML('<?php echo esc_js(wp_kses_post($result->band_detail)); ?>');
 
+const bandDetails = <?php echo json_encode(json_decode($result->band_detail, true), JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG); ?>;
 const userAnswerAndComment = <?php echo json_encode(json_decode($result->user_answer_and_comment, true), JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG); ?>;
 
 console.log("User Answer and Comment:", userAnswerAndComment);
 
+// Function to check which parts exist in userAnswerAndComment
+function getAvailableParts() {
+    const availableParts = [];
+    if (userAnswerAndComment && userAnswerAndComment['1']) availableParts.push('1');
+    if (userAnswerAndComment && userAnswerAndComment['2']) availableParts.push('2');
+    if (userAnswerAndComment && userAnswerAndComment['3']) availableParts.push('3');
+    return availableParts;
+}
 
+const availableParts = getAvailableParts();
+console.log("Available parts:", availableParts);
+
+// Hide/show part buttons based on available data
+function initializePartButtons() {
+    const partButtons = {
+        '1': document.getElementById("task1"),
+        '2': document.getElementById("task2"),
+        '3': document.getElementById("task3")
+    };
+    
+    // Hide all part buttons first
+    Object.values(partButtons).forEach(button => {
+        if (button) button.style.display = 'none';
+    });
+    
+    // Show only available parts
+    availableParts.forEach(part => {
+        if (partButtons[part]) {
+            partButtons[part].style.display = 'block';
+        }
+    });
+    
+    // Always show overall button
+    document.getElementById("overall").style.display = 'block';
+}
+
+// Call this function when the page loads
+initializePartButtons();
 
 function getAnswersForTask(taskData) {
+    if (!taskData || !taskData.part) return [];
+    
+    let currentPart = taskData.part;
     const { id_tests, stts } = taskData;
+    console.log("Checking part", userAnswerAndComment[currentPart]);
+
+    // Check if the part exists in userAnswerAndComment
+    if (!userAnswerAndComment || !userAnswerAndComment[currentPart] || !userAnswerAndComment[currentPart].data) {
+        console.error("No data available for part:", currentPart);
+        return [];
+    }
 
     return id_tests.map((id_test, index) => {
         const stt = stts ? stts[index] : null;
+        const currentStt = (stt > 0) ? stt - 1 : 0; 
+        console.log("Đang check ", currentStt);
 
-        // Find matching answers for each question based on id_test and stt
-        const matches = userAnswerAndComment.filter(item => 
-            item.id_question === id_test && (stt === null || item.stt === stt)
-        );
+        if (!userAnswerAndComment[currentPart].data[currentStt]) {
+            console.error("Invalid stt index:", currentStt);
+            return null;
+        }
 
-        // Get the answers as a string
-        const answers = matches.map(match => match.answer).join(", ");
-        const checkFluencyAndCoherenceComment = matches.map(match => match.checkFluencyAndCoherenceSend.checkFluencyAndCoherenceComment).join(", ");
-        const checkLexicalResourceComment = matches.map(match => match.checkLexicalResourceSend.checkLexicalResourceComment).join(", ");
-        const checkGrammarticalRangeAndAccuracyComment = matches.map(match => match.checkGrammarticalRangeAndAccuracySend.checkGrammarticalRangeAndAccuracyComment).join(", ");
-        const link_audios =  matches.map(match => match.link_audio).join(", ");
-        
-        // Return the question's answers along with the question content
+        // Get data safely
+        const answers = userAnswerAndComment[currentPart].data[currentStt]?.answer || "";
+        const link_audios = userAnswerAndComment[currentPart].data[currentStt]?.audio || "";
+
+        // Get comments if available
+        const checkFluencyAndCoherenceComment = userAnswerAndComment[currentPart]?.final_analysis?.detail_recommendation?.flu || "";
+        const checkLexicalResourceComment = userAnswerAndComment[currentPart]?.final_analysis?.detail_recommendation?.lr || "";
+        const checkGrammarticalRangeAndAccuracyComment = userAnswerAndComment[currentPart]?.final_analysis?.detail_recommendation?.gra || "";
+        const checkPronunciationComment = userAnswerAndComment[currentPart]?.final_analysis?.detail_recommendation?.pro || "";
+
         return {
             id_test: id_test,
             stt: stt,
@@ -600,46 +639,155 @@ function getAnswersForTask(taskData) {
             checkFluencyAndCoherenceComment: checkFluencyAndCoherenceComment,
             checkLexicalResourceComment: checkLexicalResourceComment,
             checkGrammarticalRangeAndAccuracyComment: checkGrammarticalRangeAndAccuracyComment,
+            checkPronunciationComment: checkPronunciationComment,
         };
-    });
+    }).filter(Boolean);
 }
-// Ensure proper encoding of PHP arrays as JavaScript objects
-const task1Data = {
-    id_tests: <?php echo json_encode(array_column($task1_data, 'id_test')); ?>,
-    stts: <?php echo json_encode(array_column($task1_data, 'stt')); ?>,
-    question_contents: <?php echo json_encode(array_map('html_entity_decode', array_column($task1_data, 'question_content'))); ?>,
-    samples: <?php echo json_encode(array_map('html_entity_decode', array_column($task1_data, 'sample'))); ?>
 
-};
+// Tạo sttAll tăng dần liên tục qua tất cả các part
+let globalIndex = 0;
 
-const task2Data = {
-    id_tests: <?php echo json_encode(array_column($task2_data, 'id_test')); ?>,
-    question_contents: <?php echo json_encode(array_map('html_entity_decode', array_column($task2_data, 'question_content'))); ?>,
-    samples: <?php echo json_encode(array_map('html_entity_decode', array_column($task2_data, 'sample'))); ?>
+// Initialize task data only for available parts
+const taskDataMap = {};
 
-};
+// Only initialize data for parts that exist in userAnswerAndComment
+if (availableParts.includes('1')) {
+    const task1IdTests = <?php echo isset($task1_data) ? json_encode(array_column($task1_data, 'id_test')) : '[]' ?>;
+    const task1Stts = <?php echo isset($task1_data) ? json_encode(array_column($task1_data, 'stt')) : '[]' ?>;
+    const task1QuestionContents = <?php echo isset($task1_data) ? json_encode(array_map('html_entity_decode', array_column($task1_data, 'question_content'))) : '[]' ?>;
+    const task1Samples = <?php echo isset($task1_data) ? json_encode(array_map('html_entity_decode', array_column($task1_data, 'sample'))) : '[]' ?>;
 
-const task3Data = {
-    id_tests: <?php echo json_encode(array_column($task3_data, 'id_test')); ?>,
-    stts: <?php echo json_encode(array_column($task3_data, 'stt')); ?>,
-    question_contents: <?php echo json_encode(array_map('html_entity_decode', array_column($task3_data, 'question_content'))); ?>,
-    samples: <?php echo json_encode(array_map('html_entity_decode', array_column($task3_data, 'sample'))); ?>
+    taskDataMap.task1 = {
+        part: 1,
+        id_tests: task1IdTests,
+        question_contents: task1QuestionContents,
+        samples: task1Samples,
+        suggestions: [],
+        stts: task1Stts,
+        indexes: []
+    };
+}
 
-};
+if (availableParts.includes('2')) {
+    const task2IdTests = <?php echo isset($task2_data) ? json_encode(array_column($task2_data, 'id_test')) : '[]' ?>;
+    const task2Stts = <?php echo isset($task2_data) ? json_encode(array_column($task2_data, 'stt')) : '[]' ?>;
+    const task2QuestionContents = <?php echo isset($task2_data) ? json_encode(array_map('html_entity_decode', array_column($task2_data, 'question_content'))) : '[]' ?>;
+    const task2Samples = <?php echo isset($task2_data) ? json_encode(array_map('html_entity_decode', array_column($task2_data, 'sample'))) : '[]' ?>;
 
-/*console.log("Datee semt ", userAnswerAndComment); // To check the structure
-console.log(userAnswerAndComment.unchange); // Check if this is undefined
-*/
+    taskDataMap.task2 = {
+        part: 2,
+        id_tests: task2IdTests,
+        question_contents: task2QuestionContents,
+        samples: task2Samples,
+        suggestions: [],
+        stts: task2Stts,
+        indexes: []
+    };
+}
 
+if (availableParts.includes('3')) {
+    const task3IdTests = <?php echo isset($task3_data) ? json_encode(array_column($task3_data, 'id_test')) : '[]' ?>;
+    const task3Stts = <?php echo isset($task3_data) ? json_encode(array_column($task3_data, 'stt')) : '[]' ?>;
+    const task3QuestionContents = <?php echo isset($task3_data) ? json_encode(array_map('html_entity_decode', array_column($task3_data, 'question_content'))) : '[]' ?>;
+    const task3Samples = <?php echo isset($task3_data) ? json_encode(array_map('html_entity_decode', array_column($task3_data, 'sample'))) : '[]' ?>;
+
+    taskDataMap.task3 = {
+        part: 3,
+        id_tests: task3IdTests,
+        question_contents: task3QuestionContents,
+        samples: task3Samples,
+        stts: task3Stts,
+        suggestions: [],
+        indexes: []
+    };
+}
+
+// Initialize global indexes for available tasks
+Object.values(taskDataMap).forEach(task => {
+    if (task.stts && task.stts.length > 0) {
+        task.indexes = task.stts.map(() => globalIndex++);
+    } else {
+        task.indexes = task.question_contents.map(() => globalIndex++);
+    }
+});
+
+// Generic function to find suggestions
+function findSuggestions(partNumber, globalIndex) {
+    if (!userAnswerAndComment || !userAnswerAndComment[partNumber]?.final_analysis?.improvement_words) return [];
+    
+    const improvementWords = userAnswerAndComment[partNumber].final_analysis.improvement_words;
+    const patterns = [
+        `q-p-${partNumber}-n-${globalIndex}`,
+        `q-p-${partNumber}-${globalIndex}`,
+        `q-p-${partNumber}-n-${globalIndex+1}`,
+        `q-p-${partNumber}-n-${globalIndex-1}`,
+        `q-p-${partNumber}-${globalIndex+1}`,
+        `q-p-${partNumber}-${globalIndex-1}`
+    ];
+    
+    for (const pattern of patterns) {
+        if (improvementWords[pattern]) {
+            return improvementWords[pattern];
+        }
+    }
+    return [];
+}
+
+// Assign suggestions to available tasks
+Object.values(taskDataMap).forEach(task => {
+    task.suggestions = task.indexes.map(index => 
+        findSuggestions(task.part, index)
+    );
+});
+
+// Generate improvement HTML
+function generateImprovementHTML(improvementData, part, questionIndex) {
+    if (!Array.isArray(improvementData) || improvementData.length === 0) {
+        return "<p style='color: #999; font-style: italic;'>No improvement suggestions for this part.</p>";
+    }
+
+    return improvementData.map((item, improveIndex) => 
+        `<div id="q-p-${part}-n-${questionIndex}-improve-${improveIndex}" style="border: 1px solid #ccc; border-radius: 8px; padding: 12px; margin-bottom: 10px; background-color: #f9f9f9; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);">
+            <p><strong class="original-text">Original:</strong> ${item.origin_word_or_phrase}</p>
+            <p><strong class="suggestion-text">Suggestion:</strong> ${item.replace_word_or_phrase}</p>
+            <p><strong class="reason-text">Reason:</strong> ${item.reason}</p>
+        </div>`
+    ).join("");
+}
+
+// Apply replacements to content
+function applyReplacements(text, suggestions) {
+    if (!suggestions || !Array.isArray(suggestions)) return text;
+
+    suggestions.forEach((item, index) => {
+        const escaped = item.origin_word_or_phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(escaped, "g");
+        text = text.replace(regex, 
+            `<span class="need_replace" id="replace_text_${index}">${item.origin_word_or_phrase}</span>
+             <span class="replaced_text" id="replace_${index}">${item.replace_word_or_phrase}</span>`
+        );
+    });
+    return text;
+}
+
+// Process available tasks
+Object.values(taskDataMap).forEach(task => {
+    task.question_contents = task.question_contents.map((content, index) => 
+        applyReplacements(content, task.suggestions[index] || [])
+    );
+});
+
+// Generate recommendation bars for available tasks
+const replaceRecommendBars = {};
+Object.entries(taskDataMap).forEach(([taskName, taskData]) => {
+    replaceRecommendBars[taskName] = taskData.suggestions.map((sugg, index) => 
+        generateImprovementHTML(sugg, taskData.part, taskData.indexes[index])
+    ).join("");
+});
 
 // Create a DOMParser to parse the decoded HTML string
 const parser = new DOMParser();
 const doc = parser.parseFromString(bandDetails, 'text/html');
-//const doc2 = parser.parseFromString(ResultTest, 'text/html');
-
-
-
-
 
 const generalSidebarContentPart1 = `
 Số từ: <br>
@@ -649,9 +797,7 @@ Số câu: <br>
 Số lượng sai ngữ pháp/ từ vựng: <br>
 Số linking Words: <br>
 Độ mạch lạc: <br>
-
 `;
-
 
 const generalSidebarContentPart2 = `
 Số từ: <br>
@@ -661,8 +807,8 @@ Số câu: <br>
 Số lượng sai ngữ pháp/ từ vựng: <br>
 Số linking Words: <br>
 Độ mạch lạc: <br>
-
 `;
+
 const generalSidebarContentPart3 = `
 Số từ: <br>
 Task: <br> 
@@ -671,42 +817,316 @@ Số câu: <br>
 Số lượng sai ngữ pháp/ từ vựng: <br>
 Số linking Words: <br>
 Độ mạch lạc: <br>
-
 `;
 
+// Generate detail comments only for available parts
+const detailComments = {};
+
+if (availableParts.includes('1')) {
+    detailComments.task1 = `
+    <strong style="color:red">Detail Feedback Speaking Part 1</strong>
+    <p style="font-weight: bold">Fluency And Coherence: </p>${userAnswerAndComment[1]?.final_analysis?.detail_recommendation?.flu || "No feedback available"}<br>
+    <p style="font-weight: bold">Lexical Resource: </p>${userAnswerAndComment[1]?.final_analysis?.detail_recommendation?.lr || "No feedback available"}<br>
+    <p style="font-weight: bold">Grammar: </p>${userAnswerAndComment[1]?.final_analysis?.detail_recommendation?.gra || "No feedback available"}<br>
+    <p style="font-weight: bold">Pronunciation: </p>${userAnswerAndComment[1]?.final_analysis?.detail_recommendation?.pro || "No feedback available"}<br>
+    `;
+}
+
+if (availableParts.includes('2')) {
+    detailComments.task2 = `
+    <strong style="color:red">Detail Feedback Speaking Part 2</strong>
+    <p style="font-weight: bold">Fluency And Coherence: </p>${userAnswerAndComment[2]?.final_analysis?.detail_recommendation?.flu || "No feedback available"}<br>
+    <p style="font-weight: bold">Lexical Resource: </p>${userAnswerAndComment[2]?.final_analysis?.detail_recommendation?.lr || "No feedback available"}<br>
+    <p style="font-weight: bold">Grammar: </p>${userAnswerAndComment[2]?.final_analysis?.detail_recommendation?.gra || "No feedback available"}<br>
+    <p style="font-weight: bold">Pronunciation: </p>${userAnswerAndComment[2]?.final_analysis?.detail_recommendation?.pro || "No feedback available"}<br>
+    `;
+}
+
+if (availableParts.includes('3')) {
+    detailComments.task3 = `
+    <strong style="color:red">Detail Feedback Speaking Part 3</strong>
+    <p style="font-weight: bold">Fluency And Coherence: </p>${userAnswerAndComment[3]?.final_analysis?.detail_recommendation?.flu || "No feedback available"}<br>
+    <p style="font-weight: bold">Lexical Resource: </p>${userAnswerAndComment[3]?.final_analysis?.detail_recommendation?.lr || "No feedback available"}<br>
+    <p style="font-weight: bold">Grammar: </p>${userAnswerAndComment[3]?.final_analysis?.detail_recommendation?.gra || "No feedback available"}<br>
+    <p style="font-weight: bold">Pronunciation: </p>${userAnswerAndComment[3]?.final_analysis?.detail_recommendation?.pro || "No feedback available"}<br>
+    `;
+}
+
+const tasks = {
+    overall: {
+        description: "Overall feedback and analysis",
+        user_level: "",
+        wordCount: "", 
+        description_level: "",
+        replaceRecommendBar: "",
+        generalSidebar: "Overall general content here.",
+        detailSidebar: "",
+        youpass: "Overall feedback will be shown here",
+        question_seperate: [],
+        sample: [],
+        id_question: "Overall Questions",
+        suggestions: "Overall suggestions will be shown here",
+        sidebar: [
+            "Comment 1: Overall performance",
+            "Comment 2: General feedback",
+            "Comment 3: Final thoughts"
+        ],
+        imageLink: ""
+    }
+};
+
+// Add tasks only for available parts with proper data checking
+if (availableParts.includes('1') && taskDataMap.task1) {
+    const task1Desc = taskDataMap.task1.id_tests && taskDataMap.task1.stts && taskDataMap.task1.question_contents ?
+        `${taskDataMap.task1.id_tests}: ${taskDataMap.task1.stts}: ${taskDataMap.task1.question_contents}` : 
+        "Task 1 questions";
+    
+    tasks.task1 = {
+        description: task1Desc,
+        wordCount: "Word count for Task 1",    
+        generalSidebar: generalSidebarContentPart1,
+        detailSidebar: detailComments.task1 || "No detailed feedback available for Task 1",
+        user_level: "User level for Task 1",
+        replaceRecommendBar: replaceRecommendBars.task1 || "",
+        description_level: "Description level for Task 1",
+        youpass: userAnswerAndComment[1]?.final_analysis?.overall_recommendation || "YouPass feedback for Task 1",
+        question_seperate: getAnswersForTask(taskDataMap.task1),
+        sample: taskDataMap.task1.samples || [],
+        id_question: "Task 1 Questions",
+        suggestions: "Suggestions for Task 1",
+        sidebar: [
+            "Comment 1: Task 1 feedback",
+            "Comment 2: Task 1 analysis",
+            "Comment 3: Task 1 recommendations"
+        ],
+        imageLink: ""
+    };
+}
+
+if (availableParts.includes('2') && taskDataMap.task2) {
+    const task2Desc = taskDataMap.task2.id_tests && taskDataMap.task2.question_contents ?
+        `${taskDataMap.task2.id_tests}: ${taskDataMap.task2.question_contents}` : 
+        "Task 2 questions";
+    
+    tasks.task2 = {
+        description: task2Desc,
+        wordCount: "Word count for Task 2",
+        generalSidebar: generalSidebarContentPart2,
+        detailSidebar: detailComments.task2 || "No detailed feedback available for Task 2",
+        user_level: "User level for Task 2",
+        replaceRecommendBar: replaceRecommendBars.task2 || "",
+        description_level: "Description level for Task 2",
+        youpass: userAnswerAndComment[2]?.final_analysis?.overall_recommendation || "YouPass feedback for Task 2",
+        question_seperate: getAnswersForTask(taskDataMap.task2),
+        sample: taskDataMap.task2.samples || [],
+        id_question: "Task 2 Questions",
+        suggestions: "Suggestions for Task 2",
+        sidebar: [
+            "Comment 1: Task 2 feedback",
+            "Comment 2: Task 2 analysis",
+            "Comment 3: Task 2 recommendations"
+        ],
+        imageLink: ""
+    };
+}
+
+if (availableParts.includes('3') && taskDataMap.task3) {
+    const task3Desc = taskDataMap.task3.id_tests && taskDataMap.task3.stts && taskDataMap.task3.question_contents ?
+        `${taskDataMap.task3.id_tests}: ${taskDataMap.task3.stts}: ${taskDataMap.task3.question_contents}` : 
+        "Task 3 questions";
+    
+    tasks.task3 = {
+        description: task3Desc,
+        wordCount: "Word count for Task 3",
+        generalSidebar: generalSidebarContentPart3,
+        replaceRecommendBar: replaceRecommendBars.task3 || "",
+        detailSidebar: detailComments.task3 || "No detailed feedback available for Task 3",
+        user_level: "User level for Task 3",
+        description_level: "Description level for Task 3",
+        youpass: userAnswerAndComment[3]?.final_analysis?.overall_recommendation || "YouPass feedback for Task 3",
+        question_seperate: getAnswersForTask(taskDataMap.task3),
+        sample: taskDataMap.task3.samples || [],
+        id_question: "Task 3 Questions",
+        suggestions: "Suggestions for Task 3",
+        sidebar: [
+            "Comment 1: Task 3 feedback",
+            "Comment 2: Task 3 analysis",
+            "Comment 3: Task 3 recommendations"
+        ],
+        imageLink: ""
+    };
+}
+
+console.log("Tasks data:", tasks);
+
+// Function to set sidebar content based on the task and selected type (general/details)
+function setSidebarContent(task, type) {
+    const taskData = tasks[task];
+    if (!taskData) return;
+    
+    let sidebarContent = '';
+    let activeSidebar = '';
+
+    if (type === 'general') {
+        sidebarContent = taskData.generalSidebar || 'No general feedback available';
+        activeSidebar = 'general-sidebar';
+    } else if (type === 'details') {
+        sidebarContent = taskData.detailSidebar || 'No detailed feedback available';
+        activeSidebar = 'details-sidebar';
+    } else if (type === 'suggestion') {
+        sidebarContent = taskData.replaceRecommendBar || 'No improvement suggestions available';
+        activeSidebar = 'suggestion-sidebar';
+    }
+    
+    document.getElementById('sidebarContent').innerHTML = sidebarContent;
+    document.getElementById('general-sidebar').classList.remove('active');
+    document.getElementById('details-sidebar').classList.remove('active');
+    document.getElementById('suggestion-sidebar').classList.remove('active');
+
+    if (document.getElementById(activeSidebar)) {
+        document.getElementById(activeSidebar).classList.add('active');
+    }
+}
+
+// Add event listeners for switching between General and Details Sidebar
+document.getElementById('general-sidebar')?.addEventListener('click', function() {
+    setSidebarContent(currentTask, 'general');
+});
+
+document.getElementById('suggestion-sidebar')?.addEventListener('click', function() {
+    setSidebarContent(currentTask, 'suggestion');
+});
+
+document.getElementById('details-sidebar')?.addEventListener('click', function() {
+    setSidebarContent(currentTask, 'details');
+    document.getElementById('general-sidebar')?.classList.remove('active');
+    document.getElementById('suggestion-sidebar')?.classList.remove('active');
+    this.classList.add('active');
+});
+
+// Find the element by its ID
+const final_lexical_resource_point = bandDetails?.bands?.lexicalResource || "N/A";
+const final_fluency_and_coherence_point = bandDetails?.bands?.fluency || "N/A";
+const final_grammatical_range_and_accuracy_point = bandDetails?.bands?.grammar || "N/A";
+const final_pronunciation_point = bandDetails?.bands?.pronunciation || "N/A";
+
+console.log('Lexical Resource:', final_lexical_resource_point);
+console.log('Fluency and Coherence:', final_fluency_and_coherence_point);
+console.log('Grammatical Range and Accuracy:', final_grammatical_range_and_accuracy_point);
+console.log('Pronunciation:', final_pronunciation_point);
+
+// Function to set active task and update content
+function setActiveTask(task) {
+    // Update active button state
+    var buttons = document.querySelectorAll('.button-10');
+    buttons.forEach(function(button) {
+        button.classList.remove('active');
+    });
+
+    const activeButton = document.querySelector(`.button-10[onclick="setActiveTask('${task}')"]`);
+    if (activeButton) {
+        activeButton.classList.add('active');
+    }
+
+    // Show or hide the right-column
+    const rightColumn = document.querySelector('.right-column');
+    const topNav = document.querySelector('.top-nav'); 
+    if (task === "overall") {
+        rightColumn.style.display = 'none';
+        topNav.style.display = 'none';
+    } else {
+        rightColumn.style.display = 'block';
+        topNav.style.display = 'block';
+
+    }
+
+    currentTask = task;
+    document.getElementById("question_seperate").innerHTML = "";
+    document.getElementById("sample_seperate").innerHTML = "";
+
+    const taskData = tasks[task];
+    if (!taskData) return;
+
+    // Update content sections for the active task
+    document.getElementById('youpassContent').innerText = taskData.youpass || "No feedback available";
+    document.getElementById('suggestionsContent').innerText = taskData.suggestions || "No suggestions available";
+    document.getElementById("wordCount").innerText = taskData.wordCount || "N/A"; 
+    document.getElementById("user_level").innerText = taskData.user_level || "N/A";
+    document.getElementById("description_level").innerText = taskData.description_level || "N/A";
+
+    const sidebarContent = Array.isArray(taskData.sidebar) ? 
+        taskData.sidebar.map(comment => `<div class="comment">${comment}</div>`).join('') :
+        "No comments available";
+    document.getElementById('sidebarContent').innerHTML = sidebarContent;
+
+    if (taskData.imageLink && taskData.imageLink.trim() !== "") {
+        document.getElementById('taskImageContainer').innerHTML = `<img src="${taskData.imageLink}" alt="Chart Image">`;
+    } else {
+        document.getElementById('taskImageContainer').innerHTML = "";
+    }    
+
+    document.getElementById('score').textContent = ResultTest || "N/A";
+    document.getElementById('lexical_resource_score').textContent = final_lexical_resource_point;
+    document.getElementById('fluency_and_coherence_score').textContent = final_fluency_and_coherence_point;
+    document.getElementById('grammatical_range_and_accuracy_score').textContent = final_grammatical_range_and_accuracy_point;
+    document.getElementById('pronunciation_score').textContent = final_pronunciation_point;
+    document.getElementById('id_test_div').innerHTML = taskData.id_question || "N/A";
+
+    switch (task) {
+        case 'task1':
+            if (taskDataMap.task1) {
+                renderQuestionsWithAnswers(taskDataMap.task1, 1);
+                getSampleForQuestion(taskDataMap.task1, 1);
+            }
+            break;
+        case 'task2':
+            if (taskDataMap.task2) {
+                renderQuestionsWithAnswers(taskDataMap.task2, 2);
+                getSampleForQuestion(taskDataMap.task2, 2);
+            }
+            break;
+        case 'task3':
+            if (taskDataMap.task3) {
+                renderQuestionsWithAnswers(taskDataMap.task3, 3);
+                getSampleForQuestion(taskDataMap.task3, 3);
+            }
+            break;
+        case 'overall':
+            renderOverall();
+            break;
+    }
+
+    openTab('question_seperate');
+    setSidebarContent(task, 'general');
+}
 
 
-          // PHP data embedded into JavaScript 
-          
-const task1Description = `<?php echo json_encode(array_column($task1_data, 'id_test')); ?>: <?php echo json_encode(array_column($task1_data, 'stt')); ?>: <?php echo json_encode(array_column($task1_data, 'question_content')); ?>`;
-const task2Description = `<?php echo json_encode(array_column($task2_data, 'id_test')); ?>: <?php echo json_encode(array_column($task2_data, 'question_content')); ?>`;
-const task3Description = `<?php echo json_encode(array_column($task3_data, 'id_test')); ?>: <?php echo json_encode(array_column($task3_data, 'stt')); ?>: <?php echo json_encode(array_column($task3_data, 'question_content')); ?>`;
-// Assuming task1Data, task2Data, and task3Data are now properly formatted and contain the data
+
 // Modified render function to ensure it loads task-specific content
 function renderQuestionsWithAnswers(taskData, partIndex, hasStt = true) {
+    if (!taskData || !taskData.id_tests || !taskData.question_contents) return;
+    
     const idTests = taskData.id_tests;
     const stts = taskData.stts || [];
     const questionContents = taskData.question_contents;
 
     const taskAnswers = getAnswersForTask(taskData);
+    if (!taskAnswers || taskAnswers.length === 0) return;
+
+    let questionContainer = document.getElementById("question_seperate");
+    if (!questionContainer) return;
 
     idTests.forEach((id_test, index) => {
         const stt = hasStt ? stts[index] : null;
-        const questionContent = questionContents[index];
-        const answers = taskAnswers[index].answers;
-        const link_audios = taskAnswers[index].link_audios;
+        const questionContent = questionContents[index] || "No question content available";
+        const answers = taskAnswers[index]?.answers || "No answer available";
+        const link_audios = taskAnswers[index]?.link_audios || "";
 
-        const checkFluencyAndCoherenceComment = taskAnswers[index].checkFluencyAndCoherenceComment;
-        const checkLexicalResourceComment = taskAnswers[index].checkLexicalResourceComment;
-        const checkGrammarticalRangeAndAccuracyComment = taskAnswers[index].checkGrammarticalRangeAndAccuracyComment;
-
-        const uniqueId = hasStt
-            ? `part-${partIndex}-idTest-${id_test}-stt-${stt}`
-            : `part-${partIndex}-idTest-${id_test}`;
+        const uniqueId = hasStt ?
+            `part-${partIndex}-idTest-${id_test}-stt-${stt}` :
+            `part-${partIndex}-idTest-${id_test}`;
         const audioContainerId = `audioContainer-${uniqueId}`;
 
-        // Append question content and answers
-        let questionContainer = document.getElementById("question_seperate");
         questionContainer.innerHTML += `
             <div class="task-container" id="original">
                 <p class="task-description" id="taskDescription-${uniqueId}">
@@ -714,11 +1134,8 @@ function renderQuestionsWithAnswers(taskData, partIndex, hasStt = true) {
                 </p>
                 <div>
                     <p id="originalContent-${uniqueId}">
-                        ${answers ? `<strong>Your Answers:</strong> ${answers}<br>` : ''}
+                        <strong>Your Answers:</strong> ${answers}<br>
                         ${link_audios ? `<div id="${audioContainerId}"><strong>Audio:</strong> <audio controls src="${link_audios}"></audio></div><br>` : ''}
-                        ${checkFluencyAndCoherenceComment ? `<strong>Fluency and Coherence:</strong> ${checkFluencyAndCoherenceComment}<br>` : ''}
-                        ${checkLexicalResourceComment ? `<strong>Lexical Resource:</strong> ${checkLexicalResourceComment}<br>` : ''}
-                        ${checkGrammarticalRangeAndAccuracyComment ? `<strong>Grammatical Range and Accuracy:</strong> ${checkGrammarticalRangeAndAccuracyComment}` : ''}
                     </p>
                 </div>
             </div>
@@ -726,340 +1143,55 @@ function renderQuestionsWithAnswers(taskData, partIndex, hasStt = true) {
     });
 }
 
-
-async function fetchAndPlayAudio(url, audioContainerId) {
-    try {
-        const response = await fetch(url);
-        if (response.ok) {
-            const blob = await response.blob();
-            const audioUrl = URL.createObjectURL(blob);
-            document.getElementById(audioContainerId).innerHTML = `<strong>Audio:</strong> <audio controls src="${audioUrl}"></audio>`;
-        } else {
-            console.error("Failed to retrieve audio from file.io.");
-            document.getElementById(audioContainerId).innerHTML = `<strong>Audio unavailable.</strong>`;
-        }
-    } catch (error) {
-        console.error("Error fetching audio:", error);
-        document.getElementById(audioContainerId).innerHTML = `<strong>Audio unavailable.</strong>`;
-    }
-}
-
-
 function getSampleForQuestion(taskData, partIndex, hasStt = true) {
+    if (!taskData || !taskData.id_tests || !taskData.question_contents || !taskData.samples) return;
+    
     const idTests = taskData.id_tests;
     const stts = taskData.stts || [];
     const questionContents = taskData.question_contents;
     const samples = taskData.samples;
 
-    const taskAnswers = getAnswersForTask(taskData);
+    let sampleContainer = document.getElementById("sample_seperate");
+    if (!sampleContainer) return;
 
     idTests.forEach((id_test, index) => {
         const stt = hasStt ? stts[index] : null;
-        const questionContent = questionContents[index];
-        const sample = samples[index];
+        const questionContent = questionContents[index] || "No question content available";
+        const sample = samples[index] || "No sample answer available";
 
-        const answers = taskAnswers[index].answers;
+        const uniqueId = hasStt ?
+            `part-${partIndex}-idTest-${id_test}-stt-${stt}` :
+            `part-${partIndex}-idTest-${id_test}`;
 
-
-        const uniqueId = hasStt
-            ? `part-${partIndex}-idTest-${id_test}-stt-${stt}`
-            : `part-${partIndex}-idTest-${id_test}`;
-
-        // Append question content and answers
-        let sampleContainer = document.getElementById("sample_seperate");
         sampleContainer.innerHTML += `
-         <div  class="task-container"  id="sample">
+            <div class="task-container" id="sample">
                 <p class="task-description" id="question-${uniqueId}">
                     ${questionContent}
                 </p>
-
-
-                    <p id="sampleContent-"${uniqueId}">
-                        Sample: ${sample}
-                    </p>
-                </div>
-
-
+                <p id="sampleContent-${uniqueId}">
+                    <strong>Sample:</strong> ${sample}
+                </p>
             </div>
         `;
     });
 }
 
-function renderOverall(){
+function renderOverall() {
     let questionContainer = document.getElementById("question_seperate");
-        questionContainer.innerHTML += `
-            <div class="task-container">
-                <p class="task-description" id="overall-comment">
-                    Hello overall
+    if (!questionContainer) return;
+    
+    questionContainer.innerHTML = `
+        <div class="task-container">
+            <p class="task-description" id="overall-comment">
+                Overall performance analysis
+            </p>
+            <div class="tab-content">
+                <p id="originalContent-comment">
+                    ${userAnswerAndComment?.overall_recommendation || "No overall feedback available"}
                 </p>
-                <div class="tab-content" id="question_seperate">
-                    <p id="originalContent-comment">
-                       Hello overall original comment
-                    </p>
-                </div>
             </div>
-        `;
- 
-
-}
-
-
-// Example usage of setActiveTask for each button click
-document.getElementById("task1").addEventListener("click", () => setActiveTask('task1'));
-document.getElementById("task2").addEventListener("click", () => setActiveTask('task2'));
-document.getElementById("task3").addEventListener("click", () => setActiveTask('task3'));
-document.getElementById("overall").addEventListener("click", () => setActiveTask('overall'));
-
-
-    /*
-    const IdQuestionTask1 = <?php echo json_encode($task1_data['id_test']); ?>;
-    const IdQuestionTask2 = <?php echo json_encode($task2_data['id_test']); ?>;
-
-
-    const bandScoreOverall = "<?php echo esc_html($result->band_score); ?>";
-    const bandScoreExpandOverall =  "<?php echo esc_html($result->band_score_expand); ?>";
-    //const bandScoreTask1 =  "<?php echo esc_html($result->band_score); ?>";
-    const bandScoreTask1Expand = `${taskAchievementValueTask1}, ${coherenceAndCohesionValueTask1}, ${lexicalResourceValueTask1}, ${grammaticalRangeAndAccuracyValueTask1} `;
-    //const bandScoreTask2 =  "<?php echo esc_html($result->band_score); ?>";
-    const bandScoreTask2Expand = `${taskAchievementValueTask2}, ${coherenceAndCohesionValueTask2}, ${lexicalResourceValueTask2}, ${grammaticalRangeAndAccuracyValueTask2} `;
-
-    const taskAchievementTask2 = `${taskAchievementValueTask2}`;
-    const coherenceAndCohesionTask2 = `${coherenceAndCohesionValueTask2}`;
-    const lexicalResourceTask2 = `${lexicalResourceValueTask2}`;
-    const grammaticalRangeAndAccuracyTask2 = `${grammaticalRangeAndAccuracyValueTask2}`;
-    const taskAchievementTask1 = `${taskAchievementValueTask1}`;
-    const coherenceAndCohesionTask1 = `${coherenceAndCohesionValueTask1}`;
-    const lexicalResourceTask1 = `${lexicalResourceValueTask1}`;
-    const grammaticalRangeAndAccuracyTask1 = `${grammaticalRangeAndAccuracyValueTask1}`;
-
-
-    const task1Sample = <?php echo json_encode($task1_data['sample_writing']); ?>;
-    const task2Sample = <?php echo json_encode($task2_data['sample_writing']); ?>;
-    const task1UserEssay = <?php echo wp_json_encode($result->task1userform); ?>;
-    const task2UserEssay = <?php echo wp_json_encode($result->task2userform); ?>;
-    */
-
-    // Keep track of the currently active task
-let currentTask = 'overall'; // Default task on page load
-let detailsCommentTask1 =``;
-let detailsCommentTask2 =``;
-let detailsCommentTask3 =``;
-
-
-
-const tasks = {
-    overall: {
-        description: "this is overall content",
-        user_level:"",
-        wordCount: "task overall wc", 
-        wordCount: "",
-        description_level:"",
-        generalSidebar: "Overall general content here.",
-        detailSidebar: "",
-        youpass: "Overall Content",
-        question_seperate: "Overall Original",
-        sample: "Overall sample",
-        id_question: "ID Ques overall",
-        suggestions: "Overall suggestiong",
-        sidebar: [
-            "Bình luận 1: Overall 1",
-            "Bình luận 2: Overall 2",
-            "Bình luận 3: Nên kết luận mạnh mẽ hơn."
-        ],
-        imageLink: "" // Add image link for task 2
-    },
-    task1: {
-        description: task1Description,
-        wordCount: "task 1 wc",    
-        generalSidebar: generalSidebarContentPart1,
-        detailSidebar: `"task 1 detail sb" `,
-        user_level: "task 1 ul",
-        description_level: "task 1 des lev",
-        youpass: "YouPass feedback for Task 1: Your analysis is clear and well-structured, but make sure to include more comparisons between countries.",
-        question_seperate: getAnswersForTask(task1Data), // Matches id_test and stt
-        sample: getSampleForQuestion(task1Data),
-        id_question: "task 1 - ID Question",
-        suggestions: "Suggestions for Task 1: Include more statistical data to strengthen your arguments.",
-        sidebar: [
-            "Bình luận 1: Cần cải thiện phần mở đầu.",
-            "Bình luận 2: Số liệu cần rõ ràng hơn.",
-            "Bình luận 3: Nên thêm ví dụ cụ thể."
-        ],
-        imageLink: "", // Add image link for task 1
-        
-    }, 
-    
-               
-    task2: {
-        description: task2Description,
-        wordCount: "task 2 ",
-        generalSidebar: generalSidebarContentPart2,
-        detailSidebar: `"task 2 detail 2" `,
-        user_level: "task 2 ",
-        description_level: "task 2 ",
-        youpass: "YouPass feedback for Task 2: Your argument is compelling, but it could be enhanced with more concrete examples.",
-        question_seperate: getAnswersForTask(task2Data), // Only matches id_test
-        sample: getSampleForQuestion(task2Data),
-        id_question: "task 2 ",
-        suggestions: "Suggestions for Task 2: Ensure that each paragraph focuses on a single idea to improve coherence.",
-        sidebar: [
-            "Bình luận 1: Cần tăng cường lý lẽ trong bài viết.",
-            "Bình luận 2: Tránh sử dụng ngôn ngữ quá phức tạp.",
-            "Bình luận 3: Nên kết luận mạnh mẽ hơn."
-        ],
-        imageLink: "",
-       
-    },
-    task3: {
-        description: task3Description,
-        wordCount: "task 3 ",
-        generalSidebar: generalSidebarContentPart3,
-        detailSidebar: "detailsCommentTask3",
-        user_level: "task 3 ",
-        description_level: "task 3 ",
-        youpass: "YouPass feedback for Speaking Part 3: Your argument is compelling, but it could be enhanced with more concrete examples.",
-        question_seperate: getAnswersForTask(task3Data), // Matches id_test and stt
-        sample: getSampleForQuestion(task3Data),
-        id_question: "task 3 ",
-        suggestions: "Suggestions for Task 3: Ensure that each paragraph focuses on a single idea to improve coherence.",
-        sidebar: [
-            "Bình luận 1: Cần tăng cường lý lẽ trong bài viết.",
-            "Bình luận 2: Tránh sử dụng ngôn ngữ quá phức tạp.",
-            "Bình luận 3: Nên kết luận mạnh mẽ hơn."
-        ],
-        imageLink: "",
-       
-    }
-};
-//processEssay();
-console.log(tasks)
-// Function to set sidebar content based on the task and selected type (general/details)
-function setSidebarContent(task, type) {
-    const taskData = tasks[task];
-    
-    let sidebarContent = '';
-    let activeSidebar = '';
-
-    // Depending on the type (general or details), set the sidebar content
-    if (type === 'general') {
-        sidebarContent = taskData.generalSidebar || '';  // Default to general sidebar content for the task
-        activeSidebar = 'general-sidebar';  // Set active to general
-
-    } else if (type === 'details') {
-        sidebarContent = taskData.detailSidebar || '';  // Default to details sidebar content for the task
-        activeSidebar = 'details-sidebar';  // Set active to details
-
-    }
-
-    document.getElementById('sidebarContent').innerHTML = sidebarContent;
-    document.getElementById('general-sidebar').classList.remove('active');
-    document.getElementById('details-sidebar').classList.remove('active');
-
-    // Add active class to the selected sidebar button
-    document.getElementById(activeSidebar).classList.add('active');
-}
-
-// Add event listeners for switching between General and Details Sidebar
-document.getElementById('general-sidebar').addEventListener('click', function() {
-    setSidebarContent(currentTask, 'general');  // Show General Sidebar content for the current task
-});
-
-document.getElementById('details-sidebar').addEventListener('click', function() {
-    setSidebarContent(currentTask, 'details');  // Show Details Sidebar content for the current task
-});
-
-document.getElementById('details-sidebar').addEventListener('click', function() {
-    setSidebarContent(currentTask, 'details');  // Show Details Sidebar content for the current task
-
-    // Remove 'active' class from general button and add it to details button
-    document.getElementById('general-sidebar').classList.remove('active');
-    this.classList.add('active');
-});
-
-// Find the element by its ID
-const final_lexical_resource_point = doc.getElementById('final_lexical_resource_point').textContent.trim();
-const final_fluency_and_coherence_point = doc.getElementById('final_fluency_and_coherence_point').textContent.trim();
-const final_grammatical_range_and_accuracy_point = doc.getElementById('final_grammatical_range_and_accuracy_point').textContent.trim();
-const final_pronunciation_point = doc.getElementById('final_pronunciation_point').textContent.trim();
-const bandScoreTask1Value = doc.getElementById('overall_band_score_task_1');
-const userLevelTask1Value = doc.getElementById('user_level_task_1');
-const DescriptionEssayTask1Value = doc.getElementById('description_user_essay_task_1');
-
-
-
-// Now you can log the actual values
-console.log('Lexical Resource:', final_lexical_resource_point);
-console.log('Fluency and Coherence:', final_fluency_and_coherence_point);
-console.log('Grammatical Range and Accuracy:', final_grammatical_range_and_accuracy_point);
-console.log('Pronunciation:', final_pronunciation_point);
-// Function to set active task and update content
-function setActiveTask(task) {
-    currentTask = task;  // Update the active task
-    document.getElementById("question_seperate").innerHTML = "";
-    document.getElementById("sample_seperate").innerHTML = "";
-
-    const taskData = tasks[task];
-    
-    // Update content sections for the active task
-   // document.getElementById('taskDescription').innerText = taskData.description;
-    //document.getElementById('originalContent').innerHTML = taskData.original;
-    document.getElementById('youpassContent').innerText = taskData.youpass;
-    document.getElementById('suggestionsContent').innerText = taskData.suggestions;
-    document.getElementById("wordCount").innerText = taskData.wordCount; 
-   
-
-
-    document.getElementById("user_level").innerText = taskData.user_level;
-    document.getElementById("description_level").innerText = taskData.description_level;
-
-    // Update sidebar with comments
-    document.getElementById('sidebarContent').innerHTML = taskData.sidebar.map(comment => `<div class="comment">${comment}</div>`).join('');
-
-    // Update image container with task-specific image
-   
-    // Update image container with task-specific image  
-    if (taskData.imageLink && taskData.imageLink.trim() !== "") {
-        document.getElementById('taskImageContainer').innerHTML = `<img src="${taskData.imageLink}" alt="Chart Image">`;
-    } else {
-        document.getElementById('taskImageContainer').innerHTML = ""; // Clear image container if no image link
-    }    
-        document.getElementById('score').textContent  = `${ResultTest}`;
-        document.getElementById('lexical_resource_score').textContent  = `${final_lexical_resource_point}`;
-        document.getElementById('fluency_and_coherence_score').textContent  = `${final_fluency_and_coherence_point}`;
-        document.getElementById('grammatical_range_and_accuracy_score').textContent  = `${final_grammatical_range_and_accuracy_point}`;
-        document.getElementById('pronunciation_score').textContent  = `${final_pronunciation_point}`;
-    
-
-
-    document.getElementById('id_test_div').innerHTML = `${taskData.id_question}`;
-    switch (task) {
-        case 'task1':
-            renderQuestionsWithAnswers(task1Data, 1);  // Load Speaking Part 1
-            getSampleForQuestion(task1Data, 1);
-            break;
-        case 'task2':
-            renderQuestionsWithAnswers(task2Data, 2, false);  // Load Speaking Part 2
-            getSampleForQuestion(task2Data, 2);
-
-            break;
-        case 'task3':
-            renderQuestionsWithAnswers(task3Data, 3);  // Load Speaking Part 3
-            getSampleForQuestion(task3Data, 3);
-
-            break;
-        case 'overall':
-            renderOverall();  // Load Speaking Part 3
-            break;
-        default:
-            // Handle the 'overall' tab or any default tab behavior here
-            break;
-    }
-    // Reset the tab to "original" by default
-    openTab('question_seperate');
-    
-    // Show General sidebar content for the active task
-    setSidebarContent(task, 'general');
-    
+        </div>
+    `;
 }
 
 // Function to open a specific tab
@@ -1071,27 +1203,34 @@ function openTab(tabName) {
     });
 
     // Show the selected tab content
-    document.getElementById(tabName).classList.add('active');
+    const tabContent = document.getElementById(tabName);
+    if (tabContent) {
+        tabContent.classList.add('active');
+    }
 
     // Update active button state
     var buttons = document.querySelectorAll('.tab-button');
     buttons.forEach(function(button) {
         button.classList.remove('active');
     });
-    document.querySelector(`.tab-button[onclick="openTab('${tabName}')"]`).classList.add('active');
+    
+    const activeButton = document.querySelector(`.tab-button[onclick="openTab('${tabName}')"]`);
+    if (activeButton) {
+        activeButton.classList.add('active');
+    }
 }
 
-//// Set initial active task on page load
+// Set initial active task on page load
 window.onload = function() {
     setActiveTask('overall');
 };
 </script>
-
-
-
 </body>
 </html>
 
 <?php
-
+} else {
+    // If no results with testsavenumber
+    echo '<p>Không có kết quả tìm thấy cho đề thi này.</p>';
+}
 get_footer();

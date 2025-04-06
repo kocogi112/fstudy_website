@@ -195,10 +195,41 @@ $query = new WP_Query($args);
         if ($current_post_type === 'digitalsat') {
             $table_res_name = 'save_user_result_digital_sat';
             $check_column = 'resulttest'; // Cột cần kiểm tra
-        } elseif ($current_post_type === 'ieltsreadingtest') {
+        } 
+        
+        
+        
+        
+        elseif ($current_post_type === 'ieltsreadingtest') {
             $table_res_name = 'save_user_result_ielts_reading';
             $check_column = 'overallband'; // Cột cần kiểm tra
         }
+        elseif ($current_post_type === 'ieltsspeakingtests') {
+            $table_res_name = 'save_user_result_ielts_speaking';
+            $check_column = 'resulttest'; // Cột cần kiểm tra
+        }
+        elseif ($current_post_type === 'ieltslisteningtest') {
+            $table_res_name = 'save_user_result_ielts_listening';
+            $check_column = 'overallband'; // Cột cần kiểm tra
+        }
+        elseif ($current_post_type === 'ieltswritingtests') {
+            $table_res_name = 'save_user_result_ielts_writing';
+            $check_column = 'bandscore'; // Cột cần kiểm tra
+        }
+
+
+
+
+        elseif ($current_post_type === 'topikreading') {
+            $table_res_name = 'save_user_result_topik_reading';
+            $check_column = 'overallband'; // Cột cần kiểm tra
+        }
+        elseif ($current_post_type === 'topiklistening') {
+            $table_res_name = 'save_user_result_topik_listening';
+            $check_column = 'overallband'; // Cột cần kiểm tra
+        }
+
+        
 
         // Kiểm tra kết quả trong bảng (dựa trên idtest và username)
         $completed = false;
@@ -247,9 +278,10 @@ $query = new WP_Query($args);
                     'digitalsat' => '/test/digitalsat/',
                     'thptqg' => '/test/thptqg/',
                     'topikreading' => '/test/topik/r/',
-                    
+                    'topiklistening' => '/test/topik/l/',
+
                     'conversation_ai' => '/practice/conversation_ai/',
-                    'studyvocabulary' => '/practice/studyvocabulary/',
+                    'studyvocabulary' => '/practice/vocabulary/',
                     'dictation' => '/practice/dictation/',
                     'shadowing' => '/practice/shadowing/'
                     

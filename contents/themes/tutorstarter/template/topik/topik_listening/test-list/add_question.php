@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     );
 
     // Insert the data into the database
-    $inserted = $wpdb->insert('topik_reading_test_list', $data);
+    $inserted = $wpdb->insert('topik_listening_test_list', $data);
 
     if ($inserted) {
         echo "New record created successfully";

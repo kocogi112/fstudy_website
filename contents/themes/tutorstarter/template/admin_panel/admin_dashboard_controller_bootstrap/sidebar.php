@@ -214,17 +214,35 @@ require_once($_SERVER['DOCUMENT_ROOT'] . '/wordpress/wp-load.php');
         <i class="fas fa-fw fa-cog"></i>
         <span>Topik Reading Tests</span>
     </a>
-    <div id="collapseTopikReading" class="collapse" aria-labelledby="headingIeltsSpeaking" data-parent="#accordionSidebar">
+    <div id="collapseTopikReading" class="collapse" aria-labelledby="headingTopikReading" data-parent="#accordionSidebar">
         <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Custom Topik Reading:</h6>
             <a class="collapse-item" href="<?php echo MAIN_PATH; ?>exam_questions_database/topik_reading/add_topik_reading_tests.php">Thêm đề thi</a>
             <h6 class="collapse-header">Chi tiết</h6>
-            <a class="collapse-item" href="<?php echo MAIN_PATH; ?>exam_questions_database/ielts_speaking/all_result_topik_reading.php">Bảng kết quả bài thi</a>
+            <a class="collapse-item" href="<?php echo MAIN_PATH; ?>exam_questions_database/topik_reading/all_result_topik_reading.php">Bảng kết quả bài thi</a>
             <a class="collapse-item" href="blank.html">Phân tích chuyên sâu</a>
         </div>
     </div>
 </li>
 
+
+<!-- Nav Item - Pages Collapse Menu -->
+<li class="nav-item">
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTopikListening"
+        aria-expanded="true" aria-controls="collapseTopikListening">
+        <i class="fas fa-fw fa-cog"></i>
+        <span>Topik Listening Tests</span>
+    </a>
+    <div id="collapseTopikListening" class="collapse" aria-labelledby="headingTopikListening" data-parent="#accordionSidebar">
+        <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header">Custom Topik Listening:</h6>
+            <a class="collapse-item" href="<?php echo MAIN_PATH; ?>exam_questions_database/topik_listening/add_topik_listening_tests.php">Thêm đề thi</a>
+            <h6 class="collapse-header">Chi tiết</h6>
+            <a class="collapse-item" href="<?php echo MAIN_PATH; ?>exam_questions_database/topik_listening/all_result_topik_listening.php">Bảng kết quả bài thi</a>
+            <a class="collapse-item" href="blank.html">Phân tích chuyên sâu</a>
+        </div>
+    </div>
+</li>
 
 
 <!-- Nav Item - Pages Collapse Menu -->

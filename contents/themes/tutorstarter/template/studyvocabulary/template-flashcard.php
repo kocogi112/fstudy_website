@@ -44,6 +44,7 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $id_test);
 $stmt->execute();
 $result = $stmt->get_result();
+get_header(); // Gọi phần đầu trang (header.php)
 
 if ($result->num_rows > 0) {
     // Fetch test data
@@ -96,10 +97,6 @@ if ($result->num_rows > 0) {
     $testname = $data['testname'] ?? "Test name not found";
     echo "console.log('Test name: " . addslashes($testname) . "');";
     echo "</script>";
-} else {
-    echo "<script>console.log('No data found for the given id_test');</script>";
-}
-get_header(); // Gọi phần đầu trang (header.php)
 
 // Close statement and connection
 $stmt->close();
@@ -294,6 +291,12 @@ $conn->close();
 
 
 <?php
+
+} else {
+    echo "No tests found";
+}
+
+
 get_footer();
 /*} else {
     get_header();

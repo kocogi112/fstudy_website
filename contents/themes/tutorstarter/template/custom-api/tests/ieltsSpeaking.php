@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'data' => $data, /*For dev - not show in live */
             'part' => $part, 
             'ai_route_stats' => $ai_route_stats, /*For dev - not show in live */
-            'ai_response' => $ai_response, /*For dev - not show in live */
+            //'ai_response' => $ai_response, /*For dev - not show in live */
 
             'final_analysis' => [
                 'analysis' => [
@@ -309,6 +309,7 @@ function finalImprovementSuggestion() {
     return ['improvement_suggestions' => $improvement[1]];
 }
 
+
 function finalSuggestionWordAndPhrase() {
     global $ai_response_data;
 
@@ -318,14 +319,83 @@ function finalSuggestionWordAndPhrase() {
 
     $content = $ai_response_data['choices'][0]['message']['content'];
 
-    preg_match('/"suggested_words_or_phrases":\s*(\[[^\]]+\])/', $content, $suggestions);
-
-    if (!isset($suggestions[1])) {
-        return ['error' => 'Missing suggested words or phrases'];
+    // Improved JSON extraction with better error handling
+    $json_str = extractFullJson($content);
+    
+    if ($json_str === false) {
+        return ['error' => 'Failed to extract JSON from response'];
     }
 
-    return json_decode($suggestions[1], true);
+    $full_json = json_decode($json_str, true);
+    
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        error_log("JSON decode error: " . json_last_error_msg());
+        error_log("Problematic JSON: " . $json_str);
+        return ['error' => 'Failed to decode JSON: ' . json_last_error_msg()];
+    }
+
+    if (!isset($full_json['suggested_words_or_phrases'])) {
+        return ['error' => 'Missing suggested_words_or_phrases in response'];
+    }
+
+    $result = [];
+    foreach ($full_json['suggested_words_or_phrases'] as $item) {
+        if (isset($item['id_question']) && isset($item['suggestions'])) {
+            $result[$item['id_question']] = $item['suggestions'];
+        }
+    }
+
+    return !empty($result) ? $result : ['error' => 'No valid suggestions found'];
 }
+
+function extractFullJson($content) {
+    // Try to extract complete JSON first
+    if (preg_match('/\{(?:[^{}]|(?R))*\}/s', $content, $json_match)) {
+        return $json_match[0];
+    }
+
+    // Fallback for malformed JSON
+    $start_pos = strpos($content, '{"suggested_words_or_phrases":');
+    if ($start_pos === false) {
+        return false;
+    }
+
+    $brace_count = 0;
+    $in_string = false;
+    $json_str = '';
+
+    // Manually reconstruct JSON
+    for ($i = $start_pos; $i < strlen($content); $i++) {
+        $char = $content[$i];
+
+        if ($char === '"' && ($i === 0 || $content[$i-1] !== '\\')) {
+            $in_string = !$in_string;
+        }
+
+        if (!$in_string) {
+            if ($char === '{') $brace_count++;
+            if ($char === '}') $brace_count--;
+        }
+
+        $json_str .= $char;
+
+        if ($brace_count === 0 && !$in_string) {
+            break;
+        }
+    }
+
+    // Final validation
+    if (json_decode($json_str, true) !== null) {
+        return $json_str;
+    }
+
+    return false;
+}
+
+
+
+
+
 
 function finaloverViewEssay($data, $essay_type, $linkingWords) {
     $word_count = str_word_count($data);

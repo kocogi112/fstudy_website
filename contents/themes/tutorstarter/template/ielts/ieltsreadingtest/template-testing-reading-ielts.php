@@ -57,7 +57,7 @@ if (!$custom_number) {
 
 
  // Create result_id
- $result_id = $hour . $minute . $second . $custom_number . $user_id . $random_number;
+ $result_id = $hour . $minute . $second . $user_id . $random_number;
  $site_url = get_site_url();
 
  echo "<script> 
@@ -539,6 +539,7 @@ html {
     font-size: 15px;
     text-align: center;
     display: inline-block;
+    cursor: pointer;
 }
 .highlight-marked {
     background-color: yellow !important;

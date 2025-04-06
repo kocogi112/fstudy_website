@@ -57,7 +57,7 @@ if (!$custom_number) {
 
 
  // Create result_id
- $result_id = $hour . $minute . $second . $custom_number . $user_id . $random_number;
+ $result_id = $hour . $minute . $second . $user_id . $random_number;
  $site_url = get_site_url();
 
  echo "<script> 
@@ -569,26 +569,17 @@ tr:nth-child(even) {
 }
 
 .number-question {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    width: 32px;
-    height: 32px;
-    font-size: 16px;
-    font-weight: 500;
-    color: #282828;
-    flex-shrink: 0;
-    background-color: #fff;
+    
+    border-radius: 50%;
+    background-color: #e8f2ff;
+    color: #35509a;
+    width: 35px;
+    height: 35px;
+    line-height: 35px;
+    font-size: 15px;
+    text-align: center;
+    display: inline-block;
     cursor: pointer;
-    opacity: 1;
-    font-family: "Montserrat", Helvetica, Arial, sans-serif;
-    -moz-transition: all ease 0.2s;
-    -o-transition: all ease 0.2s;
-    -webkit-transition: all ease 0.2s;
-    transition: all ease 0.2s;
-    font-size: 12px;
-    border: 1px solid #EAECEF;
 }
 .highlight-marked {
     background-color: yellow !important;
@@ -993,7 +984,7 @@ img{
                     <button id="next-btn" style="display: none;" >Next</button>
                     <h5  id="time-result"></h5>
 
-                    <h5 id ="useranswerdiv">Here: </h5>
+                    <h5 id ="useranswerdiv"  style="display: none;">Here: </h5>
         <!-- giấu form send kết quả bài thi -->
 
 

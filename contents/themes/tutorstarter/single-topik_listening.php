@@ -20,7 +20,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 // Truy vấn `question_choose` từ bảng `ielts_reading_test_list` theo `id_test`
-$sql_test = "SELECT  * FROM topik_reading_test_list WHERE id_test = ?";
+$sql_test = "SELECT  * FROM topik_listening_test_list WHERE id_test = ?";
 $stmt_test = $conn->prepare($sql_test);
 
 if ($stmt_test === false) {
@@ -75,7 +75,7 @@ $conn->close();
 
     // Get results for the current user and specific idtest (custom_number)
     $results_query = $wpdb->prepare("
-        SELECT * FROM save_user_result_topik_reading 
+        SELECT * FROM save_user_result_topik_listening 
         WHERE username = %s 
         AND idtest = %d
         ORDER BY dateform DESC",
@@ -268,7 +268,7 @@ $conn->close();
                             <td><?php echo esc_html($result->overallband); ?></td>
                             <td><?php echo esc_html($result->correct_number) ;?>/ <?php echo esc_html($result->total_question_number); ?></td>
                             <td>
-                                <a href="<?php echo $site_url?>/topik/r/result/<?php echo esc_html($result->testsavenumber); ?>">
+                                <a href="<?php echo $site_url?>/topik/l/result/<?php echo esc_html($result->testsavenumber); ?>">
                                     Xem bài làm
                                 </a>
 
@@ -306,7 +306,7 @@ $conn->close();
                 <h4 class="alert-heading">Pro tips:</h4> <hr>
                 <p>Sẵn sàng để bắt đầu làm full test? Để đạt được kết quả tốt nhất, bạn cần dành ra 40 phút cho bài test này.</p>
             </div><br>
-            <a class="btn-submit" href="<?php echo $site_url?>/test/topik/r/<?php echo $custom_number?>/start/">Bắt đầu bài thi</a>
+            <a class="btn-submit" href="<?php echo $site_url?>/test/topik/l/<?php echo $custom_number?>/start/">Bắt đầu bài thi</a>
         </div>
 
         <div id="practice-content" style="display: none;">
@@ -316,7 +316,7 @@ $conn->close();
             </div><br>
 
             <p class="h2-test">Giới hạn thời gian (Để trống để làm bài không giới hạn):</p>
-            <form action="<?php echo $site_url?>/test/topik/r/<?php echo $custom_number?>/start/" method="get">
+            <form action="<?php echo $site_url?>/test/topik/l/<?php echo $custom_number?>/start/" method="get">
                 <label style="font-size: 18px;" for="timer"></label>
 
                 <select id="timer" name="option">

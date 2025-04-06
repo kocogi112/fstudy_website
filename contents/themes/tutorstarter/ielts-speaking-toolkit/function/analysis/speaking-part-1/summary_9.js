@@ -1,33 +1,50 @@
 function ReviewPage(i) {
+    // Count questions per part for STT
+    const currentPart = quizData.questions[i].part;
+    const currentIDs = quizData.questions[i].id;
+
+    let partQuestionCount = 0;
+    
+    // Calculate STT by counting how many previous questions belong to the same part
+    for (let j = 0; j <= i; j++) {
+        if (quizData.questions[j].part === currentPart) {
+            partQuestionCount++;
+        }
+    }
+    
     let editAnsPage = document.getElementById('edit-ans-area');
     let answer = answers['answer' + (i + 1)] || "";
     let current_question = quizData.questions[i].question;
-    let current_part = quizData.questions[i].part;
-    let id_question =  `q-p-${current_part}-n-${i}`;
+    let id_question = `q-p-${currentPart}-n-${i}`;
 
     let counter = counters['counter' + (i + 1)] || "";
     let reanswer = reanswers['reanswer' + (i + 1)] || "";
     let result = '';
     const link = answers['link_audio' + (i + 1)];
+
     let Timeused = counter;
     let wordCount = answer.split(/\s+/).length;
     let averageSpeakRate = wordCount / Timeused;
 
-
-
     let questionBlock = document.createElement('div');
     questionBlock.innerHTML = `
         <div id = '${id_question}'>
-            <p style="color:red"><strong>Question ${i + 1} (Part: ${quizData.questions[i].part}):</strong> ${current_question}</p>
+            <p style="color:red"><strong>Part ${currentPart} - Question ${partQuestionCount}:</strong> ${current_question}</p>
             <p><strong>Your Answer:</strong> <span id="answer${i + 1}"></span></p>
-            <p><strong>Speak Rate:</strong> <span id="speakRate_${id_question}">${averageSpeakRate}</span></p>
-            <p><strong>Time Spent:</strong> <span id="timeSpent_${id_question}">${Timeused}</span></p>
-            <p><strong>Word Count:</strong> <span id="wordCount_${id_question}">${wordCount}</span></p>
+            <p><strong>Speak Rate:</strong> <span id="speakRate_${id_question}">${averageSpeakRate.toFixed(2)} words/sec</span></p>
+            <p><strong>Time Spent:</strong> <span id="timeSpent_${id_question}">${Timeused} seconds</span></p>
+            <p><strong>Word Count:</strong> <span id="wordCount_${id_question}">${wordCount} words</span></p>
+            <strong>Audio:</strong> <audio controls src="${link}"></audio>
 
+            <div id = "information-area" >
+                <p><strong>STT:</strong> <span  id="stt_${id_question}">${partQuestionCount}</span></p>
+                <p><strong>Part:</strong> <span  id="part_${id_question}">${currentPart}</span></p>
+                <p><strong>ID Question:</strong> <span  id="ids_${id_question}">${currentIDs}</span></p>
+                <p><strong>Audio Link:</strong> <span id="audioLink_${id_question}">${link}</span></p>
+            </div>
         </div>
     `;
     editAnsPage.appendChild(questionBlock);
-
 
     let answerElement = document.getElementById(`answer${i + 1}`);
     let words = answer.split(' ');
@@ -123,6 +140,16 @@ document.getElementById('log-edited-answer').addEventListener('click', async () 
             let wordCount = parseInt(document.getElementById(`wordCount_${id_question}`)?.textContent || '0', 10);
             let timeSpent = parseFloat(document.getElementById(`timeSpent_${id_question}`)?.textContent || '0');
             let averageSpeakRate = parseFloat(document.getElementById(`speakRate_${id_question}`)?.textContent || '0');
+            let audioLink = document.getElementById(`audioLink_${id_question}`)?.textContent || 'null';
+            let stt = document.getElementById(`stt_${id_question}`)?.textContent || 'null';
+            let partID = document.getElementById(`part_${id_question}`)?.textContent || 'null';
+            let ids = document.getElementById(`ids_${id_question}`)?.textContent || 'null';
+
+
+
+
+
+
 
             let answerSpans = questionBlock.querySelectorAll(`[id^="answer"] span`);
             let finalAnswer = Array.from(answerSpans).map(span => {
@@ -141,6 +168,10 @@ document.getElementById('log-edited-answer').addEventListener('click', async () 
                 id_question: id_question,
                 question: questionText,
                 answer: finalAnswer,
+                audio: audioLink,
+                stt: stt,
+                part: partID,
+                id: ids,
                 length: wordCount,
                 avarage_speak: averageSpeakRate,
                 time_spent: timeSpent,
@@ -184,8 +215,12 @@ function getWordEdits() {
     return wordEdits;
 }
 
-// Hàm gửi dữ
 async function MarkTest(editedData) {
+    const results = {}; // Object to hold all parts' data responses
+    const allDataResponses = {}; // Object to store ALL part responses
+    let finalResult = null; // For final speaking result
+
+    // Process each part
     for (let part in editedData.detail) {
         console.log(`Loading part ${part}...`);
         console.log(JSON.stringify({ [part]: editedData.detail[part] }, null, 4));
@@ -200,18 +235,56 @@ async function MarkTest(editedData) {
             });
 
             let dataResponse = await response.json();
-            console.log(dataResponse);
-            console.log(part);
-
-
-        
+            console.log(`Part ${part} response:`, dataResponse);
             
+            // Store the response for each part
+            results[part] = dataResponse;
+            allDataResponses[part] = dataResponse; // Store ALL responses
+
         } catch (error) {
             console.error(`Error sending part ${part}:`, error);
         }
     }
-}
 
+    // Log all results
+    console.log('All parts results:', JSON.stringify(results, null, 4));
+    console.log('All data responses:', JSON.stringify(allDataResponses, null, 4));
+    
+    // Get final speaking result
+    try {
+        let responsefinal = await fetch(`${siteUrl}/api/public/test/v1/ielts/final_speaking/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ results: results })
+        });
+
+        finalResult = await responsefinal.json();
+        console.log('Final result:', finalResult);
+        
+    } catch (error) {
+        console.error(`Error getting final result:`, error);
+    }
+
+    // Update UI
+    document.getElementById("result-full-page").style.display = "block";
+
+    // Set values safely
+    if (finalResult) {
+        document.getElementById("band_detail").value = JSON.stringify(finalResult, null, 2);
+        
+        // Set overall band score if available
+        if (finalResult.bands && finalResult.bands.overallBand !== undefined) {
+            document.getElementById("resulttest").value = finalResult.bands.overallBand;
+        }
+    }
+    
+    // Show ALL responses in user_answer_and_comment
+    document.getElementById("user_answer_and_comment").value = JSON.stringify(allDataResponses, null, 2);
+    
+    ResultInput();
+}
 
 document.getElementById('log-edited-words').addEventListener('click', () => {
     let editedData = {

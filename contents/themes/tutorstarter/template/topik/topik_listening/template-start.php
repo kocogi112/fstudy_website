@@ -68,7 +68,7 @@ if (!$custom_number) {
 
 
 
-$sql_test = "SELECT * FROM topik_reading_test_list WHERE id_test = ?";
+$sql_test = "SELECT * FROM topik_listening_test_list WHERE id_test = ?";
 
 
 // Query to fetch token details for the current username
@@ -168,7 +168,7 @@ if ($result2->num_rows > 0) {
                     let time_left = "' . (isset($foundUser['time_left']) ? $foundUser['time_left'] : 10) . '";
                     let correct_answer = ' . $correct_answer . ';
                 </script>';
-                        
+        
 
 
 
@@ -187,7 +187,7 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 
-    <title>Topik Reading </title>
+    <title>Topik Listening</title>
     <style>
 
         #quiz-container1 {
@@ -291,8 +291,17 @@ $conn->close();
             background-color: #f8f9fa; /* Màu nền nhẹ */
             border-bottom: 2px solid #ddd; /* Đường kẻ ngăn cách */
         }
-
+    
     </style>
+ 
+        
+<link rel="preload" as="style" href="https://study4.com/static/dist/vendor.df4fc65c3402a0b2e4d4.min.css?v=1743585533" onload="this.rel='stylesheet'">
+
+
+
+
+
+        
 </head>
 <body>
     <div id="timer"></div>
@@ -313,13 +322,14 @@ $conn->close();
             <h3>Answers</h3>
             <div id="boxanswers"></div>
             <button id="logBtn">Submit Answers</button>
-            <!-- giấu form send kết quả bài thi -->
+
+               <!-- giấu form send kết quả bài thi -->
 
 
     
   
      <span id="message"  ></span>
-     <form id="saveTopikReadingResult"  >
+     <form id="saveTopikListeningResult"  >
                 <div class="card">
                     <div class="card-header">Form lưu kết quả</div>
                     <div class="card-body" >
@@ -413,21 +423,22 @@ $conn->close();
     </form>
     <!-- kết thúc send form -->
 
+
         </div>
     </div>
-
+       
     <script>
         
             // function save data qua ajax
-        jQuery('#saveTopikReadingResult').submit(function(event) {
+            jQuery('#saveTopikListeningResult').submit(function(event) {
             event.preventDefault(); // Prevent the default form submission
             
             var link = "<?php echo admin_url('admin-ajax.php'); ?>";
             
-            var form = jQuery('#saveTopikReadingResult').serialize();
+            var form = jQuery('#saveTopikListeningResult').serialize();
             var formData = new FormData();
-            formData.append('action', 'save_user_result_topik_reading');
-            formData.append('save_user_result_topik_reading', form);
+            formData.append('action', 'save_user_result_topik_listening');
+            formData.append('save_user_result_topik_listening', form);
             
             jQuery.ajax({
                 url: link,
@@ -438,7 +449,7 @@ $conn->close();
                 success: function(result) {
                     jQuery('#submit').attr('disabled', false);
                     if (result.success == true) {
-                        jQuery('#saveTopikReadingResult')[0].reset();
+                        jQuery('#saveTopikListeningResult')[0].reset();
                     }
                     jQuery('#result_msg').html('<span class="' + result.success + '">' + result.data + '</span>');
                 }
@@ -451,7 +462,7 @@ $conn->close();
         document.addEventListener("DOMContentLoaded", function () {
             document.addEventListener("submitForm", function () {
                 setTimeout(function () {
-                    let form = document.getElementById("saveTopikReadingResult");
+                    let form = document.getElementById("saveTopikListeningResult");
                     form.submit(); // This should work now that there's no conflict
                 }, 2000); 
             });
@@ -461,325 +472,489 @@ $conn->close();
         //end new adding
 
 
+document.addEventListener("DOMContentLoaded", function () {
+    let currentPlayer = null;
+let currentAudioGroup = null; // Thêm biến để theo dõi group hiện tại
+
+function initAudioPlayer(contextElement) {
+    // Kiểm tra xem context có thuộc group nào không
+    const parentGroup = contextElement.closest('.question-group-wrapper');
+    
+    // Nếu cùng group với audio hiện tại, không làm gì cả
+    if (parentGroup && currentAudioGroup === parentGroup) {
+        return;
+    }
+    
+    // Cập nhật group hiện tại
+    currentAudioGroup = parentGroup;
+    
+    // Xóa player cũ nếu tồn tại
+    if (currentPlayer) {
+        currentPlayer.destroy();
+    }
+    
+    // Tìm audio element trong context hiện tại
+    const audioElement = contextElement.querySelector('.post-audio-item');
+    if (!audioElement) return;
+    
+    // Tạm ẩn controls gốc
+    const originalControls = contextElement.querySelector('.plyr__controls');
+    if (originalControls) originalControls.style.display = 'none';
+    
+    // Khởi tạo player mới
+    currentPlayer = new Plyr(audioElement, {
+        controls: ['play', 'progress', 'current-time', 'mute', 'volume'],
+        settings: ['speed'],
+        speed: { selected: 1, options: [0.5, 0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2, 4] },
+        display: 'inline'
+    });
+    
+    // Khi player ready
+    currentPlayer.on('ready', function() {
+        if (originalControls) {
+            originalControls.style.display = '';
+            const plyrControls = contextElement.querySelector('.plyr__controls');
+            if (plyrControls) plyrControls.style.display = 'none';
+            
+            // Đồng bộ sự kiện controls
+            syncPlayerControls(currentPlayer, originalControls);
+        }
+    });
+    
+    // Tự động phát nếu đang trong group
+    if (parentGroup) {
+        currentPlayer.play().catch(e => console.log("Autoplay prevented:", e));
+    }
+}
+
+    // Hàm đồng bộ controls với player
+    function syncPlayerControls(player, originalControls) {
+        // Đồng bộ sự kiện play/pause
+        const originalPlayBtn = originalControls.querySelector('[data-plyr="play"]');
+        if (originalPlayBtn) {
+            originalPlayBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (player.paused) {
+                    player.play();
+                } else {
+                    player.pause();
+                }
+            });
+        }
         
-        document.addEventListener("DOMContentLoaded", function () {
-            const questions = document.querySelectorAll(".question-wrapper");
-            const contexts = document.querySelectorAll(".context-wrapper");
-            const groupQuestion = document.querySelectorAll(".question-group-wrapper");
-
-            const sidebar = document.getElementById("boxanswers");
-            const prevBtn = document.getElementById("prevBtn");
-            const nextBtn = document.getElementById("nextBtn");
-            const logBtn = document.getElementById("logBtn");
-            const timerElement = document.getElementById("timer");
-            let currentQuestion = 0;
+        // Đồng bộ sự kiện volume
+        const originalVolumeBtn = originalControls.querySelector('[data-plyr="mute"]');
+        const originalVolumeSlider = originalControls.querySelector('[data-plyr="volume"]');
+        
+        if (originalVolumeBtn && originalVolumeSlider) {
+            originalVolumeBtn.addEventListener('click', function() {
+                player.muted = !player.muted;
+            });
             
-            // Cài đặt timer 60 phút
-            let timeLeft = <?php echo intval($time); ?> * 60; // Chắc chắn rằng $time là số nguyên
-            let timerInterval;
+            originalVolumeSlider.addEventListener('input', function() {
+                player.volume = this.value;
+            });
+        }
+        
+        // Đồng bộ sự kiện seek
+        const originalSeek = originalControls.querySelector('[data-plyr="seek"]');
+        if (originalSeek) {
+            originalSeek.addEventListener('input', function() {
+                player.currentTime = (this.value / 100) * player.duration;
+            });
+        }
+        
+        // Cập nhật giao diện khi player thay đổi trạng thái
+        player.on('play', () => updateControls());
+        player.on('pause', () => updateControls());
+        player.on('volumechange', () => updateControls());
+        player.on('timeupdate', () => updateControls());
+        
+        function updateControls() {
+            if (!originalControls) return;
             
-
-            let startTime; // Declare globally
-
-            function startTimer() {
-                startTime = new Date(); // Record start time at beginning
-
-                timerInterval = setInterval(function() {
-                    timeLeft--;
-                    
-                    // Cập nhật hiển thị timer
-                    const minutes = Math.floor(timeLeft / 60);
-                    const seconds = timeLeft % 60;
-                    timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                    
-                    // Thay đổi màu sắc khi thời gian sắp hết
-                    if (timeLeft <= 300) { // 5 phút cuối
-                        timerElement.classList.add("time-critical");
-                        timerElement.classList.remove("time-warning");
-                    } else if (timeLeft <= 900) { // 15 phút cuối
-                        timerElement.classList.add("time-warning");
-                        timerElement.classList.remove("time-critical");
-                    }
-                    
-                    // Tự động nộp bài khi hết giờ
-                    if (timeLeft <= 0) {
-                        clearInterval(timerInterval);
-                        submitQuiz();
-                    }
-                }, 1000);
+            // Cập nhật trạng thái nút play/pause
+            if (originalPlayBtn) {
+                if (player.paused) {
+                    originalPlayBtn.querySelector('.icon--pressed').style.display = 'none';
+                    originalPlayBtn.querySelector('.icon--not-pressed').style.display = '';
+                } else {
+                    originalPlayBtn.querySelector('.icon--pressed').style.display = '';
+                    originalPlayBtn.querySelector('.icon--not-pressed').style.display = 'none';
+                }
             }
             
-            // Khởi tạo sidebar với các câu hỏi
-            questions.forEach((question, index) => {
-                let qid = question.getAttribute("data-qid");
-                let box = document.createElement("div");
-                box.classList.add("box-answer");
-                box.setAttribute("data-qid", qid);
-                box.setAttribute("data-index", index);
-                box.textContent = `${index + 1}`;
-                sidebar.appendChild(box);
-                
-                // Click vào box answer để chuyển đến câu hỏi tương ứng
-                box.addEventListener("click", function() {
-                    currentQuestion = parseInt(this.getAttribute("data-index"));
-                    showQuestion(currentQuestion);
-                });
-            });
-            
-            // Xử lý sự kiện khi chọn đáp án
-            document.querySelectorAll(".form-check-input").forEach(input => {
-                input.addEventListener("change", function () {
-                    let qid = this.getAttribute("data-qid");
-                    let box = document.querySelector(`.box-answer[data-qid='${qid}']`);
-                    box.classList.add("selected");
-                });
-            });
-            
-            // Nút Previous
-            prevBtn.addEventListener("click", function() {
-                if (currentQuestion > 0) {
-                    currentQuestion--;
-                    showQuestion(currentQuestion);
-                }
-            });
-            
-            // Nút Next
-            nextBtn.addEventListener("click", function() {
-                if (currentQuestion < questions.length - 1) {
-                    currentQuestion++;
-                    showQuestion(currentQuestion);
-                }
-            });
-            
-            // Nút Submit
-            logBtn.addEventListener("click", submitQuiz);
-            
-            // Hiển thị câu hỏi đầu tiên
-            showQuestion(currentQuestion);
-            
-            // Bắt đầu đếm ngược
-            startTimer();
-            
-            // Hàm hiển thị câu hỏi và context tương ứng
-            function showQuestion(index) {
-                // Ẩn tất cả câu hỏi và context
-                questions.forEach(q => q.classList.remove("active"));
-                contexts.forEach(c => c.classList.remove("active"));
-                groupQuestion.forEach(g => g.classList.remove("active"));
-                
-                // Hiển thị câu hỏi hiện tại
-                if (questions[index]) {
-                    questions[index].classList.add("active");
-                    
-                    // Tìm group cha của câu hỏi hiện tại
-                    const currentGroup = questions[index].closest('.question-group-wrapper');
-                    if (currentGroup) {
-                        // Hiển thị tất cả context-wrapper trong group này
-                        const groupContexts = currentGroup.querySelectorAll('.context-wrapper');
-                        groupContexts.forEach(context => {
-                            context.classList.add("active");
-                        });
-                        
-                        // Đánh dấu group là active
-                        currentGroup.classList.add("active");
-                    } else if (contexts[index]) {
-                        // Nếu không thuộc group nào thì hiển thị context tương ứng
-                        contexts[index].classList.add("active");
-                    }
-                }
-                            
-                // Cập nhật trạng thái nút
-                prevBtn.disabled = index === 0;
-                nextBtn.disabled = index === questions.length - 1;
-                
-                // Cuộn lên đầu trang
-                window.scrollTo(0, 0);
+            // Cập nhật volume
+            if (originalVolumeSlider && originalVolumeBtn) {
+                originalVolumeSlider.value = player.volume;
+                originalVolumeBtn.querySelector('.icon--pressed').style.display = player.muted ? '' : 'none';
+                originalVolumeBtn.querySelector('.icon--not-pressed').style.display = player.muted ? 'none' : '';
             }
             
-            // Hàm nộp bài
-            const currentDate = new Date();
+            // Cập nhật seek
+            if (originalSeek) {
+                originalSeek.value = (player.currentTime / player.duration) * 100;
+                const timeDisplay = originalControls.querySelector('.plyr__time--current');
+                if (timeDisplay) {
+                    timeDisplay.textContent = formatTime(player.currentTime);
+                }
+            }
+        }
+        
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+    }
 
-            const day = currentDate.getDate();
-            const month = currentDate.getMonth() + 1; // Adding 1 because getMonth() returns zero-based month index
-            const year = currentDate.getFullYear();
+    // Hàm reload audio
+    function reloadAudio(player) {
+        if (player) {
+            const audioElement = player.media;
+            const currentTime = player.currentTime;
+            const isPlaying = !player.paused;
+            
+            const src = audioElement.querySelector('source').src;
+            const newSrc = src.split('?')[0] + '?t=' + new Date().getTime();
+            
+            audioElement.querySelector('source').src = newSrc;
+            audioElement.load();
+            
+            if (isPlaying) {
+                player.play().then(() => {
+                    player.currentTime = currentTime;
+                }).catch(e => {
+                    console.error("Play error:", e);
+                });
+            } else {
+                player.currentTime = currentTime;
+            }
+        }
+    }
+    let currentGroupId = null;
+    let globalPlayer = null;
+    let currentAudioContext = null;
 
-                        // Display the date
-            const dateElement = `${year}-${month}-${day}`;
 
+    // Khởi tạo các biến và sự kiện chung
+    const questions = document.querySelectorAll(".question-wrapper");
+    const contexts = document.querySelectorAll(".context-wrapper");
+    const groupQuestion = document.querySelectorAll(".question-group-wrapper");
+    const sidebar = document.getElementById("boxanswers");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const logBtn = document.getElementById("logBtn");
+    const timerElement = document.getElementById("timer");
+    let currentQuestion = 0;
+    
+    // Cài đặt timer
+    let timeLeft = <?php echo intval($time); ?> * 60;
+    let timerInterval;
+    let startTime; // Declare globally
 
+    function startTimer() {
+        startTime = new Date(); // Record start time at beginning
 
-
-            function submitQuiz() {
+        timerInterval = setInterval(function() {
+            timeLeft--;
+            
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft <= 300) {
+                timerElement.classList.add("time-critical");
+                timerElement.classList.remove("time-warning");
+            } else if (timeLeft <= 900) {
+                timerElement.classList.add("time-warning");
+                timerElement.classList.remove("time-critical");
+            }
+            
+            if (timeLeft <= 0) {
                 clearInterval(timerInterval);
-                timerElement.textContent = "00:00";
+                submitQuiz();
+            }
+        }, 1000);
+    }
+    
+    // Khởi tạo sidebar với các câu hỏi
+    questions.forEach((question, index) => {
+        let qid = question.getAttribute("data-qid");
+        let box = document.createElement("div");
+        box.classList.add("box-answer");
+        box.setAttribute("data-qid", qid);
+        box.setAttribute("data-index", index);
+        box.textContent = `${index + 1}`;
+        sidebar.appendChild(box);
+        
+        box.addEventListener("click", function() {
+            currentQuestion = parseInt(this.getAttribute("data-index"));
+            showQuestion(currentQuestion);
+        });
+    });
+    
+    // Xử lý sự kiện khi chọn đáp án
+    document.querySelectorAll(".form-check-input").forEach(input => {
+        input.addEventListener("change", function () {
+            let qid = this.getAttribute("data-qid");
+            let box = document.querySelector(`.box-answer[data-qid='${qid}']`);
+            box.classList.add("selected");
+        });
+    });
+    
+    // Nút Previous
+    prevBtn.addEventListener("click", function() {
+        if (currentQuestion > 0) {
+            currentQuestion--;
+            showQuestion(currentQuestion);
+        }
+    });
+    
+    // Nút Next
+    nextBtn.addEventListener("click", function() {
+        if (currentQuestion < questions.length - 1) {
+            currentQuestion++;
+            showQuestion(currentQuestion);
+        }
+    });
+    
+    // Nút Submit
+    logBtn.addEventListener("click", submitQuiz);
+    
+    // Hiển thị câu hỏi đầu tiên
+    showQuestion(currentQuestion);
+    
+    // Bắt đầu đếm ngược
+    startTimer();
+    
+    // Hàm hiển thị câu hỏi
+    function showQuestion(index) {
+    // Ẩn tất cả câu hỏi và context
+    questions.forEach(q => q.classList.remove("active"));
+    contexts.forEach(c => c.classList.remove("active"));
+    groupQuestion.forEach(g => g.classList.remove("active"));
+    
+    // Hiển thị câu hỏi hiện tại
+    if (questions[index]) {
+        questions[index].classList.add("active");
+        
+        const currentGroup = questions[index].closest('.question-group-wrapper');
+        if (currentGroup) {
+            const groupContexts = currentGroup.querySelectorAll('.context-wrapper');
+            groupContexts.forEach(context => {
+                context.classList.add("active");
                 
-                const results = [];
-                const questionBoxes = document.querySelectorAll('.box-answer');
+                // Chỉ khởi tạo player nếu đây là context đầu tiên trong group
+                if (context.querySelector('.post-audio-item') && 
+                   (!currentAudioContext || !currentAudioContext.closest('.question-group-wrapper') === currentGroup)) {
+                    initAudioPlayer(context);
+                }
+            });
+            
+            currentGroup.classList.add("active");
+        } else if (contexts[index]) {
+            contexts[index].classList.add("active");
+            if (contexts[index].querySelector('.post-audio-item')) {
+                initAudioPlayer(contexts[index]);
+            }
+        }
+    }
+        
+        // Cập nhật trạng thái nút
+        prevBtn.disabled = index === 0;
+        nextBtn.disabled = index === questions.length - 1;
+        
+        // Cuộn lên đầu trang
+        window.scrollTo(0, 0);
+    }
+    
+      // Hàm nộp bài
+      const currentDate = new Date();
+
+        const day = currentDate.getDate();
+        const month = currentDate.getMonth() + 1; // Adding 1 because getMonth() returns zero-based month index
+        const year = currentDate.getFullYear();
+
+                    // Display the date
+        const dateElement = `${year}-${month}-${day}`;
+
+
+
+
+        function submitQuiz() {
+            clearInterval(timerInterval);
+            timerElement.textContent = "00:00";
+            
+            const results = [];
+            const questionBoxes = document.querySelectorAll('.box-answer');
+            
+            questionBoxes.forEach((box, index) => {
+                const qid = box.getAttribute('data-qid');
+                const questionNumber = index + 1;
+                const selectedAnswer = document.querySelector(`.form-check-input[data-qid="${qid}"]:checked`);
                 
-                questionBoxes.forEach((box, index) => {
-                    const qid = box.getAttribute('data-qid');
-                    const questionNumber = index + 1;
-                    const selectedAnswer = document.querySelector(`.form-check-input[data-qid="${qid}"]:checked`);
-                    
-                    if (selectedAnswer) {
-                        results.push({
-                            question: questionNumber,
-                            answer: selectedAnswer.value,
-                            status: 'answered'
-                        });
-                    } else {
-                        results.push({
-                            question: questionNumber,
-                            answer: null,
-                            status: 'not answered'
-                        });
-                    }
-                });
+                if (selectedAnswer) {
+                    results.push({
+                        question: questionNumber,
+                        answer: selectedAnswer.value,
+                        status: 'answered'
+                    });
+                } else {
+                    results.push({
+                        question: questionNumber,
+                        answer: null,
+                        status: 'not answered'
+                    });
+                }
+            });
+            
+            // Calculate time taken
+            const endTime = new Date();
+            const timeTaken = (endTime - startTime) / 1000; // in seconds
+            const minutes = Math.floor(timeTaken / 60);
+            const seconds = Math.floor(timeTaken % 60);
+            const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Compare with correct answers
+            let correctCount = 0;
+            let incorrectCount = 0;
+            let unansweredCount = 0;
+            
+            const detailedResults = results.map(item => {
+                const correctAnswer = correct_answer[item.question.toString()];
+                let result = '';
                 
-                // Calculate time taken
-                const endTime = new Date();
-                const timeTaken = (endTime - startTime) / 1000; // in seconds
-                const minutes = Math.floor(timeTaken / 60);
-                const seconds = Math.floor(timeTaken % 60);
-                const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                if (item.status === 'not answered') {
+                    unansweredCount++;
+                    result = 'Unanswered';
+                } else if (item.answer === correctAnswer) {
+                    correctCount++;
+                    result = 'Correct';
+                } else {
+                    incorrectCount++;
+                    result = 'Incorrect';
+                }
                 
-                // Compare with correct answers
-                let correctCount = 0;
-                let incorrectCount = 0;
-                let unansweredCount = 0;
-                
-                const detailedResults = results.map(item => {
-                    const correctAnswer = correct_answer[item.question.toString()];
-                    let result = '';
-                    
-                    if (item.status === 'not answered') {
-                        unansweredCount++;
-                        result = 'Unanswered';
-                    } else if (item.answer === correctAnswer) {
-                        correctCount++;
-                        result = 'Correct';
-                    } else {
-                        incorrectCount++;
-                        result = 'Incorrect';
-                    }
-                    
-                    return {
-                        Question: item.question,
-                        YourAnswer: item.answer || '-',
-                        CorrectAnswer: correctAnswer,
-                        Result: result
-                    };
-                });
+                return {
+                    Question: item.question,
+                    YourAnswer: item.answer || '-',
+                    CorrectAnswer: correctAnswer,
+                    Result: result
+                };
+            });
 
 
 
-                const userAns = results.map(item => {
-                    return {
-                        Question: item.question,
-                        YourAnswer: item.answer || ' '
-                    };
-                });
+            const userAns = results.map(item => {
+                return {
+                    Question: item.question,
+                    YourAnswer: item.answer || ' '
+                };
+            });
 
 
 
 
-                const estimatedReadingScore = Math.round((correctCount / 40) * 100);
+            const estimatedReadingScore = Math.round((correctCount / 40) * 100);
 
 
 
-                
-                // Display results in console
-                console.log("=== QUIZ RESULTS ===");
-                console.log(`Time taken: ${timeString}`);
-                console.log(`Total questions: ${results.length}`);
-                console.log(`Correct answers: ${correctCount}`);
-                console.log(`Incorrect answers: ${incorrectCount}`);
-                console.log(`Unanswered questions: ${unansweredCount}`);
-                console.log(`Your estimate band: ${estimatedReadingScore}`);
+            
+            // Display results in console
+            console.log("=== QUIZ RESULTS ===");
+            console.log(`Time taken: ${timeString}`);
+            console.log(`Total questions: ${results.length}`);
+            console.log(`Correct answers: ${correctCount}`);
+            console.log(`Incorrect answers: ${incorrectCount}`);
+            console.log(`Unanswered questions: ${unansweredCount}`);
+            console.log(`Your estimate band: ${estimatedReadingScore}`);
 
-                console.table(detailedResults);
+            console.table(detailedResults);
 
-                
-                // Display alert
-                const answeredCount = results.filter(r => r.status === 'answered').length;
-                const totalQuestions = results.length;
-                
-                // Disable all inputs and buttons
-                document.querySelectorAll(".form-check-input").forEach(input => {
-                    input.disabled = true;
-                });
-                prevBtn.disabled = true;
-                nextBtn.disabled = true;
-                logBtn.disabled = true;
-                
-                alert(`TIME'S UP!\nYou answered ${answeredCount}/${totalQuestions} questions.\nCorrect: ${correctCount}, Incorrect: ${incorrectCount}, Unanswered: ${unansweredCount}\nCheck console for details.`);
-                
-                
+            
+            // Display alert
+            const answeredCount = results.filter(r => r.status === 'answered').length;
+            const totalQuestions = results.length;
+            
+            // Disable all inputs and buttons
+            document.querySelectorAll(".form-check-input").forEach(input => {
+                input.disabled = true;
+            });
+            prevBtn.disabled = true;
+            nextBtn.disabled = true;
+            logBtn.disabled = true;
+            
+            alert(`TIME'S UP!\nYou answered ${answeredCount}/${totalQuestions} questions.\nCorrect: ${correctCount}, Incorrect: ${incorrectCount}, Unanswered: ${unansweredCount}\nCheck console for details.`);
+            
+            
 
 
 
-               
-                /*var contentToCopy5 = document.getElementById("id_category").textContent;
-                var contentToCopy7 = document.getElementById("correctanswerdiv").textContent;
+        
+            /*var contentToCopy5 = document.getElementById("id_category").textContent;
+            var contentToCopy7 = document.getElementById("correctanswerdiv").textContent;
+        */
+
+            document.getElementById("correct_percentage").value = `${correctCount}/${results.length}`;
+            document.getElementById("testsavenumber").value = resultId;
+
+
+            document.getElementById("total_question_number").value = `${results.length}`;
+            document.getElementById("correct_number").value = `${correctCount}`;
+            document.getElementById("incorrect_number").value = `${incorrectCount}`;
+            document.getElementById("skip_number").value = `${unansweredCount}`;
+
+
+            document.getElementById("overallband").value = `${estimatedReadingScore}`;
+
+            document.getElementById("dateform").value = dateElement;
+            document.getElementById("test_type").value = test_type;
+
+            document.getElementById("testname").value = testname;
+            document.getElementById("idtest").value = id_test;
+            document.getElementById("useranswer").value = JSON.stringify(userAns);
+            document.getElementById("timedotest").value = timeString;
+            
+        /*  
+            document.getElementById("idcategory").value = contentToCopy5;
+            document.getElementById("idtest").value = contentToCopy6;
+            document.getElementById("correctanswer").value = contentToCopy7;
             */
 
-                document.getElementById("correct_percentage").value = `${correctCount}/${results.length}`;
-                document.getElementById("testsavenumber").value = resultId;
-
-
-                document.getElementById("total_question_number").value = `${results.length}`;
-                document.getElementById("correct_number").value = `${correctCount}`;
-                document.getElementById("incorrect_number").value = `${incorrectCount}`;
-                document.getElementById("skip_number").value = `${unansweredCount}`;
-
-
-                document.getElementById("overallband").value = `${estimatedReadingScore}`;
-
-                document.getElementById("dateform").value = dateElement;
-                document.getElementById("test_type").value = test_type;
-
-                document.getElementById("testname").value = testname;
-                document.getElementById("idtest").value = id_test;
-                document.getElementById("useranswer").value = JSON.stringify(userAns);
-                document.getElementById("timedotest").value = timeString;
-                
-            /*  
-                document.getElementById("idcategory").value = contentToCopy5;
-                document.getElementById("idtest").value = contentToCopy6;
-                document.getElementById("correctanswer").value = contentToCopy7;
-                */
-
-                
-                // Add a delay before submitting the form
-                
-            /*setTimeout(function() {
-            // Automatically submit the form
-            jQuery('#saveTopikReadingResult').submit();
-            },0); // 5000 milliseconds = 5 seconds */
+            
+            // Add a delay before submitting the form
+            
+        /*setTimeout(function() {
+        // Automatically submit the form
+        jQuery('#saveTopikReadingResult').submit();
+        },0); // 5000 milliseconds = 5 seconds */
 
 
 
-            return {
-                    results: detailedResults,
-                    stats: {
-                        total: totalQuestions,
-                        correct: correctCount,
-                        incorrect: incorrectCount,
-                        unanswered: unansweredCount,
-                        timeTaken: timeString
-                    }
-                };
+        return {
+                results: detailedResults,
+                stats: {
+                    total: totalQuestions,
+                    correct: correctCount,
+                    incorrect: incorrectCount,
+                    unanswered: unansweredCount,
+                    timeTaken: timeString
+                }
+            };
 
-            }
-        });
-
+        }
 
 
-
-
-    </script>
+});
+</script>
+ 
+ <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 
     
+<!--<script type='text/javascript' src="https://study4.com/static/dist/vendor.df4fc65c3402a0b2e4d4.js?v=1743585533"></script>
+ <script type='text/javascript' src="https://study4.com/static/dist/main.0222e7ff14c2c34badef.js?v=1743585533"></script> 
+    -->
 </body>
 
     
@@ -834,7 +1009,7 @@ else{
                 data: {
                     action: 'update_buy_test',
                     type_transaction: 'paid',
-                    table: 'topik_reading_test_list',
+                    table: 'topik_listening_test_list',
                     change_token: '$token_need',
                     payment_gate: 'token',
                     title: 'Renew test $testname with $id_test (TOPIK Reading) with $token_need (Buy $time_allow time do this test)',

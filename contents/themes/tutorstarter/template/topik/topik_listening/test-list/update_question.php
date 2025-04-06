@@ -4,49 +4,41 @@ require_once('C:\xampp\htdocs\wordpress\wp-load.php'); // Adjust the path as nec
 
 global $wpdb;
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Get and sanitize input data
+// Get the data from the POST request
+    $number = wp_kses_post($_POST['number']);
     $id_test = wp_kses_post($_POST['id_test']);
     $testname = wp_kses_post($_POST['testname']);
     $testcode = wp_unslash($_POST['testcode']); // Không lọc thẻ HTML
     $correct_answer = wp_unslash($_POST['correct_answer']);
-    $test_type = wp_kses_post($_POST['test_type']);
-    $time = wp_kses_post($_POST['time']);
-    $number_question = wp_kses_post($_POST['number_question']);
-
     $permissive_management = wp_kses_post($_POST['permissive_management']);
     $token_need = wp_unslash($_POST['token_need']);
     $role_access = wp_unslash($_POST['role_access']);
     $time_allow = wp_unslash($_POST['time_allow']);
+    $number_question = wp_unslash($_POST['number_question']);
+
+    $test_type = wp_kses_post($_POST['test_type']);
+    $time = wp_kses_post($_POST['time']);
 
 
-    // Prepare data for insertion
-    $data = array(
+
+// Prepare the data for updating
+$data = array(
         'id_test' => $id_test,
         'testname' => $testname,
         'testcode' => $testcode,
         'correct_answer' => $correct_answer,
         'permissive_management' => $permissive_management,
-        'token_need' => $token_need,
         'test_type' => $test_type,
-        'number_question' => $number_question,
         'time' => $time,
-
+        'number_question' => $number_question,
+        'token_need' => $token_need,
         'role_access' => $role_access,
         'time_allow' => $time_allow,
-    );
+);
 
-    // Insert the data into the database
-    $inserted = $wpdb->insert('topik_reading_test_list', $data);
+// Update the record in the database
+$wpdb->update('topik_listening_test_list', $data, array('number' => $number));
 
-    if ($inserted) {
-        echo "New record created successfully";
-    } else {
-        echo "Error: " . $wpdb->last_error;
-    }
-
-    // Redirect back to the main page
-    wp_redirect('index.php');
-    exit;
-}
+// Return a response
+echo json_encode(array('status' => 'success'));
 ?>
