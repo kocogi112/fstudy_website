@@ -21,9 +21,17 @@ $post_types = [
     'all' => 'Tất cả',
     'thptqg' => 'THPTQG',
     'digitalsat' => 'Digital SAT',
+
+    'ieltslisteningtest' => 'Ielts Listening',
     'ieltsspeakingtests' => 'Ielts Speaking',
     'ieltsreadingtest' => 'Ielts Reading',
     'ieltswritingtests' => 'Ielts Writing',
+
+    'topikreading' => 'Topik Reading',
+    'topiklistening' => 'Topik Listening',
+    'topikwriting' => 'Topik Writing',
+    'topikspeaking' => 'Topik Speaking',
+
     'dictationexercise' => 'Dictation Exercise',
     'studyvocabulary' => 'Study Vocabulary',
 ];
@@ -32,9 +40,19 @@ $post_types = [
 $table_mappings = [
     'thptqg' => 'save_user_result_thptqg',
     'digitalsat' => 'save_user_result_digital_sat',
+
+
     'ieltsspeakingtests' => 'save_user_result_ielts_speaking',
+    'ieltslisteningtest' => 'save_user_result_ielts_listening',
     'ieltsreadingtest' => 'save_user_result_ielts_reading',
     'ieltswritingtests' => 'save_user_result_ielts_writing',
+    
+
+    'topikreading' => 'save_user_result_topik_reading',
+    'topiklistening' => 'save_user_result_topik_listening',
+    'topikwriting' => 'save_user_result_topik_writing',
+    'topikspeaking' => 'save_user_result_topik_speaking',
+
     'dictationexercise' => 'save_user_result_dictation',
     'studyvocabulary' => 'save_user_result_vocab',
 ];

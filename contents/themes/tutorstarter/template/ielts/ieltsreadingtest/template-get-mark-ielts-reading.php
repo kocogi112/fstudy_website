@@ -182,9 +182,7 @@ if ($result_test->num_rows > 0) {
 
     console.log(quizData);
     </script>';
-} else {
-    echo '<script type="text/javascript">console.error("Không tìm thấy test với custom number: ' . $custom_number . '");</script>';
-}
+
 
 
 
@@ -1031,11 +1029,16 @@ else{
     echo"<i>This test's result is on private mode. This mean only owner of this test can view it. If you are owner of this test, you should login at that account. Otherwise, you may contact the owner to change setting of this result to Public mode so anyone can view it</i>";
     
 } 
-}else {
-    header("Location: http://localhost/wordpress/404");
-    die();
+}
+else {
+    get_header();
+    echo 'Unable to find test for this result. Probably, id test was removed or edited. Please contact admin to debug';
+}
 
-    // If no results with testsavenumber
-   // echo '<p>Không có test nào với testsavenumber này.</p>';
+
+}else {
+    get_header();
+    echo 'Not found ID Test';
+
 }
 

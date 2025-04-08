@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly.
 }
 ?>
-
+<!--tutor/dashboard/analysis_test.php-->
 <div>
     <style>
         /* CSS */
@@ -42,7 +42,13 @@ if (is_user_logged_in()) {
         ['table' => 'save_user_result_ielts_reading', 'base_url' => 'http://localhost/wordpress/ielts/r/', 'result_column' => 'overallband', 'type' => 'ielts_reading'],
         ['table' => 'save_user_result_ielts_speaking', 'base_url' => 'http://localhost/wordpress/ielts/s/', 'result_column' => 'resulttest', 'type' => 'ielts_speaking'],
         ['table' => 'save_user_result_ielts_writing', 'base_url' => 'http://localhost/wordpress/ielts/w/', 'result_column' => 'band_score', 'type' => 'ielts_writing'],
-        ['table' => 'save_user_result_ielts_listening', 'base_url' => 'http://localhost/wordpress/ielts/l/', 'result_column' => 'overallband', 'type' => 'ielts_listening']
+        ['table' => 'save_user_result_ielts_listening', 'base_url' => 'http://localhost/wordpress/ielts/l/', 'result_column' => 'overallband', 'type' => 'ielts_listening'],
+    
+        ['table' => 'save_user_result_topik_reading', 'base_url' => 'http://localhost/wordpress/topik/r/', 'result_column' => 'overallband', 'type' => 'topik_reading'],
+        ['table' => 'save_user_result_topik_listening', 'base_url' => 'http://localhost/wordpress/topik/l/', 'result_column' => 'overallband', 'type' => 'topik_listening'],
+        ['table' => 'save_user_result_topik_writing', 'base_url' => 'http://localhost/wordpress/topik/w/', 'result_column' => 'overallband', 'type' => 'topik_writing'],
+        ['table' => 'save_user_result_topik_speaking', 'base_url' => 'http://localhost/wordpress/topik/s/', 'result_column' => 'overallband', 'type' => 'topik_speaking'],
+
     ];
 
     $all_results = [];
@@ -84,6 +90,12 @@ if (is_user_logged_in()) {
     <button class="tab" data-filter="ielts_speaking">IELTS Speaking</button>
     <button class="tab" data-filter="ielts_writing">IELTS Writing</button>
     <button class="tab" data-filter="ielts_listening">IELTS Listening</button>
+
+
+    <button class="tab" data-filter="topik_reading">Topik Reading</button>
+    <button class="tab" data-filter="topik_speaking">Topik Speaking</button>
+    <button class="tab" data-filter="topik_writing">Topik Writing</button>
+    <button class="tab" data-filter="topik_listening">Topik Listening</button>
 </div>
 
 <!-- Bảng kết quả -->

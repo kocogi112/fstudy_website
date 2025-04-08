@@ -36,46 +36,46 @@ $testsavenumber = get_query_var('testsaveieltsspeaking');
 
 
     // Assign $custom_number using the id_test field from the query result if available
-$custom_number = 0; // Default value
-if (!empty($results)) {
-    // Assuming you want the first result's id_test
-    $custom_number = intval($results[0]->idtest);
+    $custom_number = 0; // Default value
+    if (!empty($results)) {
+        // Assuming you want the first result's id_test
+        $custom_number = $results[0]->idtest;
 
-}
-
-
-// Set custom_number as id_test
-$id_test = $custom_number;
-
-// Prepare the SQL statement
-$sql = "SELECT testname, id_test, test_type, question_choose, tag, book FROM ielts_speaking_test_list WHERE id_test = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $id_test);
-$stmt->execute();
-$result = $stmt->get_result();
+    }
 
 
+    // Set custom_number as id_test
+    $id_test = $custom_number;
 
-echo "<script>console.log('Custom Number doing template: " . esc_js($custom_number) . "');</script>";
-
-
-if ($result->num_rows > 0) {
-    // Fetch test data if available
-    $data = $result->fetch_assoc();
-    $testname = $data['testname'];
-    add_filter('document_title_parts', function ($title) use ($testname) {
-        $title['title'] = $testname; // Use the $testname variable from the outer scope
-        return $title;
-    });
-    
-    
-} else {
-    echo "<script>console.log('No data found for the given id_test');</script>";
-}
+    // Prepare the SQL statement
+    $sql = "SELECT testname, id_test, test_type, question_choose, tag, book FROM ielts_speaking_test_list WHERE id_test = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $id_test);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
 
 
-get_header();
+    echo "<script>console.log('Custom Number doing template: " . esc_js($custom_number) . "');</script>";
+
+
+    if ($result->num_rows > 0) {
+        // Fetch test data if available
+        $data = $result->fetch_assoc();
+        $testname = $data['testname'];
+        add_filter('document_title_parts', function ($title) use ($testname) {
+            $title['title'] = $testname; // Use the $testname variable from the outer scope
+            return $title;
+        });
+        
+        
+    } else {
+        echo "<script>console.log('No data found for the given id_test');</script>";
+    }
+
+
+
+    get_header();
 
 
     // Get current user's username
@@ -95,70 +95,83 @@ get_header();
 
     if (!empty($results)) {
     
-        $questions = explode(",", $data['question_choose']);
-        // Normalize question IDs to handle spaces
-        $questions = array_map(function($id) {
-            return str_replace(' ', '', trim($id)); // Remove spaces and trim
-        }, $questions);
+        $questions = !empty($data['question_choose']) 
+    ? array_map(
+        function($id) { return str_replace(' ', '', trim($id)); },
+        explode(",", $data['question_choose'])
+      )
+    : [];
         
             // Display results
             foreach ($results as $result) {
-             
-                    $task1_data = [];
-                    $task2_data = [];
-                    $task3_data = [];
+                $user_answer_and_comment = json_decode($result->user_answer_and_comment, true);
+                
+                // Trong phần PHP, sau khi decode user_answer_and_comment
+                $parts_present = [];
+                if (isset($user_answer_and_comment['1'])) {
+                    $parts_present[] = 1;
+                }
+                if (isset($user_answer_and_comment['2'])) {
+                    $parts_present[] = 2;
+                }
+                if (isset($user_answer_and_comment['3'])) {
+                    $parts_present[] = 3;
+                }
+                                
+                echo "<script>console.log('Parts present: " . implode(', ', $parts_present) . "');</script>";
+                
+                // Now you can use this information to only query for the parts that exist
+                $task1_data = [];
+                $task2_data = [];
+                $task3_data = [];
+        
+                // Loop through all question IDs in the questions array
+                foreach ($questions as $question_id) {
+                    // Only query for Part 1 if it exists
+                    if (isset($user_answer_and_comment['1'])) {
+                        $sql_question = "SELECT speaking_part, id_test, stt, question_content, sample FROM ielts_speaking_part_1_question WHERE id_test = ?";
+                        $stmt_question = $conn->prepare($sql_question);
+                        $stmt_question->bind_param("s", $question_id);
+                        $stmt_question->execute();
+                        $result_question = $stmt_question->get_result();
+        
+                        while ($row = $result_question->fetch_assoc()) {
+                            $task1_data[] = $row;
+                        }
+                    }
+        
+                    // Only query for Part 2 if it exists
+                    if (isset($user_answer_and_comment['2'])) {
+                        $sql_question_task2 = "SELECT speaking_part, id_test, question_content, topic, sample FROM ielts_speaking_part_2_question WHERE id_test = ?";
+                        $stmt_question_task2 = $conn->prepare($sql_question_task2);
+                        $stmt_question_task2->bind_param("s", $question_id);
+                        $stmt_question_task2->execute();
+                        $result_question_task_2 = $stmt_question_task2->get_result();
+        
+                        while ($row = $result_question_task_2->fetch_assoc()) {
+                            $task2_data[] = $row;
+                        }
+                    }
+        
+                    // Only query for Part 3 if it exists
+                    if (isset($user_answer_and_comment['3'])) {
+                        $sql_question_task3 = "SELECT speaking_part, stt, id_test, question_content, topic, sample FROM ielts_speaking_part_3_question WHERE id_test = ?";
+                        $stmt_question_task3 = $conn->prepare($sql_question_task3);
+                        $stmt_question_task3->bind_param("s", $question_id);
+                        $stmt_question_task3->execute();
+                        $result_question_task_3 = $stmt_question_task3->get_result();
+        
+                        while ($row = $result_question_task_3->fetch_assoc()) {
+                            $task3_data[] = $row;
+                        }
+                    }
+                }
+        
+                // Output or process the data as needed
+                error_log(print_r($task1_data, true));
+                error_log(print_r($task2_data, true));
+                error_log(print_r($task3_data, true));
 
-                    // Loop through all question IDs in the questions array
-                    // Display results
-foreach ($results as $result) {
-    $task1_data = [];
-    $task2_data = [];
-    $task3_data = [];
-
-    // Loop through all question IDs in the questions array
-    foreach ($questions as $question_id) {
-        // Query for Speaking Part 1
-        $sql_question = "SELECT speaking_part, id_test, stt, question_content, sample FROM ielts_speaking_part_1_question WHERE id_test = ?";
-        $stmt_question = $conn->prepare($sql_question);
-        $stmt_question->bind_param("s", $question_id);
-        $stmt_question->execute();
-        $result_question = $stmt_question->get_result();
-
-        // Fetch all rows for Part 1 and add to task1_data
-        while ($row = $result_question->fetch_assoc()) {
-            $task1_data[] = $row;
-        }
-
-        // Query for Speaking Part 2
-        $sql_question_task2 = "SELECT speaking_part, id_test, question_content, topic, sample FROM ielts_speaking_part_2_question WHERE id_test = ?";
-        $stmt_question_task2 = $conn->prepare($sql_question_task2);
-        $stmt_question_task2->bind_param("s", $question_id);
-        $stmt_question_task2->execute();
-        $result_question_task_2 = $stmt_question_task2->get_result();
-
-        // Fetch all rows for Part 2 and add to task2_data
-        while ($row = $result_question_task_2->fetch_assoc()) {
-            $task2_data[] = $row;
-        }
-
-        // Query for Speaking Part 3
-        $sql_question_task3 = "SELECT speaking_part, stt, id_test, question_content, topic, sample FROM ielts_speaking_part_3_question WHERE id_test = ?";
-        $stmt_question_task3 = $conn->prepare($sql_question_task3);
-        $stmt_question_task3->bind_param("s", $question_id);
-        $stmt_question_task3->execute();
-        $result_question_task_3 = $stmt_question_task3->get_result();
-
-        // Fetch all rows for Part 3 and add to task3_data
-        while ($row = $result_question_task_3->fetch_assoc()) {
-            $task3_data[] = $row;
-        }
-    }
-
-    // Output or process the data as needed
-    error_log(print_r($task1_data, true));
-    error_log(print_r($task2_data, true));
-    error_log(print_r($task3_data, true));
-}
 
 
                 
@@ -558,8 +571,7 @@ const bandDetails = <?php echo json_encode(json_decode($result->band_detail, tru
 const userAnswerAndComment = <?php echo json_encode(json_decode($result->user_answer_and_comment, true), JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG); ?>;
 
 console.log("User Answer and Comment:", userAnswerAndComment);
-
-// Function to check which parts exist in userAnswerAndComment
+// Thêm hàm kiểm tra part nào có dữ liệu
 function getAvailableParts() {
     const availableParts = [];
     if (userAnswerAndComment && userAnswerAndComment['1']) availableParts.push('1');
@@ -571,7 +583,7 @@ function getAvailableParts() {
 const availableParts = getAvailableParts();
 console.log("Available parts:", availableParts);
 
-// Hide/show part buttons based on available data
+// Hàm ẩn/hiện các nút part dựa trên dữ liệu có sẵn
 function initializePartButtons() {
     const partButtons = {
         '1': document.getElementById("task1"),
@@ -579,23 +591,23 @@ function initializePartButtons() {
         '3': document.getElementById("task3")
     };
     
-    // Hide all part buttons first
+    // Ẩn tất cả các nút part trước
     Object.values(partButtons).forEach(button => {
         if (button) button.style.display = 'none';
     });
     
-    // Show only available parts
+    // Chỉ hiển thị các part có dữ liệu
     availableParts.forEach(part => {
         if (partButtons[part]) {
             partButtons[part].style.display = 'block';
         }
     });
     
-    // Always show overall button
+    // Luôn hiển thị nút overall
     document.getElementById("overall").style.display = 'block';
 }
 
-// Call this function when the page loads
+// Gọi hàm này khi trang load
 initializePartButtons();
 
 function getAnswersForTask(taskData) {
@@ -1045,11 +1057,19 @@ function setActiveTask(task) {
     document.getElementById("sample_seperate").innerHTML = "";
 
     const taskData = tasks[task];
-    if (!taskData) return;
+    if (!taskData) {
+        console.error("No data available for task:", task);
+        return;
+    }
 
     // Update content sections for the active task
-    document.getElementById('youpassContent').innerText = taskData.youpass || "No feedback available";
-    document.getElementById('suggestionsContent').innerText = taskData.suggestions || "No suggestions available";
+    if (taskData.youpass) {
+        document.getElementById('youpassContent').innerHTML = taskData.youpass;
+    }
+    
+    if (taskData.suggestions) {
+        document.getElementById('suggestionsContent').innerHTML = taskData.suggestions;
+    }
     document.getElementById("wordCount").innerText = taskData.wordCount || "N/A"; 
     document.getElementById("user_level").innerText = taskData.user_level || "N/A";
     document.getElementById("description_level").innerText = taskData.description_level || "N/A";
@@ -1102,23 +1122,36 @@ function setActiveTask(task) {
 
 
 
-// Modified render function to ensure it loads task-specific content
 function renderQuestionsWithAnswers(taskData, partIndex, hasStt = true) {
-    if (!taskData || !taskData.id_tests || !taskData.question_contents) return;
+    if (!taskData || !taskData.id_tests || !taskData.question_contents) {
+        console.error("Invalid task data for part", partIndex);
+        return;
+    }
     
     const idTests = taskData.id_tests;
     const stts = taskData.stts || [];
     const questionContents = taskData.question_contents;
 
     const taskAnswers = getAnswersForTask(taskData);
-    if (!taskAnswers || taskAnswers.length === 0) return;
+    if (!taskAnswers || taskAnswers.length === 0) {
+        console.error("No answers found for part", partIndex);
+        return;
+    }
 
     let questionContainer = document.getElementById("question_seperate");
     if (!questionContainer) return;
 
+    let htmlContent = '';
+    
     idTests.forEach((id_test, index) => {
+        // Kiểm tra xem có dữ liệu cho câu hỏi này không
+        if (!questionContents[index] || !taskAnswers[index]) {
+            console.warn(`Missing data for question ${index} in part ${partIndex}`);
+            return;
+        }
+
         const stt = hasStt ? stts[index] : null;
-        const questionContent = questionContents[index] || "No question content available";
+        const questionContent = questionContents[index];
         const answers = taskAnswers[index]?.answers || "No answer available";
         const link_audios = taskAnswers[index]?.link_audios || "";
 
@@ -1127,7 +1160,7 @@ function renderQuestionsWithAnswers(taskData, partIndex, hasStt = true) {
             `part-${partIndex}-idTest-${id_test}`;
         const audioContainerId = `audioContainer-${uniqueId}`;
 
-        questionContainer.innerHTML += `
+        htmlContent += `
             <div class="task-container" id="original">
                 <p class="task-description" id="taskDescription-${uniqueId}">
                     ${questionContent}
@@ -1141,11 +1174,20 @@ function renderQuestionsWithAnswers(taskData, partIndex, hasStt = true) {
             </div>
         `;
     });
+
+    // Chỉ cập nhật nếu có nội dung
+    if (htmlContent) {
+        questionContainer.innerHTML = htmlContent;
+    } else {
+        questionContainer.innerHTML = `<p>No questions available for this part</p>`;
+    }
 }
 
 function getSampleForQuestion(taskData, partIndex, hasStt = true) {
-    if (!taskData || !taskData.id_tests || !taskData.question_contents || !taskData.samples) return;
-    
+    if (!taskData || !taskData.id_tests || !taskData.question_contents || !taskData.samples) {
+        console.error("Invalid sample data for part", partIndex);
+        return;
+    }    
     const idTests = taskData.id_tests;
     const stts = taskData.stts || [];
     const questionContents = taskData.question_contents;
@@ -1180,6 +1222,8 @@ function renderOverall() {
     let questionContainer = document.getElementById("question_seperate");
     if (!questionContainer) return;
     
+    let overallContent = userAnswerAndComment?.overall_recommendation || "No overall feedback available";
+    
     questionContainer.innerHTML = `
         <div class="task-container">
             <p class="task-description" id="overall-comment">
@@ -1187,7 +1231,7 @@ function renderOverall() {
             </p>
             <div class="tab-content">
                 <p id="originalContent-comment">
-                    ${userAnswerAndComment?.overall_recommendation || "No overall feedback available"}
+                    ${overallContent}
                 </p>
             </div>
         </div>

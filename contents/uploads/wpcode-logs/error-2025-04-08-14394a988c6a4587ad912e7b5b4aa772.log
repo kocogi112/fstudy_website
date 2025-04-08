@@ -1,0 +1,12 @@
+2025-04-08T16:38:57+00:00 Cannot redeclare update_digital_sat_results_callback() (previously declared in C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code:554)
+2025-04-08T18:39:56+00:00 Uncaught Error: Call to a member function fetch_assoc() on null in C:\xampp\htdocs\wordpress\contents\themes\tutorstarter\template\topik\topik_reading\template-result.php:78
+Stack trace:
+#0 C:\xampp\htdocs\wordpress\contents\plugins\insert-headers-and-footers\includes\class-wpcode-snippet-execute.php(419) : eval()'d code(1569): include()
+#1 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(324): WPCode_Snippet_Execute->{closure}('')
+#2 C:\xampp\htdocs\wordpress\wp-includes\class-wp-hook.php(348): WP_Hook->apply_filters(NULL, Array)
+#3 C:\xampp\htdocs\wordpress\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#4 C:\xampp\htdocs\wordpress\wp-includes\template-loader.php(13): do_action('template_redire...')
+#5 C:\xampp\htdocs\wordpress\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
+#7 {main}
+  thrown

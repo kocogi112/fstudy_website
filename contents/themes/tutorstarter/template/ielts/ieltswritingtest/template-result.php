@@ -41,7 +41,7 @@ $testsavenumber = get_query_var('testsaveieltswriting');
 $custom_number = 0; // Default value
 if (!empty($results)) {
     // Assuming you want the first result's id_test
-    $custom_number = intval($results[0]->idtest);
+    $custom_number = $results[0]->idtest;
 
 }
 
@@ -168,7 +168,6 @@ get_header();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Review Interface</title>
     <style>
         /* Reset */
         * {

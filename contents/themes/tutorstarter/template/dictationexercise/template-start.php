@@ -15,7 +15,7 @@ $post_id = get_the_ID();
 $user_id = get_current_user_id();
 
 //$commentcount = get_comments_number( $post->ID );
-$custom_number =intval(get_query_var('id_test'));
+$custom_number = get_query_var('id_test');
 $current_user = wp_get_current_user();
 $current_username = $current_user->user_login;
 $username = $current_username;
@@ -1033,7 +1033,59 @@ border: 3px solid transparent;
   background-color: #298e46;
   box-shadow: rgba(20, 70, 32, .2) 0 1px 0 inset;
 }
-
+.modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.7);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .modal-content {
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+        width: 80%;
+        max-width: 700px;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    
+    .modal-nav {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+    
+    .modal-nav button {
+        padding: 8px 15px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    
+    .modal-nav button:hover {
+        background-color: #45a049;
+    }
+    
+    .modal-nav button:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+    }
+    
+    .close-modal-2 {
+        float: right;
+        cursor: pointer;
+        font-size: 20px;
+        font-weight: bold;
+    }
 
 </style>
 </head>
@@ -1079,6 +1131,14 @@ border: 3px solid transparent;
 
     <div id="content1">
    
+                <div class="modal-overlay" id="questionModal">
+                    <div class="modal-content">
+                        <span class="close-modal-2">&times;</span>
+                        <div id="modalQuestionContent"></div>
+                        
+                    </div>
+                </div>
+
 
         <div id = 'left-side' class="left-side">
         <div id = "checkpoint" class = "checkpoint">
@@ -1132,6 +1192,8 @@ border: 3px solid transparent;
 
 
       <button id="listenAgain" class="button-4" role="button"><i class="fa-solid fa-play"></i> Listen Again</button><br>
+      <button id="saveProgress" class="button-4" role="button" onclick = "saveProgress()"><i class="fa-solid fa-bars-progress"></i> Save Progress</button><br>
+
       <textarea class = "textarea" type="text" id="userInput" placeholder="Enter transcript text here"></textarea>
 
       <div class = "controls">
@@ -1157,6 +1219,8 @@ endif; ?>
     
 
     <script>
+
+
   document.addEventListener("DOMContentLoaded", function () {
     const toggleButton = document.getElementById("toggle-video-btn");
     const player = document.getElementById("player");
@@ -1177,7 +1241,38 @@ endif; ?>
       }
     });
   });
+  var modal = document.getElementById("questionModal");
+  var closeBtn = document.querySelector(".close-modal-2");
+                        
+  closeBtn.onclick = function() {
+    modal.style.display = "none";
+  }
+                                      
+  window.onclick = function(event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+     }
+  }
 
+  const currentDate = new Date();
+
+  const day = currentDate.getDate();
+  const month = currentDate.getMonth() + 1; // Adding 1 because getMonth() returns zero-based month index
+  const year = currentDate.getFullYear();
+  const dateElement = `${year}-${month}-${day}`;
+
+
+
+   function saveProgress(){
+      var modal = document.getElementById("questionModal");
+      var modalContent = document.getElementById("modalQuestionContent");
+      modalContent.innerHTML = `
+          Lưu progress: ${currentQuestion}
+          idTest: ${id_test}
+          Date: ${dateElement}       
+      `;
+      modal.style.display = "flex";
+    }
 
   function main(){
     console.log("Passed Main");
