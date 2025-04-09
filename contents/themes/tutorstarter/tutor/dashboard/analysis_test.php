@@ -41,7 +41,7 @@ if (is_user_logged_in()) {
         ['table' => 'save_user_result_digital_sat', 'base_url' => 'http://localhost/wordpress/digitalsat/', 'result_column' => 'resulttest', 'type' => 'sat'],
         ['table' => 'save_user_result_ielts_reading', 'base_url' => 'http://localhost/wordpress/ielts/r/', 'result_column' => 'overallband', 'type' => 'ielts_reading'],
         ['table' => 'save_user_result_ielts_speaking', 'base_url' => 'http://localhost/wordpress/ielts/s/', 'result_column' => 'resulttest', 'type' => 'ielts_speaking'],
-        ['table' => 'save_user_result_ielts_writing', 'base_url' => 'http://localhost/wordpress/ielts/w/', 'result_column' => 'band_score', 'type' => 'ielts_writing'],
+        ['table' => 'save_user_result_ielts_writing', 'base_url' => 'http://localhost/wordpress/ielts/w/', 'result_column' => 'resulttest', 'type' => 'ielts_writing'],
         ['table' => 'save_user_result_ielts_listening', 'base_url' => 'http://localhost/wordpress/ielts/l/', 'result_column' => 'overallband', 'type' => 'ielts_listening'],
     
         ['table' => 'save_user_result_topik_reading', 'base_url' => 'http://localhost/wordpress/topik/r/', 'result_column' => 'overallband', 'type' => 'topik_reading'],

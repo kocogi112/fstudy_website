@@ -266,8 +266,8 @@ $parts = explode(',', $question_choose);
                         ?>
                         <tr>
                             <td><?php echo esc_html($result->dateform); ?></td>
-                            <td><?php echo esc_html($result->band_score); ?></td>
-                            <td><?php echo esc_html($result->band_score_expand) ;?></td>
+                            <td><?php echo esc_html($result->resulttest); ?></td>
+                            <td><?php echo esc_html($result->band_detail) ;?></td>
                             <td><?php echo esc_html($result->timeSpent) ;?></td>
 
                             <td>

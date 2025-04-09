@@ -15,13 +15,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
 
     // Kiểm tra nếu các trường cần thiết tồn tại
-    if (isset($input['question'], $input['answer'], $input['sample'], $input['part'], $input['idquestion'])) {
+    if (isset($input['question'], $input['answer'], $input['sample'], $input['part'], $input['idquestion'], $input['data'])) {
         $question = $input['question'];
         $answer = $input['answer'];
         $sample = $input['sample'];
         $part = $input['part'];
         $idquestion = $input['idquestion'];
         $essay_type = $input['type'];
+        $data = $input['data'];
+
 
         // Gọi các hàm xử lý dữ liệu
         $grammarCheck = checkGrammarAndSpelling($answer);
@@ -41,18 +43,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Trả về dữ liệu đã nhận và kết quả phân tích
         echo json_encode([
             'status' => 'success',
-            'question' => $question, /*For dev - not show in live */
-            'answer' => $answer, 
-            'sample' => $sample, /*For dev - not show in live */
-            'part' => $part, /*For dev - not show in live */
+            'data' => $data, /*For dev - not show in live */
+
+            //'question' => $question, /*For dev - not show in live */
+            //'answer' => $answer, 
+            //'sample' => $sample, /*For dev - not show in live */
+            //'part' => $part, /*For dev - not show in live */
             'ai_route_stats' => $ai_route_stats, /*For dev - not show in live */
             'idquestion' => $idquestion,
-            'ai_response' => $ai_response, /*For dev - not show in live */
+            //'ai_response' => $ai_response, /*For dev - not show in live */
 
             'final_analysis' => [
                 'analysis' => [
-                    'grammarCheck' => $grammarCheck,
-                    'wordFrequency' => $wordFrequency,
+                   // 'grammarCheck' => $grammarCheck,
+                    //'wordFrequency' => $wordFrequency,
                     'standardCheck' => $standardCheck,
                     'linkingWordsCheck' => $linkingWordsCheck
                 ],

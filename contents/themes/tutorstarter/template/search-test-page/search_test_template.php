@@ -214,7 +214,7 @@ $query = new WP_Query($args);
         }
         elseif ($current_post_type === 'ieltswritingtests') {
             $table_res_name = 'save_user_result_ielts_writing';
-            $check_column = 'bandscore'; // Cột cần kiểm tra
+            $check_column = 'resulttest'; // Cột cần kiểm tra
         }
 
 

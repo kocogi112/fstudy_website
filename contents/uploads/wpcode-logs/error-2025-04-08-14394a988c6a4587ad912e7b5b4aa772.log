@@ -10,3 +10,9 @@ Stack trace:
 #6 C:\xampp\htdocs\wordpress\index.php(17): require('C:\\xampp\\htdocs...')
 #7 {main}
   thrown
+2025-04-08T20:38:44+00:00 syntax error, unexpected single-quoted string "save_progress_test", expecting identifier or variable or "{" or "$"
+2025-04-08T20:39:06+00:00 syntax error, unexpected single-quoted string "save_progress_test", expecting identifier or variable or "{" or "$"
+2025-04-08T20:39:22+00:00 syntax error, unexpected single-quoted string "save_progress_test", expecting identifier or variable or "{" or "$"
+2025-04-08T20:39:37+00:00 syntax error, unexpected single-quoted string "save_progress_test", expecting identifier or variable or "{" or "$"
+2025-04-08T20:40:09+00:00 Snippet "save_progress_all_test" (#1445) was automatically deactivated due to a fatal error.
+2025-04-08T20:40:09+00:00 syntax error, unexpected single-quoted string "save_progress_test", expecting identifier or variable or "{" or "$"

@@ -20,6 +20,13 @@ $current_user = wp_get_current_user();
 $current_username = $current_user->user_login;
 $username = $current_username;
 
+echo '
+<script>
+       
+    var Currentusername = "' . $username . '";
+
+</script>
+';
 
   // Database credentials
   $servername = DB_HOST;
@@ -50,9 +57,12 @@ $site_url = get_site_url();
 
 echo '
 <script>
+        var ajaxurl = "' . admin_url('admin-ajax.php') . '";
 
 var siteUrl = "' . $site_url .'";
 var id_test = "' . $id_test . '";
+var siteUrl = "' . $site_url . '";
+
 </script>
 ';
 
@@ -1056,6 +1066,28 @@ border: 3px solid transparent;
         overflow-y: auto;
     }
     
+.modal-overlay-progress {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.7);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .modal-progress {
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+        width: 80%;
+        max-width: 700px;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
     .modal-nav {
         display: flex;
         justify-content: space-between;
@@ -1081,6 +1113,12 @@ border: 3px solid transparent;
     }
     
     .close-modal-2 {
+        float: right;
+        cursor: pointer;
+        font-size: 20px;
+        font-weight: bold;
+    }
+    .close-modal-progress {
         float: right;
         cursor: pointer;
         font-size: 20px;
@@ -1131,10 +1169,21 @@ border: 3px solid transparent;
 
     <div id="content1">
    
+                  <!--Save Progress Popup-->
                 <div class="modal-overlay" id="questionModal">
                     <div class="modal-content">
                         <span class="close-modal-2">&times;</span>
                         <div id="modalQuestionContent"></div>
+                        
+                    </div>
+                </div>
+
+
+                  <!--Show Recorded Progress-->
+                <div class="modal-overlay-progress" id="questionModalProgress">
+                    <div class="modal-progress">
+                        <span class="close-modal-progress">&times;</span>
+                        <div id="modalContentProgress"></div>
                         
                     </div>
                 </div>
@@ -1192,7 +1241,8 @@ border: 3px solid transparent;
 
 
       <button id="listenAgain" class="button-4" role="button"><i class="fa-solid fa-play"></i> Listen Again</button><br>
-      <button id="saveProgress" class="button-4" role="button" onclick = "saveProgress()"><i class="fa-solid fa-bars-progress"></i> Save Progress</button><br>
+      <button id="saveProgress" class="button-4" role="button" onclick = "saveProgress()"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg> Save Progress</button><br>
+      <button id="openProgress" class="button-4" role="button" onclick = "openProgress()"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l5-5-5-5"/><path d="M13.8 12H3m9 10a10 10 0 1 0 0-20"/></svg> Open Progress</button><br>
 
       <textarea class = "textarea" type="text" id="userInput" placeholder="Enter transcript text here"></textarea>
 
@@ -1254,6 +1304,21 @@ endif; ?>
      }
   }
 
+
+  var modalProgress = document.getElementById("questionModalProgress");
+  var closeBtnProgress = document.querySelector(".close-modal-progress");
+                        
+  closeBtnProgress.onclick = function() {
+    modalProgress.style.display = "none";
+  }
+                                      
+  window.onclick = function(event) {
+    if (event.target == modalProgress) {
+      modalProgress.style.display = "none";
+     }
+  }
+
+
   const currentDate = new Date();
 
   const day = currentDate.getDate();
@@ -1262,17 +1327,142 @@ endif; ?>
   const dateElement = `${year}-${month}-${day}`;
 
 
+  function saveProgress() {
+    const modal = document.getElementById("questionModal");
+    const modalContent = document.getElementById("modalQuestionContent");
+    
+    modalContent.innerHTML = `
+        <div>
+            <p><strong>Loại test:</strong> dictation</p>
+            <p><strong>Progress:</strong> ${currentQuestion}</p>
+            <p><strong>ID Test:</strong> ${id_test}</p>
+            <p><strong>Date:</strong> ${dateElement.value || new Date().toLocaleString()}</p>
+        </div>
+        <button id="saveProgressBtn">Lưu progress</button>
+        <div id="saveResult" style="margin-top: 10px;"></div>
+    `;
+    modal.style.display = "flex";
 
-   function saveProgress(){
-      var modal = document.getElementById("questionModal");
-      var modalContent = document.getElementById("modalQuestionContent");
-      modalContent.innerHTML = `
-          Lưu progress: ${currentQuestion}
-          idTest: ${id_test}
-          Date: ${dateElement}       
-      `;
-      modal.style.display = "flex";
+    document.getElementById('saveProgressBtn').addEventListener('click', function() {
+        const btn = this;
+        const resultDiv = document.getElementById('saveResult');
+        
+        btn.disabled = true;
+        btn.textContent = 'Đang lưu...';
+        resultDiv.innerHTML = '<p>Đang xử lý...</p>';
+        
+        // Chuẩn bị data gửi đi
+        const data = {
+            action: 'save_dictation_progress',
+            username: Currentusername, // Hàm lấy username
+            id_test: id_test,
+            progress: currentQuestion,
+            date: dateElement
+        };
+
+        // Gửi AJAX đơn giản
+        fetch(ajaxurl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                resultDiv.innerHTML = '<p style="color: green;">Lưu thành công!</p>';
+            } else {
+                throw new Error(result.data?.message || 'Lỗi khi lưu progress');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            resultDiv.innerHTML = `<p style="color: red;">Lỗi: ${error.message}</p>`;
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.textContent = 'Lưu progress';
+        });
+    });
+}
+
+async function openProgress() {
+    const modal = document.getElementById("questionModalProgress");
+    const modalContent = document.getElementById("modalContentProgress");
+    
+    modalContent.innerHTML = `Loading your progress...`;
+    modal.style.display = "flex";
+
+    try {
+        const response = await fetch(`${siteUrl}/wp-json/v1/check-progress`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: Currentusername,
+                type: 'dictation',
+                id_test: id_test
+            })
+        });
+
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.message || 'Failed to fetch progress');
+        }
+
+        if (result.success && result.found) {
+            modalContent.innerHTML = `
+                <div class="progress-info">
+                    <h3>Your Progress</h3>
+                    <p><strong>Current Progress:</strong> ${result.data.progress}</p>
+                    <p><strong>Last Updated:</strong> ${result.data.date}</p>
+                    <button onclick="Continue(${result.data.progress})">Continue</button>
+                </div>
+            `;
+        } else {
+            modalContent.innerHTML = `
+                <div class="no-progress">
+                    <p>No progress record found for this test</p>
+                    <button onclick="closeModal()">Close</button>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        modalContent.innerHTML = `
+            <div class="error-message">
+                <p>Error loading progress: ${error.message}</p>
+                <button onclick="openProgress()">Retry</button>
+            </div>
+        `;
     }
+}
+
+function closeModal() {
+    const modal = document.getElementById("questionModalProgress");
+    modal.style.display = "none";
+}
+
+function Continue(savedProgress) {
+    // Đóng modal progress
+    closeModal();
+    
+    // Bắt đầu bài test
+    getStart();
+    
+    // Chuyển đến câu hỏi đã lưu
+    currentQuestion = savedProgress;
+    currentTranscriptIndex = currentQuestion - 1;
+    
+    // Cập nhật giao diện
+    updateTranscript();
+    updateQuestionNumber();
+    
+    console.log(`Continuing from question ${currentQuestion}`);
+}
 
   function main(){
     console.log("Passed Main");
@@ -1334,9 +1524,22 @@ function getStart() {
     document.getElementById("left-side").style.display = "block";
     document.getElementById("right-side").style.display = "block";
 
-    updateTranscript();
-
-    navigateTranscript(0);
+    // Khởi tạo player nếu chưa có
+    if (typeof YT !== 'undefined' && !player) {
+        player = new YT.Player('player', {
+            height: '315',
+            width: '560',
+            videoId: '<?php echo esc_html($id_video);?>',
+            playerVars: { enablejsapi: 1 },
+            events: {
+                onReady: function() {
+                    updateTranscript();
+                }
+            }
+        });
+    } else {
+        updateTranscript();
+    }
 }
 document.getElementById('listenAgain').addEventListener('click', () => {
     const currentItem = transcript[currentTranscriptIndex];
@@ -1410,31 +1613,36 @@ document.getElementById('listenAgain').addEventListener('click', () => {
 
 
 
-  
-  
-        function updateTranscript() {
-        const currentItem = transcript[currentTranscriptIndex];
-        if (currentItem) {
-            clearTimeout(timeoutId);
-            document.getElementById('transcript').innerText = currentItem.text;
-            player.seekTo(currentItem.start, true);
-            player.playVideo();
-            const duration = currentItem.duration * 1000;
-            timeoutId = setTimeout(() => player.pauseVideo(), duration);
-            updateQuestionNumber();
-        }
-    }
+        
+      function updateTranscript() {
+          const currentItem = transcript[currentTranscriptIndex];
+          if (currentItem) {
+              clearTimeout(timeoutId);
+              document.getElementById('transcript').innerText = currentItem.text;
+              document.getElementById('userInput').value = ""; // Clear input field
+              
+              // Nếu player đã sẵn sàng, seek và play
+              if (player && player.seekTo) {
+                  player.seekTo(currentItem.start, true);
+                  player.playVideo();
+                  const duration = currentItem.duration * 1000;
+                  timeoutId = setTimeout(() => player.pauseVideo(), duration);
+              }
+              
+              updateQuestionNumber();
+          }
+      }
 
-        function navigateTranscript(direction) {
+      function navigateTranscript(direction) {
           let userInput = document.getElementById("userInput");
-        userInput.value = "";
+          userInput.value = "";
 
-        currentQuestion += direction;
-        if (currentQuestion < 1) currentQuestion = 1;
-        if (currentQuestion > totalQuestions) currentQuestion = totalQuestions;
-        currentTranscriptIndex = currentQuestion - 1;
-        updateTranscript();
-    }
+          currentQuestion += direction;
+          if (currentQuestion < 1) currentQuestion = 1;
+          if (currentQuestion > totalQuestions) currentQuestion = totalQuestions;
+          currentTranscriptIndex = currentQuestion - 1;
+          updateTranscript();
+      }
 
     document.getElementById('previous').addEventListener('click', () => navigateTranscript(-1));
     document.getElementById('next').addEventListener('click', () => navigateTranscript(1));
@@ -1596,6 +1804,59 @@ else{
 
 .close-modal:hover {
     background-color: #aaa;
+}
+    #questionModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+#modalQuestionContent {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 90%;
+}
+
+.progress-info {
+    margin-bottom: 20px;
+}
+
+.progress-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.save-btn {
+    background: #4CAF50;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.close-btn {
+    background: #f44336;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.save-btn:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
 }
 </style>
 

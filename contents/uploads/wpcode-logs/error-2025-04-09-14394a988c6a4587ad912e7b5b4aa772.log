@@ -1,0 +1,272 @@
+2025-04-09T17:37:34+00:00 Snippet "Add result test online to database (and target, plan)" (#66) was automatically deactivated due to a fatal error.
+2025-04-09T17:37:34+00:00 Undefined variable ${
+  "1": {
+    "status": "success",
+    "data": {
+      "id_question": "1000",
+      "part": 1,
+      "question": "The table below gives information about the average annual distance travelled by adults and the types of travel in 1977 and 2007. Summarise the information by selecting and reporting the main features, and make comparisons where relevant.",
+      "wordCount": 259,
+      "sentenceCount": 12,
+      "paragraphCount": 4,
+      "answer": "The given table compares different means of transportation in terms of the annual distance traveled by adults in two separate years, 1977 and 2007. Units are measured in miles.nnOverall, cars were by far the most popular method of transport during the entire 40-year period, witnessing the most dramatic rise. In contrast, bicycles and motorcycles were the least common modes of transportation. Regarding changes in commuting patterns, there was an upward trend in the use of cars, trains, and taxis, while the remaining methods of transport recorded a decline.nnIn 1977, cars occupied the position as the most prevalent vehicle, with 3,500 miles traveled, nearly quadruple the distance of the second and third most popular methods, buses and trains, which ranged from 800 to 900 miles. Meanwhile, the distance traveled on foot was 400 miles on average, twice as high as that of taxis. Bicycles were as common as motorbikes, with the average distance for each vehicle standing at 100 miles.nnBy 2007, the distance traveled by car had increased twofold to 7,100 miles, solidifying its position as the most preferred mode of transportation. Similar changes were seen in the figures for trains and taxis, with the former witnessing a slight growth to 1,000 miles and the latter recording a fourfold rise to 800 miles. In contrast, the other transport methods underwent a descending trend, with the most dramatic drop recorded in buses, falling by 300 miles to reach 500 miles in 2007. The distances traveled by walking, motorbikes, and bicycles dropped to 300, 90, and 80 miles, respectively."
+    },
+    "ai_route_stats": {
+      "now_end_point": "groq",
+      "next_end_point": "glhf",
+      "api_info": {
+        "name_end_point": "groq",
+        "api_endpoint_url": "http://localhost/wordpress/wp-json/custom-api/v1/groq",
+        "api_key": "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",
+        "updated_time": "2025-01-11 22:03:51",
+        "type": "1001",
+        "all_time_use_number": "0",
+        "today_time_use_number": "0"
+      }
+    },
+    "idquestion": "1000",
+    "final_analysis": {
+      "analysis": {
+        "standardCheck": {
+          "standardQualify": "Đạt tiêu chuẩn",
+          "maxPointOverall": 8.5
+        },
+        "linkingWordsCheck": {
+          "linkingWordsCount": 0,
+          "uniqueLinkingWords": 0,
+          "foundLinkingWords": []
+        }
+      },
+      "overview_essay": {
+        "word_count": 241,
+        "sentence_count": 12,
+        "paragraph_count": 7,
+        "essay_type": "Line graph",
+        "linkingWordsCount": 0,
+        "uniqueLinkingWords": 0,
+        "foundLinkingWords": [],
+        "total_errors_count": 0,
+        "grammar_suggestions": [],
+        "word_frequency": {
+          "80": 1,
+          "100": 1,
+          "300": 1,
+          "400": 1,
+          "500": 1,
+          "800": 2,
+          "900": 1,
+          "1977": 1,
+          "the": 22,
+          "given": 1,
+          "table": 1,
+          "compares": 1,
+          "different": 1,
+          "means": 1,
+          "of": 9,
+          "transportation": 1,
+          "in": 11,
+          "terms": 1,
+          "annual": 1,
+          "distance": 5,
+          "traveled": 4,
+          "by": 6,
+          "adults": 1,
+          "two": 1,
+          "separate": 1,
+          "years,": 1,
+          "and": 9,
+          "2007.": 2,
+          "units": 1,
+          "are": 1,
+          "measured": 1,
+          "miles.": 4,
+          "overall,": 1,
+          "cars": 2,
+          "were": 4,
+          "far": 1,
+          "most": 6,
+          "popular": 2,
+          "method": 1,
+          "transport": 3,
+          "during": 1,
+          "entire": 1,
+          "40-year": 1,
+          "period,": 1,
+          "witnessing": 2,
+          "dramatic": 2,
+          "rise.": 1,
+          "contrast,": 2,
+          "bicycles": 3,
+          "motorcycles": 1,
+          "least": 1,
+          "common": 2,
+          "modes": 1,
+          "transportation.": 2,
+          "regarding": 1,
+          "changes": 2,
+          "commuting": 1,
+          "patterns,": 1,
+          "there": 1,
+          "was": 2,
+          "an": 1,
+          "upward": 1,
+          "trend": 1,
+          "use": 1,
+          "cars,": 1,
+          "trains,": 2,
+          "taxis,": 2,
+          "while": 1,
+          "remaining": 1,
+          "methods": 2,
+          "recorded": 2,
+          "a": 4,
+          "decline.": 1,
+          "1977,": 1,
+          "occupied": 1,
+          "position": 2,
+          "as": 6,
+          "prevalent": 1,
+          "vehicle,": 1,
+          "with": 4,
+          "3,500": 1,
+          "miles": 5,
+          "traveled,": 1,
+          "nearly": 1,
+          "quadruple": 1,
+          "second": 1,
+          "third": 1,
+          "methods,": 1,
+          "buses": 1,
+          "which": 1,
+          "ranged": 1,
+          "from": 1,
+          "to": 6,
+          "meanwhile,": 1,
+          "on": 2,
+          "foot": 1,
+          "average,": 1,
+          "twice": 1,
+          "high": 1,
+          "that": 1,
+          "taxis.": 1,
+          "motorbikes,": 2,
+          "average": 1,
+          "for": 2,
+          "each": 1,
+          "vehicle": 1,
+          "standing": 1,
+          "at": 1,
+          "2007,": 1,
+          "car": 1,
+          "had": 1,
+          "increased": 1,
+          "twofold": 1,
+          "7,100": 1,
+          "miles,": 2,
+          "solidifying": 1,
+          "its": 1,
+          "preferred": 1,
+          "mode": 1,
+          "similar": 1,
+          "seen": 1,
+          "figures": 1,
+          "trains": 1,
+          "former": 1,
+          "slight": 1,
+          "growth": 1,
+          "1,000": 1,
+          "latter": 1,
+          "recording": 1,
+          "fourfold": 1,
+          "rise": 1,
+          "other": 1,
+          "underwent": 1,
+          "descending": 1,
+          "trend,": 1,
+          "drop": 1,
+          "buses,": 1,
+          "falling": 1,
+          "reach": 1,
+          "distances": 1,
+          "walking,": 1,
+          "dropped": 1,
+          "300,": 1,
+          "90,": 1,
+          "respectively.": 1
+        }
+      },
+      "band": {
+        "ta": 6.5,
+        "cc": 5.5,
+        "lr": 5,
+        "gra": 4,
+        "overallband": 5.5
+      },
+      "detail_recommendation": {
+        "ta_tr": "The essay provides a good overview of the main features in the table, highlighting the changes in commuting patterns over the 40-year period. However, the paragraph structure could be improved to provide a clearer flow of ideas.",
+        "cc": "The essay has a generally logical structure, with each paragraph focusing on a specific aspect of the table. However, the transitions between paragraphs could be improved to create a smoother flow.",
+        "lr": "The vocabulary used in the essay is generally accurate, but there are some opportunities for improvement. The use of more formal and technical vocabulary could enhance the overall quality of the writing.",
+        "gra": "The essay displays some grammatical errors, such as subject-verb agreement mistakes and incorrect use of articles. Improving sentence structure and avoiding grammatical errors would enhance the overall quality of the writing."
+      },
+      "improvement_words": [
+        {
+          "original": "Overall, cars were by far the most popular method of transport during the entire 40-year period",
+          "suggestion": "Throughout the 40-year period, cars emerged as the dominant mode of transportation",
+          "reason": "Improves sentence structure and clarity"
+        },
+        {
+          "original": "witnessing the most dramatic rise",
+          "suggestion": "experienced the most significant increase",
+          "reason": "More formal vocabulary options"
+        },
+        {
+          "original": "In contrast, bicycles and motorcycles were the least common modes of transportation",
+          "suggestion": "On the other hand, bicycles and motorcycles were the least prevailing modes of transportation",
+          "reason": "Improves sentence structure and clarity"
+        },
+        {
+          "original": "Regarding changes in commuting patterns, there was an upward trend in the use of cars, trains, and taxis",
+          "suggestion": "In terms of shifts in commuting habits, a notable increase was observed in the usage of cars, trains, and taxis",
+          "reason": "Improves sentence structure and clarity"
+        },
+        {
+          "original": "the remaining methods of transport recorded a decline",
+          "suggestion": "Conversely, the other modes of transportation experienced a decline",
+          "reason": "Improves sentence structure and clarity"
+        },
+        {
+          "original": "In 1977, cars occupied the position as the most prevalent vehicle",
+          "suggestion": "In 1977, cars held the top spot as the most commonly used vehicle",
+          "reason": "Improves sentence structure and clarity"
+        },
+        {
+          "original": "with 3,500 miles traveled, nearly quadruple the distance of the second and third most popular methods",
+          "suggestion": "with an average distance of 3,500 miles, significantly exceeding the distances covered by buses and trains",
+          "reason": "Improves sentence structure and clarity"
+        },
+        {
+          "original": "By 2007, the distance traveled by car had increased twofold to 7,100 miles",
+          "suggestion": "By 2007, the average distance traveled by car had more than doubled to 7,100 miles",
+          "reason": "Improves sentence structure and clarity"
+        },
+        {
+          "original": "the distances traveled by walking, motorbikes, and bicycles dropped to 300, 90, and 80 miles, respectively",
+          "suggestion": "the average distances travelled by walking, motorbikes, and bicycles decreased to 300, 90, and 80 miles, respectively",
+          "reason": "Improves sentence structure and clarity"
+        },
+        {
+          "original": "The given table compares different means of transportation in terms of the annual distance traveled by adults in two separate years, 1977 and 2007",
+          "suggestion": "The table presents a comparison of the average annual distance traveled by adults using different modes of transportation in 1977 and 2007",
+          "reason": "Improves sentence structure and clarity"
+        }
+      ],
+      "suggestion": {
+        "improvement_suggestions": "To improve the essay, the candidate could focus on providing a clearer and more concise introduction, improving paragraph structure and flow, and using more formal and technical vocabulary. Additionally, the candidate should work on avoiding grammatical errors and improving sentence structure."
+      },
+      "top_weak_point": {
+        "weakest_score": 4,
+        "message": "Bạn đang kém nhất ở phần: Grammatical Range and Accuracy"
+      }
+    }
+  }
+}

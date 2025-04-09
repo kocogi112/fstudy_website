@@ -13,9 +13,9 @@ if (is_user_logged_in()) {
     $current_username = $current_user->user_login;
     $username = $current_username;
 
-// Get the custom number field value
-//$custom_number = get_post_meta($post_id, '_ieltswritingtests_custom_number', true);
-$custom_number = intval(get_query_var('id_test'));
+    // Get the custom number field value
+    //$custom_number = get_post_meta($post_id, '_ieltswritingtests_custom_number', true);
+    $custom_number = get_query_var('id_test');
 
   // Database credentials
   $servername = DB_HOST;
@@ -50,7 +50,7 @@ if (!$id_test) {
 
 
  // Create result_id
- $result_id = $hour . $minute . $second . $id_test . $user_id . $random_number;
+ $result_id = $hour . $minute . $second . $user_id . $random_number;
  $site_url = get_site_url();
 
  echo "<script> 
@@ -1048,7 +1048,7 @@ $conn->close();
                         <span id="correctanswer_error" class="text-danger"></span>  
                     </div>
                     <div class = "form-group"   >
-                        <input type="text"  id="band-score-expand-form" name="band-score-expand-form" placeholder="Band Score Overall - Expand"  class="form-control form_data" />
+                        <textarea type="text"  id="band-score-expand-form" name="band-score-expand-form" placeholder="Band Score Overall - Expand"  class="form-control form_data" ></textarea>
                         <span id="correctanswer_error" class="text-danger"></span>  
                     </div>
 
@@ -1850,7 +1850,7 @@ The given table compares different means of transportation in terms of the annua
 
 
     <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/full_overall_chart/full_band_chart.js"></script>
-    <script  src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/process7.js"></script>
+    <script  src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/process9.js"></script>
     
 
 
@@ -1860,7 +1860,7 @@ The given table compares different means of transportation in terms of the annua
     <script  src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/function/right_bar_feature/change-mode.js"></script>
 
 
-  <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/submitTest5.js"></script>
+  <script src="http://localhost/wordpress/contents/themes/tutorstarter/ielts-writing-toolkit/submitTest6.js"></script>
 
 
 

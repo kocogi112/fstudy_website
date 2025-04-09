@@ -983,8 +983,8 @@ function ResultInput() {
 
     
     // Add a delay before submitting the form
-/*setTimeout(function() {
+setTimeout(function() {
 // Automatically submit the form
 jQuery('#saveUserWritingTest').submit();
-}, 5000); // 5000 milliseconds = 5 seconds*/
+}, 5000); // 5000 milliseconds = 5 seconds
 }
